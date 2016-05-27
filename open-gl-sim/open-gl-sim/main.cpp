@@ -131,7 +131,10 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT); // clear the screen - will be filled with clear color set above
 
 		//draw triangle1
+		GLfloat timeValue = glfwGetTime();
 		simonSaysShader.Use();
+		glUniform1f(glGetUniformLocation(simonSaysShader.Program, "xOffset"), sin(timeValue) * 0.5);
+		glUniform1f(glGetUniformLocation(simonSaysShader.Program, "yOffset"), cos(timeValue) *0.5);
 		glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
