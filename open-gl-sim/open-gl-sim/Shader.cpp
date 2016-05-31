@@ -37,7 +37,6 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 	//compile the shaders
 	GLuint vertex, fragment;
 	GLint success;
-	GLchar infoLog[512];
 
 	//compile vertex shader
 	vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -46,6 +45,7 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 	// print compilation errors if any
 	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 	if (!success){
+		GLchar infoLog[512];
 		glGetShaderInfoLog(vertex, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	};
@@ -53,8 +53,10 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 	//compile fragment shader
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragment, 1, &fShaderCode, NULL);
+	glCompileShader(fragment);
 	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 	if (!success){
+		GLchar infoLog[512];
 		glGetShaderInfoLog(fragment, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 	};
@@ -67,6 +69,7 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 	// print out linking errors
 	glGetProgramiv(this->Program, GL_LINK_STATUS, &success);
 	if (!success) {
+		GLchar infoLog[512];
 		glGetProgramInfoLog(this->Program, 512, NULL, infoLog);
 		std::cout << "ERROR: SHADER PROGRAM LINKING FAILED\n" << infoLog << std::endl;
 	}

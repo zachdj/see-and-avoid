@@ -3,10 +3,17 @@
 #include <glew.h>
 #include <glfw3.h>
 
-#include "Shader.h"
-
 #include <iostream>
 #include <cstdio>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <SOIL.h>
+
+#include "Shader.h"
+#include "Texture.h"
 
 using namespace std;
 
@@ -51,7 +58,7 @@ int main() {
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // no resizing for you, Mr. End-User
 
 	//Time to create a window with GLFW
-	GLFWwindow* window = glfwCreateWindow(700, 600, "See and Avoid Sim", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(800, 800, "See and Avoid Sim", nullptr, nullptr);
 	if (window == nullptr) //ensure the window was initialized
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -79,26 +86,25 @@ int main() {
 	//set the clear color
 	glClearColor(0.90f, 0.90f, 0.85f, 1.0f); //off white-ish
 
-	////glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// default program
-	Shader defaultShader("default.vs", "default.fs");
+	Shader defaultShader("texture_example.vs", "texture_example.fs");
 
-	Shader simonSaysShader("simon_says.vs", "simon_says.fs");
+	//load and create the textures we'll use
+	Texture woodBoxTexture("../asset/container.jpg");
+	Texture acmeTexture("../asset/acme.jpg");
 
-	//draw a Simon-Says diamond
 	GLfloat vertices[] = {
-		-1.0f, 0.0f, 0.0f, //left
-		1.0f, 0.0f, 0.0f, //right
-		0.0f, 1.0f, 0.0f, //up
-		0.0f, -1.0f, 0.0f, //down
-		0.0f, 0.0f, 0.0f //middle
+		//positions			//colors			//texture coords
+		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // Top Right
+		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // Bottom Right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // Bottom Left
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // Top Left 
 	};
 	GLuint indices[] = {
-		0, 4, 2,
-		1, 4, 2,
-		0, 4, 3,
-		1, 4, 3
+		0, 1, 3,   // First Triangle
+		1, 2, 3    // Second Triangle
 	};
 
 	GLuint VBO, VAO, EBO;
@@ -115,11 +121,18 @@ int main() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	//set vertex attributes pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	//pointers for position, color, texture locations
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GL_FLOAT)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GL_FLOAT)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind array buffer
 	glBindVertexArray(0); //unbind vertex array	
+
+	//glm::mat4 model, view, 
 
 	//render, event, and frame buffer loop
 	while (!glfwWindowShouldClose(window))
@@ -130,14 +143,34 @@ int main() {
 		//render stuff and things
 		glClear(GL_COLOR_BUFFER_BIT); // clear the screen - will be filled with clear color set above
 
-		//draw triangle1
+		//the current time
 		GLfloat timeValue = glfwGetTime();
-		simonSaysShader.Use();
-		glUniform1f(glGetUniformLocation(simonSaysShader.Program, "xOffset"), sin(timeValue) * 0.5);
-		glUniform1f(glGetUniformLocation(simonSaysShader.Program, "yOffset"), cos(timeValue) *0.5);
+
+		//create transformation matrix
+		glm::mat4 trans;
+		trans = glm::scale(trans, glm::vec3(sin(timeValue), sin(timeValue), 0.0f));
+		trans = glm::translate(trans, glm::vec3(sin(timeValue*2)*0.6, cos(timeValue)*0.8, 0.0f));
+		trans = glm::rotate(trans, timeValue*5, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		//draw the thing
+		//the program
+		defaultShader.Use();
+		glUniformMatrix4fv(glGetUniformLocation(defaultShader.Program, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
+
+		//the box texture
+		woodBoxTexture.Use(GL_TEXTURE0);
+		glUniform1i(glGetUniformLocation(defaultShader.Program, "boxTexture"), 0);
+		// the ACME texture
+		acmeTexture.Use(GL_TEXTURE1);
+		glUniform1i(glGetUniformLocation(defaultShader.Program, "acmeTexture"), 1);
+
+		//bind VAO and draw
 		glBindVertexArray(VAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+
+		//unbind textures after drawing
+		Texture::Unbind();
 
 		// swap buffers to display what we just rendered to the back buffer
 		glfwSwapBuffers(window);
