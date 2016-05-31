@@ -42,5 +42,7 @@
     <None Include="transform_test.fs" />
     <None Include="texture_example.vs" />
     <None Include="texture_example.fs" />
+    <None Include="3d_example.vs" />
+    <None Include="3d_example.fs" />
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@ Texture::Texture(const GLchar* texturePath) {
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	// Set the texture wrapping/filtering options (on the currently bound texture object)
-	// TODO
+	// if there are any - defaults work for now
 	// Load and generate the texture
 	int width, height;
 	unsigned char* image = SOIL_load_image(texturePath, &width, &height, 0, SOIL_LOAD_RGB);
@@ -29,5 +29,5 @@ void Texture::Unbind() {
 
 Texture::~Texture()
 {
-	//glDeleteProgram(this->Program);
+	glDeleteTextures(1, &this->texture);
 }

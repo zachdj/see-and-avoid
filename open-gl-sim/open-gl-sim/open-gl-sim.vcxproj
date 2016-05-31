@@ -125,6 +125,8 @@
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="3d_example.fs" />
+    <None Include="3d_example.vs" />
     <None Include="default.fs" />
     <None Include="default.vs" />
     <None Include="simon_says.fs" />
