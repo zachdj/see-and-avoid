@@ -146,6 +146,8 @@
     <None Include="Shaders\Examples\texture_example.vs" />
     <None Include="Shaders\Examples\transform_test.fs" />
     <None Include="Shaders\Examples\transform_test.vs" />
+    <None Include="Shaders\Skybox\skybox.fs" />
+    <None Include="Shaders\Skybox\skybox.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

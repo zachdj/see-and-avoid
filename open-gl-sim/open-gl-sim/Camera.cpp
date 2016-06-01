@@ -36,9 +36,9 @@ void Camera::DoMovement(GLfloat timeValue)
 		bool rollRightActive = KeyboardHandler::keys[GLFW_KEY_D];
 		GLfloat newRoll = this->roll;
 		if (rollLeftActive && !rollRightActive) {
-			newRoll -= timeDelta * this->ROLL_NG_VELOCITY;
-		} else if(rollRightActive && !rollLeftActive){
 			newRoll += timeDelta * this->ROLL_NG_VELOCITY;
+		} else if(rollRightActive && !rollLeftActive){
+			newRoll -= timeDelta * this->ROLL_NG_VELOCITY;
 		}
 		if ( newRoll!=this->roll && newRoll <= this->MAX_ROLL && newRoll >= this->MIN_ROLL) {
 			this->roll = newRoll;

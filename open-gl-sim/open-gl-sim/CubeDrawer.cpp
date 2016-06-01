@@ -79,6 +79,9 @@ void CubeDrawer::Draw(GLfloat timeValue, Cube cubes[], GLuint count)
 	glm::mat4 view = this->camera.GetCameraViewMatrix();
 	glm::mat4 projection = this->camera.GetProjectionMatrix();
 
+
+	this->camera.DoMovement(timeValue);
+
 	glm::mat4 model;
 
 	// draw each cube

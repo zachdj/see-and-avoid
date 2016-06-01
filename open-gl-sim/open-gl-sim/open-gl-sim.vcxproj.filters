@@ -73,5 +73,7 @@
     <None Include="Shaders\Examples\default.fs" />
     <None Include="Shaders\Examples\default.vs" />
     <None Include="Shaders\Cube\Cube.fs" />
+    <None Include="Shaders\Skybox\skybox.vs" />
+    <None Include="Shaders\Skybox\skybox.fs" />
   </ItemGroup>
 </Project>
