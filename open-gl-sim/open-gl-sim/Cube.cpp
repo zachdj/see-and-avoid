@@ -9,8 +9,6 @@ Cube::Cube(glm::vec3 position)
 	this->rotationAngle = 0;
 	this->angularVelocityAxis = glm::vec3(1.0f, 0.0f, 0.0f);
 	this->angularVelocityMagnitude = 0;
-
-	this->shader = Shader("Shaders/Examples/3d_example.vs", "Shaders/Examples/3d_example.fs");
 }
 
 void Cube::SetRotation(GLfloat angle, glm::vec3 axis)

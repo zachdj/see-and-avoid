@@ -119,6 +119,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeDrawer.cpp" />
+    <ClCompile Include="KeyboardHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="Cube.h" />
     <ClInclude Include="CubeDrawer.h" />
     <ClInclude Include="IObstacle.h" />
+    <ClInclude Include="KeyboardHandler.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>

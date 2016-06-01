@@ -17,7 +17,6 @@
 		virtual void SetPosition(glm::vec3 position) = 0;
 		virtual void SetVelocity(GLfloat newVelocity, glm::vec3 direction) = 0;
 
-		Shader shader; //contains drawing instructions
 		glm::vec3 position;
 		float velocityMagnitude; //how fast to go
 		glm::vec3 velocityDirection; //what direction to go

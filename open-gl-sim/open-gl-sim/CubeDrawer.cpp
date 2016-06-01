@@ -99,10 +99,11 @@ void CubeDrawer::Draw(GLfloat timeValue, Cube cubes[], GLuint count)
 
 		//apply the cube's current position and rotation
 		model = glm::translate(model, current.position);
-		model = glm::rotate(model, glm::radians(current.rotationAngle), current.rotationAxis);
 		// apply linear velocity
 		GLfloat positionChangeMagnitude = current.velocityMagnitude * timeValue;
 		model = glm::translate(model, current.velocityDirection * positionChangeMagnitude);
+		// set current rotation
+		model = glm::rotate(model, glm::radians(current.rotationAngle), current.rotationAxis);
 		//apply angular velocity
 		model = glm::rotate(model, glm::radians(current.angularVelocityMagnitude*timeValue), current.angularVelocityAxis);
 
