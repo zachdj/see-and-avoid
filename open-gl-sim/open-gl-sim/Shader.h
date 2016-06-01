@@ -15,6 +15,7 @@ public:
 	GLuint Program;
 	// Constructor reads and builds the shaders from the given files
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+	Shader() {}
 	~Shader();
 	// Use the program
 	void Use();

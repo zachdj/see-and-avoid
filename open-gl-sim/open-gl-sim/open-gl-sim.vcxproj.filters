@@ -24,6 +24,15 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeDrawer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -32,17 +41,31 @@
     <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IObstacle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeDrawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="default.fs" />
-    <None Include="default.vs" />
-    <None Include="simon_says.vs" />
-    <None Include="simon_says.fs" />
-    <None Include="transform_test.vs" />
-    <None Include="transform_test.fs" />
-    <None Include="texture_example.vs" />
-    <None Include="texture_example.fs" />
-    <None Include="3d_example.vs" />
-    <None Include="3d_example.fs" />
+    <None Include="Shaders\Examples\3d_example.fs" />
+    <None Include="Shaders\Examples\3d_example.vs" />
+    <None Include="Shaders\Examples\simon_says.fs" />
+    <None Include="Shaders\Examples\simon_says.vs" />
+    <None Include="Shaders\Examples\texture_example.fs" />
+    <None Include="Shaders\Examples\texture_example.vs" />
+    <None Include="Shaders\Examples\transform_test.fs" />
+    <None Include="Shaders\Examples\transform_test.vs" />
+    <None Include="Shaders\Cube\cube.vs" />
+    <None Include="Shaders\Examples\default.fs" />
+    <None Include="Shaders\Examples\default.vs" />
+    <None Include="Shaders\Cube\Cube.fs" />
   </ItemGroup>
 </Project>

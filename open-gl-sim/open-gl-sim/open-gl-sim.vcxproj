@@ -116,25 +116,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="CubeDrawer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="CubeDrawer.h" />
+    <ClInclude Include="IObstacle.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="3d_example.fs" />
-    <None Include="3d_example.vs" />
-    <None Include="default.fs" />
-    <None Include="default.vs" />
-    <None Include="simon_says.fs" />
-    <None Include="simon_says.vs" />
-    <None Include="texture_example.fs" />
-    <None Include="texture_example.vs" />
-    <None Include="transform_test.fs" />
-    <None Include="transform_test.vs" />
+    <None Include="Shaders\Cube\Cube.fs" />
+    <None Include="Shaders\Cube\cube.vs" />
+    <None Include="Shaders\Examples\3d_example.fs" />
+    <None Include="Shaders\Examples\3d_example.vs" />
+    <None Include="Shaders\Examples\default.fs" />
+    <None Include="Shaders\Examples\default.vs" />
+    <None Include="Shaders\Examples\simon_says.fs" />
+    <None Include="Shaders\Examples\simon_says.vs" />
+    <None Include="Shaders\Examples\texture_example.fs" />
+    <None Include="Shaders\Examples\texture_example.vs" />
+    <None Include="Shaders\Examples\transform_test.fs" />
+    <None Include="Shaders\Examples\transform_test.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

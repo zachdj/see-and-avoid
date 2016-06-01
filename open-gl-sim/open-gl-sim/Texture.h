@@ -15,6 +15,7 @@ public:
 	// The texture ID
 	GLuint texture;
 	// Constructor reads and builds the texture from the given file
+	Texture() {};
 	Texture(const GLchar* texturePath);
 	~Texture();
 	void Use(GLuint textureUnit);
