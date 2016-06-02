@@ -9,24 +9,14 @@ Camera::Camera()
 	this->SCREEN_H = 800;
 }
 
-Camera::Camera(GLuint screenW, GLuint screenH, bool fixed_wing, glm::vec3 position)
+Camera::Camera(GLuint screenW, GLuint screenH, glm::vec3 position)
 {
-	this->FIXED_WING_MODE = fixed_wing;
-	if (fixed_wing) {
-		this->MIN_SPEED = 5.0f;
-		this->speed = this->MIN_SPEED;
-	} else {
-		this->MIN_SPEED = -this->MAX_SPEED;
-		this->speed = 0;
-	}
-
 	this->SCREEN_W = screenW;
 	this->SCREEN_H = screenH;
 
 	this->INITIAL_POSITION = position;
 	this->position = position;
 	this->previousTimeValue = 0;
-	this->direction = glm::vec3(0.0f, 0.0f, -1.0f);
 	this->pitch = 0.0f;
 	this->yaw = 0.0f;
 	this->roll = 0.0f;
@@ -37,7 +27,16 @@ Camera::Camera(GLuint screenW, GLuint screenH, bool fixed_wing, glm::vec3 positi
 void Camera::DoMovement(GLfloat timeValue)
 {
 	GLfloat timeDelta = timeValue - this->previousTimeValue;
-	if (this->FIXED_WING_MODE) {
+
+	//set fixed-wing or rotor mode for upcoming loop
+	if (KeyboardHandler::fixedWing) {
+		this->MIN_SPEED = 5.0f;
+	}
+	else {
+		this->MIN_SPEED = -this->MAX_SPEED;
+	}
+
+	if (KeyboardHandler::fixedWing) {
 		// Movement controls for a fixed wing
 
 		//roll
@@ -49,8 +48,10 @@ void Camera::DoMovement(GLfloat timeValue)
 		} else if(rollRightActive && !rollLeftActive){
 			newRoll -= timeDelta * this->ROLL_NG_VELOCITY;
 		}
-		if ( newRoll!=this->roll && newRoll <= this->MAX_ROLL && newRoll >= this->MIN_ROLL) {
+		if ( newRoll!=this->roll) {
 			this->roll = newRoll;
+			this->roll = std::fmin(this->roll, this->MAX_ROLL);
+			this->roll = std::fmax(this->roll, this->MIN_ROLL);
 		}
 		// if there is roll, then yaw should be gradually changed
 		GLfloat deltaYaw = -2.5 * timeDelta * this->roll;
@@ -66,8 +67,10 @@ void Camera::DoMovement(GLfloat timeValue)
 		else if (pitchBackwardActive && !pitchForwardActive) {
 			newPitch -= timeDelta * this->PITCH_NG_VELOCITY;
 		}
-		if (newPitch != this->pitch && newPitch <= this->MAX_PITCH && newPitch >= this->MIN_PITCH) {
+		if (newPitch != this->pitch) {
 			this->pitch = newPitch;
+			this->pitch = std::fmin(this->pitch, this->MAX_PITCH);
+			this->pitch = std::fmax(this->pitch, this->MIN_PITCH);
 		}
 
 		//yaw
@@ -191,16 +194,11 @@ void Camera::DoMovement(GLfloat timeValue)
 
 	// key sequence for resetting orientation and velocity
 	if (KeyboardHandler::keys[GLFW_KEY_LEFT_CONTROL] || KeyboardHandler::keys[GLFW_KEY_RIGHT_CONTROL]) {
-		this->pitch = 0; this->yaw = 0; this->roll = 0;
-		this->speed = 0; this->rotorStrafeSpeed = 0;
-		this->direction = glm::vec3(0.0f, 0.0f, -1.0f);
+		this->ResetOrientation();
 	} 
 	// spacebar resets the whole contraption
 	if (KeyboardHandler::keys[GLFW_KEY_SPACE]) {
-		this->pitch = 0; this->yaw = 0; this->roll = 0;
-		this->speed = 0; this->rotorStrafeSpeed = 0;
-		this->direction = glm::vec3(0.0f, 0.0f, -1.0f);
-		this->position = this->INITIAL_POSITION;
+		this->Reset();
 	}
 
 	this->previousTimeValue = timeValue;
@@ -224,6 +222,16 @@ glm::mat4 Camera::GetProjectionMatrix()
 
 glm::mat4 Camera::GetOrthoMatrix() {
 	return glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+}
+
+void Camera::ResetOrientation() {
+	this->pitch = 0; this->yaw = 0; this->roll = 0;
+	this->speed = 0; this->rotorStrafeSpeed = 0;
+}
+
+void Camera::Reset() {
+	this->ResetOrientation();
+	this->position = this->INITIAL_POSITION;
 }
 
 

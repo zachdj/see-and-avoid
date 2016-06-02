@@ -21,6 +21,7 @@ Global
 		{A63B1652-4C34-483F-BBAD-29B89D9B4857}.Release|x64.Build.0 = Release|x64
 		{A63B1652-4C34-483F-BBAD-29B89D9B4857}.Release|x86.ActiveCfg = Release|Win32
 		{A63B1652-4C34-483F-BBAD-29B89D9B4857}.Release|x86.Build.0 = Release|Win32
+		{A63B1652-4C34-483F-BBAD-29B89D9B4857}.Release|x86.Deploy.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

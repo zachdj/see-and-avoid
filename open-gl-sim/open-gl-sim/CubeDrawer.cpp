@@ -1,11 +1,11 @@
 #include "CubeDrawer.h"
+#include <vector>
 
 
-CubeDrawer::CubeDrawer(Camera & camera, Texture & tex1, Texture & tex2, Shader & defaultShader)
+CubeDrawer::CubeDrawer(Texture & tex1, Texture & tex2, Shader & defaultShader)
 {
 	this->tex1 = tex1;
 	this->tex2 = tex2;
-	this->camera = camera;
 	this->defaultShader = defaultShader;
 
 	//vertices and texture coords for a cube
@@ -74,18 +74,11 @@ CubeDrawer::CubeDrawer(Camera & camera, Texture & tex1, Texture & tex2, Shader &
 	this->VAO = VAO;
 }
 
-void CubeDrawer::Draw(GLfloat timeValue, Cube cubes[], GLuint count)
+void CubeDrawer::Draw(glm::mat4 view, glm::mat4 projection, GLfloat timeValue, std::vector<Cube>& cubes, GLuint count)
 {
-	glm::mat4 view = this->camera.GetCameraViewMatrix();
-	glm::mat4 projection = this->camera.GetProjectionMatrix();
-
-
-	this->camera.DoMovement(timeValue);
-
-	glm::mat4 model;
-
 	// draw each cube
 	for (GLuint i = 0; i < count; i++) {
+		glm::mat4 model;
 		Cube current = cubes[i];
 		this->defaultShader.Use();
 

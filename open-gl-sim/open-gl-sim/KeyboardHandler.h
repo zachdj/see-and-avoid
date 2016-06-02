@@ -12,6 +12,8 @@ public:
 
 	static bool keys[1024];
 
+	static bool fixedWing;  // will become true when the "switch planes" key is pressed.  The camera can read this value to see if it needs to switch modes
+
 };
 
 #endif

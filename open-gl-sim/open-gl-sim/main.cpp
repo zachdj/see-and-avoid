@@ -111,7 +111,7 @@ int main() {
 	glViewport(0, 0, width, height);
 
 	//initialize Camera
-	Camera camera(width, height, false, glm::vec3(0.0f, 0.0f, -10.0f));
+	Camera camera(width, height, glm::vec3(0.0f, 0.0f, -10.0f));
 	
 	//setup the key callback
 	glfwSetKeyCallback(window, key_callback);
@@ -182,34 +182,38 @@ int main() {
 
 	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
-	faces.push_back("skybox/skybox2/right.png");
-	faces.push_back("skybox/skybox2/left.png");
-	faces.push_back("skybox/skybox2/top.png");
-	faces.push_back("skybox/skybox2/bottom.png");
-	faces.push_back("skybox/skybox2/back.png");
-	faces.push_back("skybox/skybox2/front.png");
+	faces.push_back("./skybox/skybox2/right.png");
+	faces.push_back("./skybox/skybox2/left.png");
+	faces.push_back("./skybox/skybox2/top.png");
+	faces.push_back("./skybox/skybox2/bottom.png");
+	faces.push_back("./skybox/skybox2/back.png");
+	faces.push_back("./skybox/skybox2/front.png");
 	GLuint cubemapTexture = loadCubemap(faces);
 
-	Shader skyboxShader("Shaders/Skybox/skybox.vs", "Shaders/Skybox/skybox.fs");
+	Shader skyboxShader("./Shaders/Skybox/skybox.vs", "./Shaders/Skybox/skybox.fs");
 	
 
-	//create a cube!
-	Cube myCube1(glm::vec3(0.0f, 0.0f, -15.0f));
-	Cube myCube2(glm::vec3(0.0f, 0.0f, -30.0f));
-	Cube myCube3(glm::vec3(0.0f, 0.0f, -60.0f));
-	Cube myCube4(glm::vec3(0.0f, 0.0f, -90.0f));
-	Cube myCube5(glm::vec3(0.0f, 0.0f, -120.0f));
-	Cube myCube6(glm::vec3(0.0f, 0.0f, -150.0f));
-	Cube myCube7(glm::vec3(0.0f, 0.0f, -180.0f));
-	//myCube.SetVelocity(10.0f, glm::vec3(0.0f, 0.0f, 4.0f));
-	//myCube1.SetAngularVelocity(12.0f, glm::vec3(1.0f, 0.5f, 0.2f));
-	Cube toDraw[] = { myCube1, myCube2, myCube3, myCube4, myCube5, myCube6, myCube7};
-	//Cube toDraw[] = { myCube1 };
+	//create some cubes!
+	vector<Cube> myCubes;
+	//cube tunnel!
+	for (int i = 0; i < 250; i++) {
+		Cube newCube1(glm::vec3(3.0f * sin(i), 3.0 * cos(i), -10.0f * i));
+		Cube newCube2(glm::vec3(-3.0f * sin(i), -3.0 * cos(i), -10.0f * i));
+		Cube newCube3(glm::vec3(3.0f * sin(i + 3.14159/2), 3.0f * cos(i + 3.14159 / 2), -10.0f * i));
+		Cube newCube4(glm::vec3(-3.0 * sin(i + 3.14159*2.5), -3.0f * cos(i + 3.14159*2.5), -10.0f * i));
+		myCubes.push_back(newCube1);
+		myCubes.push_back(newCube2);
+		myCubes.push_back(newCube3);
+		myCubes.push_back(newCube4);
+	}
+	GLuint cubeCount = myCubes.size();
+	//Cube toDraw[] = { myCube1, myCube2, myCube3, myCube4, myCube5, myCube6, myCube7, myCube8};
+	
 	//create a CubeDrawer
-	Shader defaultShader("Shaders/Cube/cube.vs", "Shaders/Cube/cube.fs");
+	Shader defaultShader("./Shaders/Cube/cube.vs", "./Shaders/Cube/cube.fs");
 	Texture woodBoxTexture("../asset/container.jpg");
 	Texture acmeTexture("../asset/acme.jpg");
-	CubeDrawer drawer(camera, woodBoxTexture, acmeTexture, defaultShader);
+	CubeDrawer drawer(woodBoxTexture, acmeTexture, defaultShader);
 	
 	//render, event, and frame buffer loop
 	while (!glfwWindowShouldClose(window))
@@ -243,9 +247,11 @@ int main() {
 		glDepthMask(GL_TRUE);
 
 		// draw other (non-skybox) objects below
-		drawer.Draw(timeValue, toDraw, 7);
+		view = camera.GetCameraViewMatrix();
+		projection = camera.GetProjectionMatrix();
+		drawer.Draw(view, projection, timeValue, myCubes, cubeCount);
 
-		// swap buffers to display what we just rendered to the back buffer
+		// swap buffers to display what we just rendered on the back buffer
 		glfwSwapBuffers(window);
 	}
 
