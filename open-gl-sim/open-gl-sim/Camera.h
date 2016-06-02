@@ -23,13 +23,15 @@ class Camera
 		~Camera();
 
 	private :
-		GLfloat MAX_SPEED = 15.0f;
+		GLfloat MAX_SPEED = 50.0f;
 		GLfloat MIN_PITCH = -90.0f; GLfloat MAX_PITCH = 90.0f;
 		GLfloat MIN_ROLL = -45.0f; GLfloat MAX_ROLL = 45.0f;
 		GLfloat PITCH_NG_VELOCITY = 15.0f; // degrees / second
 		GLfloat ROLL_NG_VELOCITY = 15.0f;
-		GLfloat YAW_NG_VELOCITY = 15.0f;
+		GLfloat YAW_NG_VELOCITY = 4.0f; // pure yaw is slow for fixed-wings I think
+		GLfloat ACCELERATION = 10.0f; // units / second
 		bool FIXED_WING_MODE;
+		GLfloat MIN_SPEED;
 		GLuint SCREEN_W;
 		GLuint SCREEN_H;
 

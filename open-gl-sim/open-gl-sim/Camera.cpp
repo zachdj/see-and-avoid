@@ -12,11 +12,17 @@ Camera::Camera()
 Camera::Camera(GLuint screenW, GLuint screenH, bool fixed_wing, glm::vec3 position)
 {
 	this->FIXED_WING_MODE = fixed_wing;
+	if (fixed_wing) {
+		this->MIN_SPEED = 5.0f;
+	} else {
+		this->MIN_SPEED = 0.0f;
+	}
+
 	this->SCREEN_W = screenW;
 	this->SCREEN_H = screenH;
 
 	this->previousTimeValue = 0;
-	this->speed = 0.0f;
+	this->speed = this->MIN_SPEED;
 	this->position = position;
 	this->direction = glm::vec3(0.0f, 0.0f, -1.0f);
 	this->pitch = 0.0f;
@@ -43,16 +49,19 @@ void Camera::DoMovement(GLfloat timeValue)
 		if ( newRoll!=this->roll && newRoll <= this->MAX_ROLL && newRoll >= this->MIN_ROLL) {
 			this->roll = newRoll;
 		}
+		// if there is roll, then yaw should be gradually changed
+		GLfloat deltaYaw = -2.5 * timeDelta * this->roll;
+		this->yaw += deltaYaw;
 
 		//pitch
 		bool pitchForwardActive = KeyboardHandler::keys[GLFW_KEY_W];
 		bool pitchBackwardActive = KeyboardHandler::keys[GLFW_KEY_S];
 		GLfloat newPitch = this->pitch;
 		if (pitchForwardActive && !pitchBackwardActive) {
-			newPitch -= timeDelta * this->PITCH_NG_VELOCITY;
+			newPitch += timeDelta * this->PITCH_NG_VELOCITY;
 		}
 		else if (pitchBackwardActive && !pitchForwardActive) {
-			newPitch += timeDelta * this->PITCH_NG_VELOCITY;
+			newPitch -= timeDelta * this->PITCH_NG_VELOCITY;
 		}
 		if (newPitch != this->pitch && newPitch <= this->MAX_PITCH && newPitch >= this->MIN_PITCH) {
 			this->pitch = newPitch;
@@ -73,14 +82,36 @@ void Camera::DoMovement(GLfloat timeValue)
 		}
 
 		// acceleration
+		bool accelerateActive = KeyboardHandler::keys[GLFW_KEY_UP];
+		bool decelerateActive = KeyboardHandler::keys[GLFW_KEY_DOWN];
+		GLfloat newSpeed = this->speed;
+		if (accelerateActive && !decelerateActive) {
+			newSpeed += timeDelta * this->ACCELERATION;
+		}
+		else if (decelerateActive && !accelerateActive) {
+			newSpeed -= timeDelta * this->ACCELERATION;
+		}
+		//clamp speed b/t min and max values
+		this->speed = newSpeed;
+		this->speed = std::fmin(this->speed, this->MAX_SPEED);
+		this->speed = std::fmax(this->speed, this->MIN_SPEED);
 
+
+		//move UAV forward along current direction if speed > 0
+		if (this->speed > 0) {
+			//find direction
+			glm::vec3 direction;
+			direction.x = cos(glm::radians(this->pitch)) * cos(glm::radians(this->yaw + 90));
+			direction.y = sin(glm::radians(this->pitch));
+			direction.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw + 90));
+			glm::vec3 unitDirection = glm::normalize(direction);
+			this->position = this->position + this->speed * timeDelta * unitDirection;
+		}
 
 	}
 	else {
 		// Movement controls for a rotor
 	}
-
-	//move UAV forward along current direction if velocity != 0
 
 	this->previousTimeValue = timeValue;
 }

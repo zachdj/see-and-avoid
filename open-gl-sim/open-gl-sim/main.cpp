@@ -24,11 +24,6 @@
 
 using namespace std;
 
-static void error_callback(int error, const char* description)
-{
-	fputs(description, stderr);
-}
-
 // Loads a cubemap texture from 6 individual texture faces
 // Order should be:
 // +X (right)
@@ -62,10 +57,20 @@ GLuint loadCubemap(vector<const GLchar*> faces)
 	return textureID;
 }
 
+
+static void error_callback(int error, const char* description)
+{
+	fputs(description, stderr);
+}
+
 //responds to keyboard events
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	KeyboardHandler::handle_key_press(window, key, scancode, action, mods);	
+	//handle escape key
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
 }
 
 int main() {
@@ -190,15 +195,16 @@ int main() {
 
 	//create a cube!
 	Cube myCube1(glm::vec3(0.0f, 0.0f, -15.0f));
-	Cube myCube2(glm::vec3(-2.0f, 1.0f, 0.0f));
-	Cube myCube3(glm::vec3(0.0f, 0.0f, 0.0f));
-	Cube myCube4(glm::vec3(2.0f, -1.0f, 0.0f));
-	Cube myCube5(glm::vec3(4.0f, 1.0f, 0.0f));
-	Cube myCube6(glm::vec3(3.0f, 0.0f, 0.0f));
+	Cube myCube2(glm::vec3(0.0f, 0.0f, -30.0f));
+	Cube myCube3(glm::vec3(0.0f, 0.0f, -60.0f));
+	Cube myCube4(glm::vec3(0.0f, 0.0f, -90.0f));
+	Cube myCube5(glm::vec3(0.0f, 0.0f, -120.0f));
+	Cube myCube6(glm::vec3(0.0f, 0.0f, -150.0f));
+	Cube myCube7(glm::vec3(0.0f, 0.0f, -180.0f));
 	//myCube.SetVelocity(10.0f, glm::vec3(0.0f, 0.0f, 4.0f));
 	//myCube1.SetAngularVelocity(12.0f, glm::vec3(1.0f, 0.5f, 0.2f));
-	//Cube toDraw[] = { myCube1, myCube2, myCube3, myCube4, myCube5, myCube6};
-	Cube toDraw[] = { myCube1 };
+	Cube toDraw[] = { myCube1, myCube2, myCube3, myCube4, myCube5, myCube6, myCube7};
+	//Cube toDraw[] = { myCube1 };
 	//create a CubeDrawer
 	Shader defaultShader("Shaders/Cube/cube.vs", "Shaders/Cube/cube.fs");
 	Texture woodBoxTexture("../asset/container.jpg");
@@ -237,7 +243,7 @@ int main() {
 		glDepthMask(GL_TRUE);
 
 		// draw other (non-skybox) objects below
-		drawer.Draw(timeValue, toDraw, 1);
+		drawer.Draw(timeValue, toDraw, 7);
 
 		// swap buffers to display what we just rendered to the back buffer
 		glfwSwapBuffers(window);
