@@ -177,12 +177,12 @@ int main() {
 
 	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
-	faces.push_back("skybox/skybox3/right.jpg");
-	faces.push_back("skybox/skybox3/left.jpg");
-	faces.push_back("skybox/skybox3/top.jpg");
-	faces.push_back("skybox/skybox3/bottom.jpg");
-	faces.push_back("skybox/skybox3/back.jpg");
-	faces.push_back("skybox/skybox3/front.jpg");
+	faces.push_back("skybox/skybox2/right.png");
+	faces.push_back("skybox/skybox2/left.png");
+	faces.push_back("skybox/skybox2/top.png");
+	faces.push_back("skybox/skybox2/bottom.png");
+	faces.push_back("skybox/skybox2/back.png");
+	faces.push_back("skybox/skybox2/front.png");
 	GLuint cubemapTexture = loadCubemap(faces);
 
 	Shader skyboxShader("Shaders/Skybox/skybox.vs", "Shaders/Skybox/skybox.fs");

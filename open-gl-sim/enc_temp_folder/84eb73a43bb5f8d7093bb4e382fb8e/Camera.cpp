@@ -74,7 +74,6 @@ void Camera::DoMovement(GLfloat timeValue)
 
 		// acceleration
 
-
 	}
 	else {
 		// Movement controls for a rotor
