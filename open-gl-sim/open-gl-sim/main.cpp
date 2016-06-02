@@ -111,7 +111,7 @@ int main() {
 	glViewport(0, 0, width, height);
 
 	//initialize Camera
-	Camera camera(width, height, true, glm::vec3(0.0f, 0.0f, -10.0f));
+	Camera camera(width, height, false, glm::vec3(0.0f, 0.0f, -10.0f));
 	
 	//setup the key callback
 	glfwSetKeyCallback(window, key_callback);

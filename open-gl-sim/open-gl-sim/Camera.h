@@ -23,21 +23,27 @@ class Camera
 		~Camera();
 
 	private :
-		GLfloat MAX_SPEED = 50.0f;
+		GLfloat MAX_SPEED = 50.0f; // distance units / second
 		GLfloat MIN_PITCH = -90.0f; GLfloat MAX_PITCH = 90.0f;
 		GLfloat MIN_ROLL = -45.0f; GLfloat MAX_ROLL = 45.0f;
 		GLfloat PITCH_NG_VELOCITY = 15.0f; // degrees / second
 		GLfloat ROLL_NG_VELOCITY = 15.0f;
-		GLfloat YAW_NG_VELOCITY = 4.0f; // pure yaw is slow for fixed-wings I think
+		GLfloat YAW_NG_VELOCITY = 4.0f; // pure yaw without roll is pretty slow for fixed-wings I think
+		GLfloat ROTOR_YAW_NG_VELOCITY = 60.0f; // yaw is much faster for rotors
 		GLfloat ACCELERATION = 10.0f; // units / second
+		GLfloat ROTOR_ACCELERATION = 15.0f;
+		GLfloat ROTOR_VERTICAL_VELOCITY = 8.0f;
+		GLfloat MAX_ROTOR_PITCH = 25.0f; //degrees
 		bool FIXED_WING_MODE;
 		GLfloat MIN_SPEED;
+		glm::vec3 INITIAL_POSITION;
 		GLuint SCREEN_W;
 		GLuint SCREEN_H;
 
 		GLfloat previousTimeValue;
 		glm::vec3 position;
 		GLfloat speed;
+		GLfloat rotorStrafeSpeed;
 		glm::vec3 direction;
 		// For ease of development and debugging, all angles are in degrees.  They are converted to rads by glm::radians
 		GLfloat pitch;
