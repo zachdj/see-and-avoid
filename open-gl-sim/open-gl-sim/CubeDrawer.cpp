@@ -74,10 +74,10 @@ CubeDrawer::CubeDrawer(Texture & tex1, Texture & tex2, Shader & defaultShader)
 	this->VAO = VAO;
 }
 
-void CubeDrawer::Draw(glm::mat4 view, glm::mat4 projection, GLfloat timeValue, std::vector<Cube>& cubes, GLuint count)
+void CubeDrawer::Draw(glm::mat4 view, glm::mat4 projection, GLfloat timeValue, std::vector<Cube>& cubes)
 {
 	// draw each cube
-	for (GLuint i = 0; i < count; i++) {
+	for (GLuint i = 0; i < cubes.size(); i++) {
 		glm::mat4 model;
 		Cube current = cubes[i];
 		this->defaultShader.Use();

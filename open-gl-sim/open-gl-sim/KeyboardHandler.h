@@ -1,6 +1,4 @@
 #pragma once
-#ifndef KEYBOARDHANDLER_H
-#define KEYBOARDHANDLER_H
 
 #include <glew.h>
 #include <glfw3.h>
@@ -15,6 +13,4 @@ public:
 	static bool fixedWing;  // will become true when the "switch planes" key is pressed.  The camera can read this value to see if it needs to switch modes
 
 };
-
-#endif
 

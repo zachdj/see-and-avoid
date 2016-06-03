@@ -1,5 +1,4 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include <string>
 #include <fstream>
@@ -20,6 +19,4 @@ public:
 	// Use the program
 	void Use();
 };
-
-#endif
 

@@ -1,5 +1,4 @@
 //Credit to Joey DeVries of learnopengl.com for the model-loading class.  I've modified it slightly to work on windows and with this application
-
 #pragma once
 // Std. Includes
 #include <string>
@@ -10,7 +9,7 @@
 #include <vector>
 using namespace std;
 // GL Includes
-#include <glew.h> // Contains all the necessery OpenGL includes
+#include <glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <SOIL.h>
@@ -20,8 +19,7 @@ using namespace std;
 
 #include "Mesh.h"
 #include "Shader.h"
-
-GLint TextureFromFile(const char* path, string directory);
+#include "FileUtils.h"
 
 class Model
 {
@@ -175,7 +173,7 @@ private:
 			if (!skip)
 			{   // If texture hasn't been loaded already, load it
 				TextureStruct texture;
-				texture.id = TextureFromFile(str.C_Str(), this->directory);
+				texture.id = FileUtils::TextureFromFile(str.C_Str(), this->directory);
 				texture.type = typeName;
 				texture.path = str;
 				textures.push_back(texture);
@@ -185,31 +183,3 @@ private:
 		return textures;
 	}
 };
-
-
-
-
-GLint TextureFromFile(const char* path, string directory)
-{
-	//Generate texture ID and load texture data 
-	cout << directory.c_str() << " at " << path << std::endl;
-	string filename = string(path);
-	filename = directory + '\\' + filename;
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-	int width, height;
-	unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
-	// Assign texture to ID
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image);
-	return textureID;
-}

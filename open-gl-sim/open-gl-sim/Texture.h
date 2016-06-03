@@ -1,6 +1,4 @@
 #pragma once
-#ifndef TEXTURE_H
-#define TEXTURE_H
 
 #include <string>
 #include <sstream>
@@ -21,6 +19,4 @@ public:
 	void Use(GLuint textureUnit);
 	static void Unbind();
 };
-
-#endif
 

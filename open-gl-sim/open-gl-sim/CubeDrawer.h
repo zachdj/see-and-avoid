@@ -1,6 +1,4 @@
 #pragma once
-#ifndef CUBEDRAWER_H
-#define CUBEDRAWER_H
 
 #include "Cube.h"
 #include "Camera.h"
@@ -16,7 +14,7 @@ class CubeDrawer
 {
 public:
 	CubeDrawer(Texture & tex1, Texture & tex2, Shader & defaultShader);
-	void Draw(glm::mat4 view, glm::mat4 projection, GLfloat timeValue, std::vector<Cube> & toDraw, GLuint count);
+	void Draw(glm::mat4 view, glm::mat4 projection, GLfloat timeValue, std::vector<Cube> & toDraw);
 	~CubeDrawer();
 
 	Texture tex1;
@@ -24,6 +22,4 @@ public:
 	GLuint VAO;
 	Shader defaultShader;
 };
-
-#endif
 

@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef CAMERA_H
-#define CAMERA_H
-
 #include <glew.h>; // Include glew to get all the required OpenGL headers
 
 #include <glm/glm.hpp>
@@ -57,6 +54,3 @@ class Camera
 		void ResetOrientation();
 		void Reset();
 };
-
-#endif
-
