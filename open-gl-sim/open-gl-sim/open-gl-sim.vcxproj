@@ -83,7 +83,8 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;SOIL.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,7 +105,8 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;SOIL.lib;assimp.lib;assimp.dll;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,6 +137,8 @@
     <ClInclude Include="CubeDrawer.h" />
     <ClInclude Include="IObstacle.h" />
     <ClInclude Include="KeyboardHandler.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
@@ -151,8 +155,20 @@
     <None Include="Shaders\Examples\texture_example.vs" />
     <None Include="Shaders\Examples\transform_test.fs" />
     <None Include="Shaders\Examples\transform_test.vs" />
+    <None Include="Shaders\ModelLoading\model_loading.fs" />
+    <None Include="Shaders\ModelLoading\model_loading.vs" />
     <None Include="Shaders\Skybox\skybox.fs" />
     <None Include="Shaders\Skybox\skybox.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="asset\acme.jpg" />
+    <Image Include="asset\container.jpg" />
+    <Image Include="skybox\skybox2\back.png" />
+    <Image Include="skybox\skybox2\bottom.png" />
+    <Image Include="skybox\skybox2\front.png" />
+    <Image Include="skybox\skybox2\left.png" />
+    <Image Include="skybox\skybox2\right.png" />
+    <Image Include="skybox\skybox2\top.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

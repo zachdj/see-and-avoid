@@ -13,11 +13,15 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <SOIL.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include "KeyboardHandler.h"
 
 #include "Shader.h"
-#include "Texture.h"
+//#include "Texture.h"
+#include "Model.h"
 #include "Camera.h"
 #include "Cube.h"
 #include "CubeDrawer.h"
@@ -182,15 +186,15 @@ int main() {
 
 	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
-	faces.push_back("./skybox/skybox2/right.png");
-	faces.push_back("./skybox/skybox2/left.png");
-	faces.push_back("./skybox/skybox2/top.png");
-	faces.push_back("./skybox/skybox2/bottom.png");
-	faces.push_back("./skybox/skybox2/back.png");
-	faces.push_back("./skybox/skybox2/front.png");
+	faces.push_back(".\\skybox\\skybox2\\right.png");
+	faces.push_back(".\\skybox\\skybox2\\left.png");
+	faces.push_back(".\\skybox\\skybox2\\top.png");
+	faces.push_back(".\\skybox\\skybox2\\bottom.png");
+	faces.push_back(".\\skybox\\skybox2\\back.png");
+	faces.push_back(".\\skybox\\skybox2\\front.png");
 	GLuint cubemapTexture = loadCubemap(faces);
 
-	Shader skyboxShader("./Shaders/Skybox/skybox.vs", "./Shaders/Skybox/skybox.fs");
+	Shader skyboxShader(".\\Shaders\\Skybox\\skybox.vs", ".\\Shaders\\Skybox\\skybox.fs");
 	
 
 	//create some cubes!
@@ -207,13 +211,18 @@ int main() {
 		myCubes.push_back(newCube4);
 	}
 	GLuint cubeCount = myCubes.size();
-	//Cube toDraw[] = { myCube1, myCube2, myCube3, myCube4, myCube5, myCube6, myCube7, myCube8};
 	
 	//create a CubeDrawer
-	Shader defaultShader("./Shaders/Cube/cube.vs", "./Shaders/Cube/cube.fs");
-	Texture woodBoxTexture("../asset/container.jpg");
-	Texture acmeTexture("../asset/acme.jpg");
+	Shader defaultShader(".\\Shaders\\Cube\\cube.vs", ".\\Shaders\\Cube\\cube.fs");
+	Texture woodBoxTexture(".\\asset\\container.jpg");
+	Texture acmeTexture(".\\asset\\acme.jpg");
 	CubeDrawer drawer(woodBoxTexture, acmeTexture, defaultShader);
+
+	// Setup and compile our shaders
+	Shader shader(".\\Shaders\\ModelLoading\\model_loading.vs", ".\\Shaders\\ModelLoading\\model_loading.fs");
+
+	// Load models
+	Model ourModel(".\\Models\\plane\\plane.obj");
 	
 	//render, event, and frame buffer loop
 	while (!glfwWindowShouldClose(window))
@@ -230,13 +239,15 @@ int main() {
 		//maybe combine these two calls
 		camera.DoMovement(timeValue);
 
+		glm::mat4 projection, view;
+
 		//render skybox
 		glDepthMask(GL_FALSE);
 		skyboxShader.Use();
 		// Set view and projection matrix
-		glm::mat4 view = glm::mat4(glm::mat3(camera.GetCameraViewMatrix()));	// Remove any translation component of the view matrix
+		view = glm::mat4(glm::mat3(camera.GetCameraViewMatrix()));	// Remove any translation component of the view matrix
 		//glm::mat4 view = camera.GetCameraViewMatrix();
-		glm::mat4 projection = camera.GetProjectionMatrix();
+		projection = camera.GetProjectionMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		//draw skybox first
@@ -250,6 +261,20 @@ int main() {
 		view = camera.GetCameraViewMatrix();
 		projection = camera.GetProjectionMatrix();
 		drawer.Draw(view, projection, timeValue, myCubes, cubeCount);
+
+		// Draw the loaded model
+		shader.Use();   // <-- Don't forget this one!
+						// Transformation matrices
+		projection = camera.GetProjectionMatrix();
+		view = camera.GetCameraViewMatrix();
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glm::mat4 model;
+
+		model = glm::translate(model, glm::vec3(0.0f, 1.0f, -40.0f));
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		ourModel.Draw(shader);
 
 		// swap buffers to display what we just rendered on the back buffer
 		glfwSwapBuffers(window);

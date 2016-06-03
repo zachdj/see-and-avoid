@@ -59,6 +59,12 @@
     <ClInclude Include="KeyboardHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Examples\3d_example.fs" />
@@ -75,5 +81,33 @@
     <None Include="Shaders\Cube\Cube.fs" />
     <None Include="Shaders\Skybox\skybox.vs" />
     <None Include="Shaders\Skybox\skybox.fs" />
+    <None Include="Shaders\ModelLoading\model_loading.vs" />
+    <None Include="Shaders\ModelLoading\model_loading.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="asset\acme.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="asset\container.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\skybox2\back.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\skybox2\bottom.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\skybox2\front.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\skybox2\left.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\skybox2\right.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\skybox2\top.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
