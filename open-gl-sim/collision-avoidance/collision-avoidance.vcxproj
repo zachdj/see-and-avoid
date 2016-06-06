@@ -69,13 +69,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib/openCV;$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\lib\openCV;C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\lib;$(LibraryPath)</LibraryPath>
-    <ReferencePath>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\collision-avoidance\bin;$(ReferencePath)</ReferencePath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib/openCV;$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,10 +88,12 @@
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY "$(SolutionDir)"\lib\*.DLL "$(TargetDir)" /D /K /Y</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>copy DLLs</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

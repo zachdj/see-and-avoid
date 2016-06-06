@@ -8,3 +8,5 @@
 *.opendb
 *.obj
 *.log
+
+*/Debug/*
