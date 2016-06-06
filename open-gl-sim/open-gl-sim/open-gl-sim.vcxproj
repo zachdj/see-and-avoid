@@ -69,12 +69,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
