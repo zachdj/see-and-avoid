@@ -105,7 +105,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;SOIL.lib;assimp.lib;assimp.dll;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;SOIL.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Users\Zach Jones\Documents\Develop\see-and-avoid\open-gl-sim\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -149,6 +149,8 @@
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\Aircraft\aircraft.fs" />
+    <None Include="Shaders\Aircraft\aircraft.vs" />
     <None Include="Shaders\Cube\Cube.fs" />
     <None Include="Shaders\Cube\cube.vs" />
     <None Include="Shaders\Examples\3d_example.fs" />
@@ -161,8 +163,6 @@
     <None Include="Shaders\Examples\texture_example.vs" />
     <None Include="Shaders\Examples\transform_test.fs" />
     <None Include="Shaders\Examples\transform_test.vs" />
-    <None Include="Shaders\ModelLoading\model_loading.fs" />
-    <None Include="Shaders\ModelLoading\model_loading.vs" />
     <None Include="Shaders\Skybox\skybox.fs" />
     <None Include="Shaders\Skybox\skybox.vs" />
   </ItemGroup>

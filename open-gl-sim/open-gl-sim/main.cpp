@@ -13,15 +13,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <SOIL.h>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 #include "KeyboardHandler.h"
 
 #include "Shader.h"
-//#include "Texture.h"
-//#include "Model.h"
 #include "Camera.h"
 #include "Cube.h"
 #include "CubeDrawer.h"
@@ -221,16 +216,17 @@ int main() {
 	CubeDrawer drawer(woodBoxTexture, acmeTexture, defaultShader);
 
 	// Setup and compile our shaders
-	Shader shader(".\\Shaders\\ModelLoading\\model_loading.vs", ".\\Shaders\\ModelLoading\\model_loading.fs");
+	Shader acShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 
 	// Load models
 	//Model ourModel(".\\Models\\plane\\plane.obj");
-	Aircraft plane(glm::vec3(0.0f, 0.0f, -400.0f), ".\\Models\\plane\\plane.obj");
-	plane.SetVelocity(40.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	Aircraft plane(glm::vec3(0.0f, 0.0f, -500.0f), ".\\Models\\plane\\plane.obj");
+	plane.SetVelocity(20.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	plane.SetAngularVelocity(45.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 	vector<Aircraft> myplanes;
 	myplanes.push_back(plane);
 
-	AircraftDrawer acDrawer(woodBoxTexture, shader);
+	AircraftDrawer acDrawer(woodBoxTexture, acShader);
 	
 	//render, event, and frame buffer loop
 	while (!glfwWindowShouldClose(window))
@@ -270,21 +266,8 @@ int main() {
 		projection = camera.GetProjectionMatrix();
 		drawer.Draw(view, projection, timeValue, myCubes);
 
+		//draw aircraft
 		acDrawer.Draw(view, projection, timeValue, myplanes);
-
-		// Draw the loaded model
-		//shader.Use();   // <-- Don't forget this one!
-		//// Transformation matrices
-		//projection = camera.GetProjectionMatrix();
-		//view = camera.GetCameraViewMatrix();
-		//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		//glm::mat4 model;
-
-		//model = glm::translate(model, glm::vec3(0.0f, 1.0f, -40.0f));
-		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-		//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		//ourModel.Draw(shader);
 
 		// swap buffers to display what we just rendered on the back buffer
 		glfwSwapBuffers(window);

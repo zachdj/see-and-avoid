@@ -16,7 +16,8 @@ void AircraftDrawer::Draw(glm::mat4 view, glm::mat4 projection, GLfloat timeValu
 
 		// load up textures
 		this->tex.Use(GL_TEXTURE0);
-		glUniform1i(glGetUniformLocation(this->shader.Program, "texture"), 0);
+		GLuint uniformLoc = glGetUniformLocation(this->shader.Program, "texture_diffuse1");
+		glUniform1i(glGetUniformLocation(this->shader.Program, "texture_diffuse1"), 0);
 
 		// Draw the loaded model
 		glUniformMatrix4fv(glGetUniformLocation(this->shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));

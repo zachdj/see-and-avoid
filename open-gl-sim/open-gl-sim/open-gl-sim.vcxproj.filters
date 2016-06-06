@@ -99,8 +99,8 @@
     <None Include="Shaders\Cube\Cube.fs" />
     <None Include="Shaders\Skybox\skybox.vs" />
     <None Include="Shaders\Skybox\skybox.fs" />
-    <None Include="Shaders\ModelLoading\model_loading.vs" />
-    <None Include="Shaders\ModelLoading\model_loading.fs" />
+    <None Include="Shaders\Aircraft\aircraft.fs" />
+    <None Include="Shaders\Aircraft\aircraft.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="asset\acme.jpg">
