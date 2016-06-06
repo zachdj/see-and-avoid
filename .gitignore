@@ -6,7 +6,6 @@
 *.idb
 *.db
 *.opendb
-*.obj
 *.log
 
 */Debug/*
