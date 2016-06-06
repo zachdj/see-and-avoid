@@ -88,8 +88,13 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // this will cause openGL to raise an error when we try to call legacy library functions
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // no resizing for you, Mr. End-User
 
+	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+	GLuint width = mode->width;
+	GLuint height = mode->height;
+
 	//Time to create a window with GLFW
-	GLFWwindow* window = glfwCreateWindow(1600, 900, "See and Avoid Sim", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(width, height, "See and Avoid Sim", nullptr, nullptr);
 	if (window == nullptr) //ensure the window was initialized
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -106,11 +111,6 @@ int main() {
 		return -1;
 	}
 
-	//get viewport dimensions from GLFW and initialize OpenGL
-	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
-	glViewport(0, 0, width, height);
-
 	//initialize Camera
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, -10.0f));
 	
@@ -118,12 +118,12 @@ int main() {
 	glfwSetKeyCallback(window, key_callback);
 
 	//set the clear color
-	glClearColor(0.8f, 0.9f, 1.0f, 1.0f); // sky blue or close
+	glClearColor(0.8f, 0.9f, 1.0f, 1.0f); // sky blue-ish;  We should never see this if the skybox is working
 
 	//tell openGL to use depth testing
 	glEnable(GL_DEPTH_TEST);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to enable Wireframe mode
 	
 	GLfloat skyboxVertices[] = {
 		// Positions          
