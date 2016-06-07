@@ -3,10 +3,18 @@
 *.exe
 *.ilk
 *.pdb
+*.tlog
 *.idb
 *.db
 *.opendb
 *.log
 *.sdf
-*/Debug/*
+*.user
+*.filters
+
+*.obj
+~*.model.obj
+
+Debug/
+Release/
 

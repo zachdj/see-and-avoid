@@ -1,3 +1,9 @@
+#pragma once
+
+#define _ITERATOR_DEBUG_LEVEL 0
+#include <opencv2\opencv.hpp>
+using namespace cv;
+
 
 #define GLEW_STATIC
 #include <glew.h>
@@ -15,7 +21,6 @@
 #include <SOIL.h>
 
 #include "KeyboardHandler.h"
-
 #include "Shader.h"
 #include "Camera.h"
 #include "Cube.h"
@@ -67,7 +72,7 @@ static void error_callback(int error, const char* description)
 //responds to keyboard events
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	KeyboardHandler::handle_key_press(window, key, scancode, action, mods);	
+	KeyboardHandler::handle_key_press(window, key, scancode, action, mods);
 	//handle escape key
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -77,7 +82,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 int main() {
 	//set error CB function
 	glfwSetErrorCallback(error_callback);
-	
+
 	//try to intialize GLFW
 	if (glfwInit() != GL_TRUE) {
 		exit(EXIT_FAILURE);
@@ -94,7 +99,7 @@ int main() {
 	GLuint height = mode->height;
 
 	//Time to create a window with GLFW
-	GLFWwindow* window = glfwCreateWindow(width, height, "See and Avoid Sim", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(width, width, "See and Avoid Sim", nullptr, nullptr);
 	if (window == nullptr) //ensure the window was initialized
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -113,7 +118,7 @@ int main() {
 
 	//initialize Camera
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, -10.0f));
-	
+
 	//setup the key callback
 	glfwSetKeyCallback(window, key_callback);
 
@@ -124,7 +129,7 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to enable Wireframe mode
-	
+
 	GLfloat skyboxVertices[] = {
 		// Positions          
 		-1.0f,  1.0f, -1.0f,
@@ -192,23 +197,23 @@ int main() {
 	GLuint cubemapTexture = loadCubemap(faces);
 
 	Shader skyboxShader(".\\Shaders\\Skybox\\skybox.vs", ".\\Shaders\\Skybox\\skybox.fs");
-	
+
 
 	//create some cubes!
 	vector<Cube> myCubes;
 	//cube tunnel!
 	for (int i = 0; i < 250; i++) {
-		Cube newCube1(glm::vec3(3.0f * sin(i), 3.0 * cos(i), -10.0f * i));
-		Cube newCube2(glm::vec3(-3.0f * sin(i), -3.0 * cos(i), -10.0f * i));
-		Cube newCube3(glm::vec3(3.0f * sin(i + 3.14159/2), 3.0f * cos(i + 3.14159 / 2), -10.0f * i));
-		Cube newCube4(glm::vec3(-3.0 * sin(i + 3.14159*2.5), -3.0f * cos(i + 3.14159*2.5), -10.0f * i));
+		Cube newCube1(glm::vec3(3.0f * sin(i), 3.0 * cos(i) + exp(0.1 * i), -10.0f * i));
+		Cube newCube2(glm::vec3(-3.0f * sin(i), -3.0 * cos(i) + exp(0.1 * i), -10.0f * i));
+		Cube newCube3(glm::vec3(3.0f * sin(i + 3.14159 / 2), 3.0f * cos(i + 3.14159 / 2) + exp(0.1 * i), -10.0f * i));
+		Cube newCube4(glm::vec3(-3.0 * sin(i + 3.14159*2.5), -3.0f * cos(i + 3.14159*2.5) + exp(0.1 * i), -10.0f * i));
 		myCubes.push_back(newCube1);
 		myCubes.push_back(newCube2);
 		myCubes.push_back(newCube3);
 		myCubes.push_back(newCube4);
 	}
 	GLuint cubeCount = myCubes.size();
-	
+
 	//create a CubeDrawer
 	Shader defaultShader(".\\Shaders\\Cube\\cube.vs", ".\\Shaders\\Cube\\cube.fs");
 	Texture woodBoxTexture(".\\asset\\container.jpg");
@@ -227,20 +232,25 @@ int main() {
 	myplanes.push_back(plane);
 
 	AircraftDrawer acDrawer(woodBoxTexture, acShader);
-	
+
+	//openCV camera display
+	VideoCapture cap(0); // open the default camera
+	if (!cap.isOpened()) {
+		return -1;
+	}
+	Mat edges;
+	namedWindow("edges", 1);
+
 	//render, event, and frame buffer loop
 	while (!glfwWindowShouldClose(window))
 	{
 		// poll for events
 		glfwPollEvents();
-
-		//clear screen and reander clear color (this should be covered by skybox)
+		// clear screen and render clear color (this should be covered by skybox)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the screen - will be filled with clear color set above
-
-		//the current time
+		// the current time in seconds
 		GLfloat timeValue = glfwGetTime();
 
-		//maybe combine these two calls
 		camera.DoMovement(timeValue);
 
 		glm::mat4 projection, view;
@@ -250,7 +260,6 @@ int main() {
 		skyboxShader.Use();
 		// Set view and projection matrix
 		view = glm::mat4(glm::mat3(camera.GetCameraViewMatrix()));	// Remove any translation component of the view matrix
-		//glm::mat4 view = camera.GetCameraViewMatrix();
 		projection = camera.GetProjectionMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -268,6 +277,16 @@ int main() {
 
 		//draw aircraft
 		acDrawer.Draw(view, projection, timeValue, myplanes);
+
+		//openCV stuff
+		Mat frame;
+		cap >> frame; // get a new frame from camera
+		cvtColor(frame, edges, CV_BGR2GRAY);
+		GaussianBlur(edges, edges, Size(7, 7), 1.5, 1.5);
+		Canny(edges, edges, 0, 30, 3);
+		imshow("edges", edges);
+		if (waitKey(30) >= 0) break;
+
 
 		// swap buffers to display what we just rendered on the back buffer
 		glfwSwapBuffers(window);
