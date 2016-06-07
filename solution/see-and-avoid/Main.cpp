@@ -4,7 +4,6 @@
 #include <opencv2\opencv.hpp>
 using namespace cv;
 
-
 #define GLEW_STATIC
 #include <glew.h>
 #include <glfw3.h>
@@ -63,7 +62,7 @@ int main() {
 	GLuint height = mode->height;
 
 	//Time to create a window with GLFW
-	GLFWwindow* window = glfwCreateWindow(width, width, "See and Avoid Sim", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(width/2.0, height/2.0, "See and Avoid Sim", nullptr, nullptr);
 	if (window == nullptr) //ensure the window was initialized
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -122,7 +121,7 @@ int main() {
 	Shader acShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 	Aircraft plane(glm::vec3(0.0f, 0.0f, -500.0f), ".\\Models\\plane\\plane.obj");
 	plane.SetVelocity(20.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	plane.SetAngularVelocity(45.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	//plane.SetAngularVelocity(45.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 	vector<Aircraft> myplanes;
 	myplanes.push_back(plane);
 
@@ -134,7 +133,8 @@ int main() {
 		return -1;
 	}
 	Mat edges;
-	namedWindow("edges", 1);
+	namedWindow("edges", 0);
+	resizeWindow("edges", width / 2.0, height / 2.0);
 
 	//render, event, and frame buffer loop
 	while (!glfwWindowShouldClose(window))
@@ -157,18 +157,26 @@ int main() {
 		//draw skybox
 		skybox.Draw(view, projection);
 
-		drawer.Draw(view, projection, timeValue, myCubes);
+		//drawer.Draw(view, projection, timeValue, myCubes);
 
 		//draw aircraft
 		acDrawer.Draw(view, projection, timeValue, myplanes);
 
 		//openCV stuff
-		Mat frame;
-		cap >> frame; // get a new frame from camera
-		cvtColor(frame, edges, CV_BGR2GRAY);
-		GaussianBlur(edges, edges, Size(7, 7), 1.5, 1.5);
-		Canny(edges, edges, 0, 30, 3);
-		imshow("edges", edges);
+
+		//create an empty matrix to hold frame data
+		cv::Mat img(height/2.0, width/2.0, CV_8UC3);
+		//use fast 4-byte alignment if possible
+		glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4);
+		//set length of one complete row in destination data (doesn't need to equal img.cols)
+		glPixelStorei(GL_PACK_ROW_LENGTH, img.step / img.elemSize()); 
+		glReadPixels(0, 0, img.cols, img.rows, GL_BGR, GL_UNSIGNED_BYTE, img.data);
+		cv::flip(img, img, 0);
+		//cvtColor(img, img, CV_BGR2GRAY);
+		//GaussianBlur(img, img, Size(7, 7), 1.5, 1.5);
+		Canny(img, img, 180, 180, 3);
+
+		imshow("edges", img);
 		if (waitKey(30) >= 0) break;
 
 		// swap buffers to display what we just rendered on the back buffer
