@@ -11,16 +11,14 @@ using namespace cv;
 
 #include <iostream>
 #include <cstdio>
-#include <algorithm>
 #include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <SOIL.h>
-
 #include "KeyboardHandler.h"
+#include "Skybox.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "Cube.h"
@@ -29,40 +27,6 @@ using namespace cv;
 #include "AircraftDrawer.h"
 
 using namespace std;
-
-// Loads a cubemap texture from 6 individual texture faces
-// Order should be:
-// +X (right)
-// -X (left)
-// +Y (top)
-// -Y (bottom)
-// +Z (front) 
-// -Z (back)
-GLuint loadCubemap(vector<const GLchar*> faces)
-{
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-
-	int width, height;
-	unsigned char* image;
-
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-	for (GLuint i = 0; i < faces.size(); i++)
-	{
-		image = SOIL_load_image(faces[i], &width, &height, 0, SOIL_LOAD_RGB);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-		SOIL_free_image_data(image);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-	return textureID;
-}
-
 
 static void error_callback(int error, const char* description)
 {
@@ -129,84 +93,18 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to enable Wireframe mode
-
-	GLfloat skyboxVertices[] = {
-		// Positions          
-		-1.0f,  1.0f, -1.0f,
-		-1.0f, -1.0f, -1.0f,
-		1.0f, -1.0f, -1.0f,
-		1.0f, -1.0f, -1.0f,
-		1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-
-		-1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
-
-		1.0f, -1.0f, -1.0f,
-		1.0f, -1.0f,  1.0f,
-		1.0f,  1.0f,  1.0f,
-		1.0f,  1.0f,  1.0f,
-		1.0f,  1.0f, -1.0f,
-		1.0f, -1.0f, -1.0f,
-
-		-1.0f, -1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		1.0f,  1.0f,  1.0f,
-		1.0f,  1.0f,  1.0f,
-		1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
-
-		-1.0f,  1.0f, -1.0f,
-		1.0f,  1.0f, -1.0f,
-		1.0f,  1.0f,  1.0f,
-		1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f, -1.0f,
-
-		-1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		1.0f, -1.0f, -1.0f,
-		1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		1.0f, -1.0f,  1.0f
-	};
-
-	// Setup skybox VAO
-	GLuint skyboxVAO, skyboxVBO;
-	glGenVertexArrays(1, &skyboxVAO);
-	glGenBuffers(1, &skyboxVBO);
-	glBindVertexArray(skyboxVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glBindVertexArray(0);
-
-	// Cubemap (Skybox)
-	vector<const GLchar*> faces;
-	faces.push_back(".\\skybox\\skybox2\\right.png");
-	faces.push_back(".\\skybox\\skybox2\\left.png");
-	faces.push_back(".\\skybox\\skybox2\\top.png");
-	faces.push_back(".\\skybox\\skybox2\\bottom.png");
-	faces.push_back(".\\skybox\\skybox2\\back.png");
-	faces.push_back(".\\skybox\\skybox2\\front.png");
-	GLuint cubemapTexture = loadCubemap(faces);
-
+	
 	Shader skyboxShader(".\\Shaders\\Skybox\\skybox.vs", ".\\Shaders\\Skybox\\skybox.fs");
-
+	Skybox skybox = Skybox(skyboxShader);
 
 	//create some cubes!
 	vector<Cube> myCubes;
 	//cube tunnel!
 	for (int i = 0; i < 250; i++) {
-		Cube newCube1(glm::vec3(3.0f * sin(i), 3.0 * cos(i) + exp(0.1 * i), -10.0f * i));
-		Cube newCube2(glm::vec3(-3.0f * sin(i), -3.0 * cos(i) + exp(0.1 * i), -10.0f * i));
-		Cube newCube3(glm::vec3(3.0f * sin(i + 3.14159 / 2), 3.0f * cos(i + 3.14159 / 2) + exp(0.1 * i), -10.0f * i));
-		Cube newCube4(glm::vec3(-3.0 * sin(i + 3.14159*2.5), -3.0f * cos(i + 3.14159*2.5) + exp(0.1 * i), -10.0f * i));
+		Cube newCube1(glm::vec3(3.0f * sin(i), 3.0 * cos(i) , -10.0f * i));
+		Cube newCube2(glm::vec3(-3.0f * sin(i), -3.0 * cos(i) , -10.0f * i));
+		Cube newCube3(glm::vec3(3.0f * sin(i + 3.14159 / 2), 3.0f * cos(i + 3.14159 / 2) , -10.0f * i));
+		Cube newCube4(glm::vec3(-3.0 * sin(i + 3.14159*2.5), -3.0f * cos(i + 3.14159*2.5) , -10.0f * i));
 		myCubes.push_back(newCube1);
 		myCubes.push_back(newCube2);
 		myCubes.push_back(newCube3);
@@ -220,11 +118,8 @@ int main() {
 	Texture acmeTexture(".\\asset\\acme.jpg");
 	CubeDrawer drawer(woodBoxTexture, acmeTexture, defaultShader);
 
-	// Setup and compile our shaders
+	// create a planeDrawer
 	Shader acShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
-
-	// Load models
-	//Model ourModel(".\\Models\\plane\\plane.obj");
 	Aircraft plane(glm::vec3(0.0f, 0.0f, -500.0f), ".\\Models\\plane\\plane.obj");
 	plane.SetVelocity(20.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 	plane.SetAngularVelocity(45.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -255,24 +150,13 @@ int main() {
 
 		glm::mat4 projection, view;
 
-		//render skybox
-		glDepthMask(GL_FALSE);
-		skyboxShader.Use();
-		// Set view and projection matrix
-		view = glm::mat4(glm::mat3(camera.GetCameraViewMatrix()));	// Remove any translation component of the view matrix
-		projection = camera.GetProjectionMatrix();
-		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		//draw skybox first
-		glBindVertexArray(skyboxVAO);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-		glDepthMask(GL_TRUE);
-
 		// draw other (non-skybox) objects below
 		view = camera.GetCameraViewMatrix();
 		projection = camera.GetProjectionMatrix();
+
+		//draw skybox
+		skybox.Draw(view, projection);
+
 		drawer.Draw(view, projection, timeValue, myCubes);
 
 		//draw aircraft
@@ -286,7 +170,6 @@ int main() {
 		Canny(edges, edges, 0, 30, 3);
 		imshow("edges", edges);
 		if (waitKey(30) >= 0) break;
-
 
 		// swap buffers to display what we just rendered on the back buffer
 		glfwSwapBuffers(window);
