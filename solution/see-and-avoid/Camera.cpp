@@ -54,7 +54,7 @@ void Camera::DoMovement(GLfloat timeValue)
 			this->roll = std::fmax(this->roll, this->MIN_ROLL);
 		}
 		// if there is roll, then yaw should be gradually changed
-		GLfloat deltaYaw = -2.5 * timeDelta * this->roll;
+		GLfloat deltaYaw = -1.25 * timeDelta * this->roll;
 		this->yaw += deltaYaw;
 
 		//pitch

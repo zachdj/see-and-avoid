@@ -1,13 +1,15 @@
-#include "AircraftDrawer.h"
+#include "PlaneDrawer.h"
 
-AircraftDrawer::AircraftDrawer(Texture & tex, Shader & aircraftShader)
+PlaneDrawer::PlaneDrawer(Texture & tex, Shader & planeShader)
 {
 	this->tex = tex;
-	this->shader = aircraftShader;
+	this->shader = planeShader;
 	this->previousTimeStep = 0;
 }
 
-void AircraftDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPosition, GLfloat timeValue, std::vector<Aircraft*> & toDraw)
+const float PlaneDrawer::YAW_PER_ROLL = 0.5f;
+
+void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPosition, GLfloat timeValue, std::vector<Aircraft*> & toDraw)
 {
 	GLfloat timeDelta = timeValue - this->previousTimeStep;
 
@@ -18,7 +20,7 @@ void AircraftDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPos
 	GLuint uniformLoc = glGetUniformLocation(this->shader.Program, "texture_diffuse1");
 	glUniform1i(glGetUniformLocation(this->shader.Program, "texture_diffuse1"), 0);
 
-	// draw each aircraft passed
+	// draw each plane passed to the method
 	for (GLuint i = 0; i < toDraw.size(); i++) {
 		Aircraft* current = toDraw[i];
 
@@ -26,17 +28,29 @@ void AircraftDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPos
 		glUniformMatrix4fv(glGetUniformLocation(this->shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(this->shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-		//apply the aircraft's current position and rotation
-		// apply linear velocity to change position
-		GLfloat positionChangeMagnitude = current->velocityMagnitude * timeDelta;
-		current->position = current->position + current->velocityDirection * positionChangeMagnitude;
-		// apply new position
+
+		//account for roll
+		// if there is roll, then yaw should be gradually changed
+		GLfloat deltaYaw = PlaneDrawer::YAW_PER_ROLL * timeDelta * current->roll;
+		current->yaw += deltaYaw;
+
+		// determine aircraft direction from pitch, roll, and velocity and update position
+		glm::vec3 direction;
+		direction.x = cos(glm::radians(current->pitch)) * cos(glm::radians(current->yaw + 90));
+		direction.y = sin(glm::radians(current->pitch));
+		direction.z = cos(glm::radians(current->pitch)) * sin(glm::radians(current->yaw + 90));
+		glm::vec3 unitDirection = glm::normalize(direction);
+		current->position = current->position + current->speed * timeDelta * unitDirection;
+
+
 		glm::mat4 model;
+		// translate to current position
 		model = glm::translate(model, current->position);
-		// set current rotation
-		model = glm::rotate(model, glm::radians(current->rotationAngle), current->rotationAxis);
-		//apply angular velocity
-		model = glm::rotate(model, glm::radians(current->angularVelocityMagnitude*timeValue), current->angularVelocityAxis);
+		// apply orientation
+		model = glm::rotate(model, glm::radians(current->pitch), glm::vec3(-1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(current->yaw), glm::vec3(0.0f, -1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(current->roll), glm::vec3(0.0f, 0.0f, 1.0f));
+		// planes need to be scaled (the normal model is massive)
 		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
 		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
@@ -49,7 +63,7 @@ void AircraftDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPos
 		current->model.Draw(this->shader);
 
 		//detect collision with camera:
-		GLfloat collisionRadius = 40.0f; // change this to be a property of the aircraft!
+		GLfloat collisionRadius = current->collisionRadius;
 		if (distanceToCam < collisionRadius && !current->hasCollided) {
 			std::cout << "Collision with Aircraft detected!" << std::endl;
 			current->hasCollided = true;
@@ -64,6 +78,6 @@ void AircraftDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPos
 	this->previousTimeStep = timeValue;
 }
 
-AircraftDrawer::~AircraftDrawer()
+PlaneDrawer::~PlaneDrawer()
 {
 }

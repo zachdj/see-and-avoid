@@ -23,7 +23,7 @@ using namespace cv;
 #include "Cube.h"
 #include "CubeDrawer.h"
 #include "Aircraft.h"
-#include "AircraftDrawer.h"
+#include "PlaneDrawer.h"
 
 using namespace std;
 
@@ -100,10 +100,10 @@ int main() {
 	vector<Cube> myCubes;
 	//cube tunnel!
 	for (int i = 0; i < 250; i++) {
-		Cube newCube1(glm::vec3(3.0f * sin(i), 3.0 * cos(i) , -10.0f * i));
-		Cube newCube2(glm::vec3(-3.0f * sin(i), -3.0 * cos(i) , -10.0f * i));
-		Cube newCube3(glm::vec3(3.0f * sin(i + 3.14159 / 2), 3.0f * cos(i + 3.14159 / 2) , -10.0f * i));
-		Cube newCube4(glm::vec3(-3.0 * sin(i + 3.14159*2.5), -3.0f * cos(i + 3.14159*2.5) , -10.0f * i));
+		Cube newCube1(glm::vec3(5.0f * sin(i), 5.0 * cos(i) , -10.0f * i));
+		Cube newCube2(glm::vec3(-5.0f * sin(i), -5.0 * cos(i) , -10.0f * i));
+		Cube newCube3(glm::vec3(5.0f * sin(i + 3.14159 / 2), 5.0f * cos(i + 3.14159 / 2) , -10.0f * i));
+		Cube newCube4(glm::vec3(-5.0 * sin(i + 3.14159*2.5), -5.0f * cos(i + 3.14159*2.5) , -10.0f * i));
 		myCubes.push_back(newCube1);
 		myCubes.push_back(newCube2);
 		myCubes.push_back(newCube3);
@@ -118,17 +118,16 @@ int main() {
 	CubeDrawer drawer(woodBoxTexture, acmeTexture, defaultShader);
 
 	// create a planeDrawer
-	Shader acShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
+	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 	vector< Aircraft*> myplanes;
-	for (int i = 0; i < 10; i++) {
-		Aircraft * plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1000.0f * (i+1)), ".\\Models\\plane\\plane.obj");
-		plane->SetVelocity(250.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-		plane->SetRotation(45.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-		//plane.SetAngularVelocity(45.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	for (int i = 0; i < 1; i++) {
+		Aircraft * plane = new Aircraft(glm::vec3(0.0f, 0.0f, -200.0f * (i+1)), 40.0f, ".\\Models\\plane\\plane.obj");
+		plane->SetSpeed(10.0f * (i+1));
+		plane->SetOrientation(0.0f, 0.0f, 0.0f);
 		myplanes.push_back(plane);
 	}
 
-	AircraftDrawer acDrawer(woodBoxTexture, acShader);
+	PlaneDrawer planeDrawer(woodBoxTexture, planeShader);
 
 	//openCV camera display
 	VideoCapture cap(0); // open the default camera
@@ -160,10 +159,10 @@ int main() {
 		//draw skybox
 		skybox.Draw(view, projection);
 
-		//drawer.Draw(view, projection, timeValue, myCubes);
+		drawer.Draw(view, projection, timeValue, myCubes);
 
 		//draw aircraft
-		acDrawer.Draw(view, projection, camera.GetPosition(), timeValue, myplanes);
+		planeDrawer.Draw(view, projection, camera.GetPosition(), timeValue, myplanes);
 
 		//openCV stuff
 
@@ -180,7 +179,7 @@ int main() {
 		Canny(img, img, 180, 180, 3);
 
 		imshow("edges", img);
-		if (waitKey(30) >= 0) break;
+		//if (waitKey(30) >= 0) break;
 
 		// swap buffers to display what we just rendered on the back buffer
 		glfwSwapBuffers(window);
