@@ -28,6 +28,76 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 		glUniformMatrix4fv(glGetUniformLocation(this->shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(this->shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
+		// This code changes the plane's orientation to navigate to its current waypoint
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
+		if (current->IsAutonomous()) {
+			// get the active waypoint
+			Waypoint * active = current->GetPath()->GetActiveWaypoint();
+			if (active != nullptr) {
+				glm::vec3 activePosition = active->GetPosition();
+				//check if we are within the completion radius of the waypoint
+				GLfloat distSqrd = pow(current->position.x - activePosition.x, 2) + pow(current->position.y - activePosition.y, 2) + pow(current->position.z - activePosition.z, 2);
+				if (distSqrd < pow(current->GetPath()->waypointCompletionRadius, 2)) {
+					current->GetPath()->CompleteWaypoint();
+				}
+				else {
+					//TODO: navigate toward active
+					//horizontal navigation in the x-z plane
+					glm::vec3 planeDirection;
+					planeDirection.x = cos(glm::radians(current->pitch)) * cos(glm::radians(current->yaw + 90));
+					planeDirection.y = sin(glm::radians(current->pitch));
+					planeDirection.z = cos(glm::radians(current->pitch)) * sin(glm::radians(current->yaw + 90));
+					planeDirection = glm::normalize(planeDirection);
+
+					glm::vec3 vectorToObject;
+					vectorToObject.x = activePosition.x - current->position.x;
+					vectorToObject.y = activePosition.y - current->position.y;
+					vectorToObject.z = activePosition.z - current->position.z;
+					vectorToObject = glm::normalize(vectorToObject);
+
+					/*GLfloat a = line1End.x - line1Start.x;
+					GLfloat b = line1End.y - line1Start.y;
+					GLfloat c = line2End.x - line2Start.x;
+					GLfloat d = line2End.y - line2Start.y;*/
+				
+					/*GLfloat atanA = atan2(planeDirection.z, planeDirection.x);
+					GLfloat atanB = atan2(vectorToObject.z, vectorToObject.x);
+
+					GLfloat angle = atanA - atanB;*/
+					//GLfloat angle = asin(glm::length(glm::cross(planeDirection, vectorToObject)));
+
+					//GLfloat angle = acos(glm::dot(planeDirection, vectorToObject));
+
+					GLfloat dotProd = glm::dot(planeDirection, vectorToObject);
+					// safety check before using acos:
+					if (dotProd < -1.0) dotProd = -1.0f;
+					else if (dotProd > 1.0) dotProd = 1.0f;
+					GLfloat angleMagnitude = acos(dotProd);
+					GLfloat angleSign = 1.0f;
+					glm::vec3 normalToPlane = glm::cross(vectorToObject, planeDirection);
+					if (glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), normalToPlane) > 0) {
+						angleSign = -1.0f;
+					}
+					GLfloat angle = angleSign * angleMagnitude;
+
+					GLfloat sigmoid = 2 / (1 + exp(-25 * (angle))) - 1;
+					//GLfloat rollPct = angle / glm::radians(90.0f);
+					current->roll = -sigmoid * 50.0f;
+
+					std::cout << "sigmoid: " << sigmoid << std::endl;
+					std::cout << "angle: " << angle << std::endl;
+				}
+			}	
+			else {
+
+			}
+		} // else proceed as normal
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
+		// The following code advances the plane forward along its current orientation
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//account for roll
 		// if there is roll, then yaw should be gradually changed

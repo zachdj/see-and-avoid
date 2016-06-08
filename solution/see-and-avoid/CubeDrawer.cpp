@@ -102,6 +102,7 @@ void CubeDrawer::Draw(glm::mat4 view, glm::mat4 projection, GLfloat timeValue, s
 		model = glm::rotate(model, glm::radians(current.rotationAngle), current.rotationAxis);
 		//apply angular velocity
 		model = glm::rotate(model, glm::radians(current.angularVelocityMagnitude*timeValue), current.angularVelocityAxis);
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 
 		glUniformMatrix4fv(glGetUniformLocation(this->defaultShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 

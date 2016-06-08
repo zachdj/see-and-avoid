@@ -123,10 +123,12 @@
     <ClCompile Include="CubeDrawer.cpp" />
     <ClCompile Include="KeyboardHandler.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="PlaneDrawer.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Waypoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aircraft.h" />
@@ -138,10 +140,12 @@
     <ClInclude Include="KeyboardHandler.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="PlaneDrawer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Waypoint.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp.dll" />

@@ -23,5 +23,6 @@ public:
 
 private:
 	static const GLfloat YAW_PER_ROLL; // how much does the yaw change for every degree of roll?
+	static const GLfloat MAX_NG_ROLL_VELOCITY;
 };
 

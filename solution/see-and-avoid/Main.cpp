@@ -99,7 +99,7 @@ int main() {
 	//create some cubes!
 	vector<Cube> myCubes;
 	//cube tunnel!
-	for (int i = 0; i < 250; i++) {
+	/*for (int i = 0; i < 250; i++) {
 		Cube newCube1(glm::vec3(5.0f * sin(i), 5.0 * cos(i) , -10.0f * i));
 		Cube newCube2(glm::vec3(-5.0f * sin(i), -5.0 * cos(i) , -10.0f * i));
 		Cube newCube3(glm::vec3(5.0f * sin(i + 3.14159 / 2), 5.0f * cos(i + 3.14159 / 2) , -10.0f * i));
@@ -108,8 +108,7 @@ int main() {
 		myCubes.push_back(newCube2);
 		myCubes.push_back(newCube3);
 		myCubes.push_back(newCube4);
-	}
-	GLuint cubeCount = myCubes.size();
+	}*/
 
 	//create a CubeDrawer
 	Shader defaultShader(".\\Shaders\\Cube\\cube.vs", ".\\Shaders\\Cube\\cube.fs");
@@ -120,14 +119,31 @@ int main() {
 	// create a planeDrawer
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 	vector< Aircraft*> myplanes;
-	for (int i = 0; i < 1; i++) {
+	/*for (int i = 0; i < 1; i++) {
 		Aircraft * plane = new Aircraft(glm::vec3(0.0f, 0.0f, -200.0f * (i+1)), 40.0f, ".\\Models\\plane\\plane.obj");
 		plane->SetSpeed(10.0f * (i+1));
 		plane->SetOrientation(0.0f, 0.0f, 0.0f);
 		myplanes.push_back(plane);
-	}
-
+	}*/
+	vector<Waypoint *> waypoints;
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -200.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(200.0f, 0.0f, -400.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -800.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-200.0f, 0.0f, -400.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -200.0f)));
+	Path myPath = Path(waypoints, 20.0f);
+	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -25.0f), myPath, 40.0f, ".\\Models\\plane\\plane.obj");
+	plane->SetSpeed(60.0f);
+	plane->SetOrientation(0.0f, 180.0f, 0.0f);
+	myplanes.push_back(plane);
 	PlaneDrawer planeDrawer(woodBoxTexture, planeShader);
+
+	//create a cube at each waypoint
+	myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, -200.0f)));
+	myCubes.push_back( Cube(glm::vec3(200.0f, 0.0f, -400.0f)));
+	myCubes.push_back( Cube(glm::vec3(0.0f, 0.0f, -800.0f)));
+	myCubes.push_back( Cube(glm::vec3(-200.0f, 0.0f, -400.0f)));
+	myCubes.push_back( Cube(glm::vec3(0.0f, 0.0f, -200.0f)));
 
 	//openCV camera display
 	VideoCapture cap(0); // open the default camera
