@@ -119,11 +119,14 @@ int main() {
 
 	// create a planeDrawer
 	Shader acShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
-	Aircraft plane(glm::vec3(0.0f, 0.0f, -500.0f), ".\\Models\\plane\\plane.obj");
-	plane.SetVelocity(20.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	//plane.SetAngularVelocity(45.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	vector<Aircraft> myplanes;
-	myplanes.push_back(plane);
+	vector< Aircraft*> myplanes;
+	for (int i = 0; i < 10; i++) {
+		Aircraft * plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1000.0f * (i+1)), ".\\Models\\plane\\plane.obj");
+		plane->SetVelocity(250.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+		plane->SetRotation(45.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		//plane.SetAngularVelocity(45.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+		myplanes.push_back(plane);
+	}
 
 	AircraftDrawer acDrawer(woodBoxTexture, acShader);
 
@@ -160,7 +163,7 @@ int main() {
 		//drawer.Draw(view, projection, timeValue, myCubes);
 
 		//draw aircraft
-		acDrawer.Draw(view, projection, timeValue, myplanes);
+		acDrawer.Draw(view, projection, camera.GetPosition(), timeValue, myplanes);
 
 		//openCV stuff
 

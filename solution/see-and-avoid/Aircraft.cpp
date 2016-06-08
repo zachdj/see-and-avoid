@@ -11,6 +11,8 @@ Aircraft::Aircraft(glm::vec3 position, GLchar* path) : model(path)
 	this->angularVelocityMagnitude = 0;
 	Model aircraftModel(path);
 	this->model = aircraftModel;
+
+	this->hasCollided = false;
 }
 
 void Aircraft::SetRotation(GLfloat angle, glm::vec3 axis)

@@ -18,6 +18,8 @@ public:
 	void SetPosition(glm::vec3 position);
 	void SetVelocity(GLfloat newVelocity, glm::vec3 direction);
 
+	bool hasCollided; //keeps track of whether this aircraft has collided with the camera to prevent multiple reportings
+
 	Model model;
 
 	~Aircraft();

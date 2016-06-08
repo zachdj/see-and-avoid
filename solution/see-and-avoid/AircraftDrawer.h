@@ -13,8 +13,9 @@ class AircraftDrawer
 {
 public:
 	AircraftDrawer(Texture & tex, Shader & aircraftShader);
-	void Draw(glm::mat4 view, glm::mat4 projection, GLfloat timeValue, std::vector<Aircraft> & toDraw);
+	void Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPosition, GLfloat timeValue, std::vector<Aircraft*> & toDraw);
 
+	GLfloat previousTimeStep;
 	Texture tex; // this texture will be used as a fallback when the model has no associated texture data
 	Shader shader;
 	~AircraftDrawer();

@@ -217,11 +217,15 @@ glm::mat4 Camera::GetCameraViewMatrix()
 
 glm::mat4 Camera::GetProjectionMatrix()
 {
-	return glm::perspective(glm::radians(45.0f), (GLfloat)this->SCREEN_W / (GLfloat)this->SCREEN_H, 0.1f, 1000.0f); // GLM handles creation of perspective transformation matrix
+	return glm::perspective(glm::radians(45.0f), (GLfloat)this->SCREEN_W / (GLfloat)this->SCREEN_H, 0.1f, this->viewDistance); // GLM handles creation of perspective transformation matrix
 }
 
 glm::mat4 Camera::GetOrthoMatrix() {
 	return glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+}
+
+glm::vec3 Camera::GetPosition(){
+	return this->position; // GLM handles creation of perspective transformation matrix
 }
 
 void Camera::ResetOrientation() {

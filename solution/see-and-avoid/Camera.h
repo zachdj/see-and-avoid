@@ -17,10 +17,13 @@ class Camera
 		glm::mat4 GetCameraViewMatrix();
 		glm::mat4 GetProjectionMatrix();
 		glm::mat4 GetOrthoMatrix();
+		glm::vec3 GetPosition();
 		~Camera();
 
 	private :
 		//shared config variables
+		GLfloat viewDistance = 1000.0f;
+		// config variables for flight
 		GLfloat MAX_SPEED = 50.0f; // distance units / second
 		GLfloat ACCELERATION = 10.0f; // units / second
 		GLfloat MIN_SPEED;
