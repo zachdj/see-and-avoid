@@ -42,33 +42,20 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 					current->GetPath()->CompleteWaypoint();
 				}
 				else {
-					//TODO: navigate toward active
 					//horizontal navigation in the x-z plane
 					glm::vec3 planeDirection;
 					planeDirection.x = cos(glm::radians(current->pitch)) * cos(glm::radians(current->yaw + 90));
-					planeDirection.y = sin(glm::radians(current->pitch));
+					planeDirection.y = 0; // restrict to horizontal plane
 					planeDirection.z = cos(glm::radians(current->pitch)) * sin(glm::radians(current->yaw + 90));
 					planeDirection = glm::normalize(planeDirection);
 
 					glm::vec3 vectorToObject;
 					vectorToObject.x = activePosition.x - current->position.x;
-					vectorToObject.y = activePosition.y - current->position.y;
+					vectorToObject.y = 0; // restrict to horizontal plane
 					vectorToObject.z = activePosition.z - current->position.z;
 					vectorToObject = glm::normalize(vectorToObject);
 
-					/*GLfloat a = line1End.x - line1Start.x;
-					GLfloat b = line1End.y - line1Start.y;
-					GLfloat c = line2End.x - line2Start.x;
-					GLfloat d = line2End.y - line2Start.y;*/
-				
-					/*GLfloat atanA = atan2(planeDirection.z, planeDirection.x);
-					GLfloat atanB = atan2(vectorToObject.z, vectorToObject.x);
-
-					GLfloat angle = atanA - atanB;*/
-					//GLfloat angle = asin(glm::length(glm::cross(planeDirection, vectorToObject)));
-
-					//GLfloat angle = acos(glm::dot(planeDirection, vectorToObject));
-
+					//determine angle b/t vectors
 					GLfloat dotProd = glm::dot(planeDirection, vectorToObject);
 					// safety check before using acos:
 					if (dotProd < -1.0) dotProd = -1.0f;
@@ -79,18 +66,52 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 					if (glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), normalToPlane) > 0) {
 						angleSign = -1.0f;
 					}
-					GLfloat angle = angleSign * angleMagnitude;
+					GLfloat angle = angleSign * angleMagnitude; //angle between vectors
+					angle = max(angle, -1.0f);
+					angle = min(angle, 1.0f);
 
+
+					// weight function goes to zero as we get closer to target line
 					GLfloat sigmoid = 2 / (1 + exp(-25 * (angle))) - 1;
-					//GLfloat rollPct = angle / glm::radians(90.0f);
-					current->roll = -sigmoid * 50.0f;
+					GLfloat deltaAngle = -sigmoid * 50.0f - current->roll;
+					GLfloat deltaAngleMag = abs(deltaAngle);
+					GLfloat deltaAngleSign = 1.0f;
+					if (deltaAngle < 0.0f) {
+						deltaAngleSign = -1.0f;
+					}
+					current->roll += min(deltaAngleMag, 1.5f) * deltaAngleSign; //control speed of turn to make it smooth
 
-					std::cout << "sigmoid: " << sigmoid << std::endl;
-					std::cout << "angle: " << angle << std::endl;
+					// vertical navigation - change pitch to seek active waypoint
+
+					vectorToObject.x = activePosition.x - current->position.x;
+					vectorToObject.y = activePosition.y - current->position.y;
+					vectorToObject.z = activePosition.z - current->position.z;
+					//create vector in th x-z plane parallel to the the vector to the object - this is essentially the projection of the above on to the horizontal plane
+					glm::vec3 parallelVector;
+					parallelVector.x = activePosition.x - current->position.x;
+					parallelVector.y = 0;
+					parallelVector.z = activePosition.z - current->position.z;
+
+					// determine angle of elevation
+					GLfloat hypotenuseLength = glm::length(vectorToObject);
+					GLfloat length = glm::length(parallelVector);
+					angle = acos(length / hypotenuseLength);
+					angle = max(angle, 0.0f);
+					angle = min(angle, 1.0f);
+
+					sigmoid = 1 / (1 + exp(-35 * (angle - 0.2)));
+					GLfloat sign = 1.0f;
+					if (vectorToObject.y < 0) {
+						sign = -1.0f;
+					}
+					deltaAngle = sign * sigmoid * 50.0f - current->pitch;
+					deltaAngleMag = abs(deltaAngle);
+					deltaAngleSign = 1.0f;
+					if (deltaAngle < 0.0f) {
+						deltaAngleSign = -1.0f;
+					}
+					current->pitch += min(deltaAngleMag, 0.25f) * deltaAngleSign;
 				}
-			}	
-			else {
-
 			}
 		} // else proceed as normal
 
@@ -116,9 +137,9 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 		glm::mat4 model;
 		// translate to current position
 		model = glm::translate(model, current->position);
-		// apply orientation
-		model = glm::rotate(model, glm::radians(current->pitch), glm::vec3(-1.0f, 0.0f, 0.0f));
+		// apply orientation - the order here actually seems to matter :/
 		model = glm::rotate(model, glm::radians(current->yaw), glm::vec3(0.0f, -1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-current->pitch), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(current->roll), glm::vec3(0.0f, 0.0f, 1.0f));
 		// planes need to be scaled (the normal model is massive)
 		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));

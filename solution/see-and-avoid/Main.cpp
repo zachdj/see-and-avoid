@@ -119,31 +119,25 @@ int main() {
 	// create a planeDrawer
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 	vector< Aircraft*> myplanes;
-	/*for (int i = 0; i < 1; i++) {
-		Aircraft * plane = new Aircraft(glm::vec3(0.0f, 0.0f, -200.0f * (i+1)), 40.0f, ".\\Models\\plane\\plane.obj");
-		plane->SetSpeed(10.0f * (i+1));
-		plane->SetOrientation(0.0f, 0.0f, 0.0f);
-		myplanes.push_back(plane);
-	}*/
 	vector<Waypoint *> waypoints;
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -200.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(200.0f, 0.0f, -400.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -800.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-200.0f, 0.0f, -400.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -200.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 150.0f, -800.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1200.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, -100.0f, -800.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-150.0f, 50.0f, -200.0f)));
 	Path myPath = Path(waypoints, 20.0f);
 	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -25.0f), myPath, 40.0f, ".\\Models\\plane\\plane.obj");
-	plane->SetSpeed(20.0f);
+	plane->SetSpeed(50.0f);
 	plane->SetOrientation(0.0f, 180.0f, 0.0f);
 	myplanes.push_back(plane);
 	PlaneDrawer planeDrawer(woodBoxTexture, planeShader);
 
 	//create a cube at each waypoint
-	myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, -200.0f)));
-	myCubes.push_back( Cube(glm::vec3(200.0f, 0.0f, -400.0f)));
-	myCubes.push_back( Cube(glm::vec3(0.0f, 0.0f, -800.0f)));
-	myCubes.push_back( Cube(glm::vec3(-200.0f, 0.0f, -400.0f)));
-	myCubes.push_back( Cube(glm::vec3(0.0f, 0.0f, -200.0f)));
+	myCubes.push_back( Cube(glm::vec3(0.0f, 0.0f, -500.0f)));
+	myCubes.push_back( Cube(glm::vec3(300.0f, 150.0f, -800.0f)));
+	myCubes.push_back( Cube(glm::vec3(0.0f, 0.0f, -1200.0f)));
+	myCubes.push_back( Cube(glm::vec3(-300.0f, -100.0f, -800.0f)));
+	myCubes.push_back( Cube(glm::vec3(-150.0f, 50.0f, -200.0f)));
 
 	//openCV camera display
 	VideoCapture cap(0); // open the default camera
@@ -151,8 +145,8 @@ int main() {
 		return -1;
 	}
 	Mat edges;
-	//namedWindow("edges", 0);
-	//resizeWindow("edges", width / 2.0, height / 2.0);
+	namedWindow("edges", 0);
+	resizeWindow("edges", width / 2.0, height / 2.0);
 
 	//render, event, and frame buffer loop
 	while (!glfwWindowShouldClose(window))
@@ -194,7 +188,7 @@ int main() {
 		//GaussianBlur(img, img, Size(7, 7), 1.5, 1.5);
 		Canny(img, img, 180, 180, 3);
 
-		//imshow("edges", img);
+		imshow("edges", img);
 		//if (waitKey(30) >= 0) break;
 
 		// swap buffers to display what we just rendered on the back buffer
