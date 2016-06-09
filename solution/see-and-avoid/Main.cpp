@@ -62,7 +62,7 @@ int main() {
 	GLuint height = mode->height;
 
 	//Time to create a window with GLFW
-	GLFWwindow* window = glfwCreateWindow(width/2.0, height/2.0, "See and Avoid Sim", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(width/1.2, height/1.2, "See and Avoid Sim", nullptr, nullptr);
 	if (window == nullptr) //ensure the window was initialized
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -133,7 +133,7 @@ int main() {
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -200.0f)));
 	Path myPath = Path(waypoints, 20.0f);
 	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -25.0f), myPath, 40.0f, ".\\Models\\plane\\plane.obj");
-	plane->SetSpeed(60.0f);
+	plane->SetSpeed(20.0f);
 	plane->SetOrientation(0.0f, 180.0f, 0.0f);
 	myplanes.push_back(plane);
 	PlaneDrawer planeDrawer(woodBoxTexture, planeShader);
@@ -151,8 +151,8 @@ int main() {
 		return -1;
 	}
 	Mat edges;
-	namedWindow("edges", 0);
-	resizeWindow("edges", width / 2.0, height / 2.0);
+	//namedWindow("edges", 0);
+	//resizeWindow("edges", width / 2.0, height / 2.0);
 
 	//render, event, and frame buffer loop
 	while (!glfwWindowShouldClose(window))
@@ -194,7 +194,7 @@ int main() {
 		//GaussianBlur(img, img, Size(7, 7), 1.5, 1.5);
 		Canny(img, img, 180, 180, 3);
 
-		imshow("edges", img);
+		//imshow("edges", img);
 		//if (waitKey(30) >= 0) break;
 
 		// swap buffers to display what we just rendered on the back buffer
