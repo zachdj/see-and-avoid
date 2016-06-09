@@ -22,7 +22,7 @@ class Camera
 
 	private :
 		//shared config variables
-		GLfloat viewDistance = 1000.0f;
+		GLfloat viewDistance = 3000.0f;
 		// config variables for flight
 		GLfloat MAX_SPEED = 50.0f; // distance units / second
 		GLfloat ACCELERATION = 10.0f; // units / second
