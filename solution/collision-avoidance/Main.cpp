@@ -1,50 +1,158 @@
 //#include "opencv2/opencv.hpp"
 #define _ITERATOR_DEBUG_LEVEL 0
 
-#include<opencv2\highgui\highgui.hpp>
-#include<iostream>
-#include <opencv2\opencv.hpp>
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/video/background_segm.hpp"
-#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/highgui/highgui.hpp>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
 #include <opencv\cv.h>
-#include <opencv\highgui.h>
-#include <opencv2\highgui.hpp>
-#include <opencv2\highgui\highgui.hpp>
-#include <iostream>
 #include <opencv2/features2d.hpp>
 #include <opencv2/features2d/features2d.hpp>
-#include <opencv2\opencv.hpp>
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/video/background_segm.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
-#include "opencv2/opencv.hpp"
-#include "opencv2/imgproc.hpp"
-#include <opencv2/highgui.hpp>
-#include <opencv2/video.hpp>
-#include <opencv2\video\background_segm.hpp>
-#include <opencv2\video\video.hpp>
-#include <opencv2\video\tracking.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "opencv2/imgproc/imgproc.hpp"
 
 
+using namespace std;
+using namespace cv;
+
+bool firstTime = true;
+
+void MyLine(Mat img, Point start, Point end)
+{
+int thickness = 3;
+int lineType = 8;
+line(img,
+start,
+end,
+CV_RGB(250,250,250),
+thickness,
+lineType);
+}
+
+int main(void)
+{
+	Mat frame, canny_output;
+	VideoCapture cap("PlaneSim2.mp4");   //open the capture for video file
+	int totalframe = cap.get(CV_CAP_PROP_FRAME_COUNT); // get total number of frames in video
+	namedWindow("Control", CV_WINDOW_NORMAL);
+	cv::moveWindow("Control", 10, 10);
+
+	// Setup SimpleBlobDetector parameters.
+	SimpleBlobDetector::Params params;
+
+	// Change thresholds
+	params.minThreshold = 120;
+	params.maxThreshold = 640;
+
+	//Filter by Color
+	params.filterByColor = true;
+	params.blobColor = 255; 
+
+	// Filter by Area.
+	params.filterByArea = true;
+	params.minArea = 10;
+	params.maxArea = 28000;
+
+	// Filter by Circularity
+	params.filterByCircularity = false;
+	params.minCircularity = 0.1;
+
+	// Filter by Convexity
+	params.filterByConvexity = false;
+	params.minConvexity = 0.87;
+
+	// Filter by Inertia
+	params.filterByInertia = false;
+	params.minInertiaRatio = 0.01;
+
+	// Storage for blobs
+	vector<KeyPoint> keypoints;
+
+	//Reduce Frame count so we don't overuse our frames available
+	totalframe--; totalframe--; totalframe--;
+
+	while (waitKey(10) != 27 && totalframe>0)
+		//wait 10 milliseconds and check for esc key
+	{
+		cap >> frame; //save captured image to frame variable
+
+        imshow("Control", frame);
+		vector<vector<Point> > contours;
+		vector<Vec4i> hierarchy;
+		
+		/// Detect edges using canny
+		Canny(frame, canny_output, 260,380, 3);
+		//imshow("After Canny", canny_output);
+		dilate(canny_output, canny_output, cv::Mat(), cv::Point(-1, -1),10);
+
+		/// Find contours
+		findContours(canny_output, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+		
+		/// Draw contours
+		Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
+		for (int i = 0; i< contours.size(); i++){
+			Scalar color = Scalar(255, 255, 255); // THIS DOES RANDOM COLORS - rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+			drawContours(drawing, contours, i, color, -10, 8, hierarchy, 0, Point());
+		    }
+
+		// Setup a rectangle to define your region of interest to crop
+		cv::Rect myROI(10, 20, 1220, 640);
+
+		// Crop the full image to that image contained by the rectangle myROI
+		// Note that this doesn't copy the data
+		drawing = drawing(myROI);
+
+        //Build blob detector
+		SimpleBlobDetector detector(params);
+
+		// Detect blobs
+		detector.detect(drawing, keypoints);
+
+		// Draw detected blobs as red circles.
+		// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures
+		// the size of the circle corresponds to the size of blob
+		Mat im_with_keypoints;
+		drawKeypoints(drawing, keypoints, im_with_keypoints, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+		// Show blobs
+		namedWindow("Blob Detection", CV_WINDOW_NORMAL);
+		imshow("Blob Detection", im_with_keypoints);
+		cv::moveWindow("Blob Detection", 10, 438);
+
+		for (std::vector<cv::KeyPoint>::iterator blobIterator = keypoints.begin(); blobIterator != keypoints.end(); blobIterator++) {
+			std::cout << "size of blob is: " << blobIterator->size << std::endl;
+			std::cout << "point is at: " << blobIterator->pt.x << " " << blobIterator->pt.y << std::endl;
+		    }
+
+		//Subtract Frame and throw away 2 more. We do not need these many frames
+		totalframe--; cap >> frame; totalframe--; cap >> frame; totalframe--;
+
+		//use this is we need to hault the program
+		/*if (firstTime) {
+			cout << "Press ENTER to start..." << endl;
+			char a;
+			cin >> a;
+			firstTime = false;
+		}
+		*/ 
+
+	}
+}
+
+
+
+
+/*THIS IS ALL OF THE TEST WORK BEFORE I CLEANED IT UP*/
+
+/*
 using namespace std;
 using namespace cv;
 
 Mat fgMaskMOG; //fg mask generated by MOG method
 Mat fgMaskMOG2; //fg mask fg mask generated by MOG2 method
 Ptr<BackgroundSubtractor>  pMOG;
-Ptr<BackgroundSubtractor>  pMOG2; 
+Ptr<BackgroundSubtractor>  pMOG2;
 RNG rng(12345);
 
 
@@ -65,173 +173,188 @@ lineType);
 
 int main(void)
 {
-	Mat frame;
-	Mat edges;
-	VideoCapture cap("PlaneSim2.mp4");   //open the capture for video file
-	int totalframe = cap.get(CV_CAP_PROP_FRAME_COUNT); // get total number of frames in video
-	namedWindow("Control", CV_WINDOW_AUTOSIZE);
-	cv::moveWindow("Control", 10, 20);
-	//pMOG = new BackgroundSubtractorMOG(100,3,0.5); //MOG approach
-	//pMOG2 = new BackgroundSubtractorMOG2(0, 18, false); //MOG2 approach
+Mat frame;
+Mat edges;
+VideoCapture cap("PlaneSim2.mp4");   //open the capture for video file
+int totalframe = cap.get(CV_CAP_PROP_FRAME_COUNT); // get total number of frames in video
+namedWindow("Control", CV_WINDOW_AUTOSIZE);
+cv::moveWindow("Control", 10, 20);
+//pMOG = new BackgroundSubtractorMOG(100,3,0.5); //MOG approach
+//pMOG2 = new BackgroundSubtractorMOG2(0, 18, false); //MOG2 approach
 
 
-	// Setup SimpleBlobDetector parameters.
-	SimpleBlobDetector::Params params;
+// Setup SimpleBlobDetector parameters.
+SimpleBlobDetector::Params params;
 
-	// Change thresholds
-	params.minThreshold = 220;
-	params.maxThreshold = 240;
+// Change thresholds
+params.minThreshold = 120;
+params.maxThreshold = 640;
 
-	
-	//Filter by Color
-	params.filterByColor = true;
-	params.blobColor = 255; 
+//Filter by Color
+params.filterByColor = true;
+params.blobColor = 255;
 
-	// Filter by Area.
-	params.filterByArea = true;
-	params.minArea = 10;
-	//params.maxArea = 800;
+// Filter by Area.
+params.filterByArea = true;
+params.minArea = 10;
+params.maxArea = 28000;
 
-	// Filter by Circularity
-	params.filterByCircularity = false;
-	params.minCircularity = 0.1;
+// Filter by Circularity
+params.filterByCircularity = false;
+params.minCircularity = 0.1;
 
-	// Filter by Convexity
-	params.filterByConvexity = false;
-	params.minConvexity = 0.87;
+// Filter by Convexity
+params.filterByConvexity = false;
+params.minConvexity = 0.87;
 
-	// Filter by Inertia
-	params.filterByInertia = false;
-	params.minInertiaRatio = 0.01;
-
-
-	// Storage for blobs
-	vector<KeyPoint> keypoints;
-	//Ptr<BackgroundSubtractor>  pMOG = new BackgroundSubtractorMOG(); //MOG approach
-	//Ptr<BackgroundSubtractor>  pMOG2 = new BackgroundSubtractorMOG2(10,20,false); //MOG2 approach
+// Filter by Inertia
+params.filterByInertia = false;
+params.minInertiaRatio = 0.01;
 
 
-	totalframe--;
-	totalframe--;
-	totalframe--;
+// Storage for blobs
+vector<KeyPoint> keypoints;
+//Ptr<BackgroundSubtractor>  pMOG = new BackgroundSubtractorMOG(); //MOG approach
+//Ptr<BackgroundSubtractor>  pMOG2 = new BackgroundSubtractorMOG2(10,20,false); //MOG2 approach
 
 
-	while (waitKey(30) != 27 && totalframe>0)
-		//wait 30 milliseconds and check for esc key
-	{
-		cap >> frame; //save captured image to frame variable
-		//cvtColor(frame, edges, CV_BGR2GRAY);
-		//GaussianBlur(frame, frame, Size(0, 0), 2.5, 2.5, BORDER_REFLECT);
-		//blur(edges, edges, Size(7, 7));
-		//Canny(edges, edges, 180, 180, 3);
-		//cv::Size s = edges.size();
-		//int rows = s.height; cout << rows << endl;
-		//int cols = s.width; cout << "    " << cols << endl;
-		//cout << Point(rows / 2 + 40, cols / 2 + 40) << endl;
-		//MyLine(edges, Point(cols/2 + 30, rows/2), Point(cols/2 - 30, rows/2 ));
-		//MyLine(edges, Point(cols / 2, rows / 2 + 30), Point(cols / 2, rows / 2 - 30));
-		//imshow("Canvas", frame); //show image on window named Camera
-		
-		//THESE ARE FOR OUR BACKGROUND SUBTRACTION
-		//pMOG->operator()(frame, fgMaskMOG);
-		//pMOG2->operator()(frame, fgMaskMOG2);
-		//imshow("FG Mask MOG", fgMaskMOG);
-		//imshow("FG Mask MOG 2", fgMaskMOG2);
-		
-
-		Mat src_gray = frame;
-	    //cvtColor(frame, src_gray, CV_BGR2GRAY);
-		//blur(src_gray, src_gray, Size(3, 3));
+totalframe--;
+totalframe--;
+totalframe--;
 
 
+while (waitKey(10) != 27 && totalframe>0)
+//wait 30 milliseconds and check for esc key
+{
+cap >> frame; //save captured image to frame variable
+//cvtColor(frame, edges, CV_BGR2GRAY);
+//GaussianBlur(frame, frame, Size(0, 0), 2.5, 2.5, BORDER_REFLECT);
+//blur(edges, edges, Size(7, 7));
+//Canny(edges, edges, 180, 180, 3);
+//cv::Size s = edges.size();
+//int rows = s.height; cout << rows << endl;
+//int cols = s.width; cout << "    " << cols << endl;
+//cout << Point(rows / 2 + 40, cols / 2 + 40) << endl;
+//MyLine(edges, Point(cols/2 + 30, rows/2), Point(cols/2 - 30, rows/2 ));
+//MyLine(edges, Point(cols / 2, rows / 2 + 30), Point(cols / 2, rows / 2 - 30));
+//imshow("Canvas", frame); //show image on window named Camera
 
-		Mat canny_output;
-		vector<vector<Point> > contours;
-		vector<Vec4i> hierarchy;
-		
-		/// Detect edges using canny
-		Canny(src_gray, canny_output, 200,380, 3);
-		imshow("After Canny", canny_output);
-		dilate(canny_output, canny_output, cv::Mat(), cv::Point(-1, -1));
-		dilate(canny_output, canny_output, cv::Mat(), cv::Point(-1, -1));
-		dilate(canny_output, canny_output, cv::Mat(), cv::Point(-1, -1));
-		/// Find contours
-		findContours(canny_output, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-		imshow("Gray", src_gray);
-
-		/// Draw contours
-		Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
-		for (int i = 0; i< contours.size(); i++)
-		{
-			Scalar color = Scalar(255, 255, 255); //rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-			drawContours(drawing, contours, i, color, -10, 8, hierarchy, 0, Point());
-		}
-
-		/// Show in a window
-		namedWindow("Contours", CV_WINDOW_AUTOSIZE);
-		imshow("Contours", drawing);
-
-		
+//THESE ARE FOR OUR BACKGROUND SUBTRACTION
+//pMOG->operator()(frame, fgMaskMOG);
+//pMOG2->operator()(frame, fgMaskMOG2);
+//imshow("FG Mask MOG", fgMaskMOG);
+//imshow("FG Mask MOG 2", fgMaskMOG2);
 
 
-
-		/*
-
-		//inRange(detectBlue, Scalar(0,0,0), Scalar(255,255,255), detectBlue);
-		//imshow("Control", detectBlue);
-		//imshow("original", frame);
-
-		Mat changeContrast;
-		//cvtColor(frame, frame, CV_RGB2GRAY);
-		//frame.convertTo(changeContrast, -1, 1.9, 0); //increase the contrast (double)
-		//imshow("High Contrast", changeContrast);
-		//bitwise_or(detectBlue, changeContrast, changeContrast);
-
-		//imshow("bitwise", changeContrast);
-		
-		
-		//GaussianBlur(frame, frame, Size(0, 0), 2.2, 2.2, BORDER_REFLECT);
-		//imshow("blur", frame);
-		//Canny(changeContrast, edges,180, 180);
-		
-		// Set up detector with params
-		Mat edges;
-		edges = frame;
-
-		*/
-		SimpleBlobDetector detector(params);
-
-		edges = drawing;
-
-		int top = (int)(0.05*edges.rows); int bottom = (int)(0.05*edges.rows);
-		int left = (int)(0.05*edges.cols); int right = (int)(0.05*edges.cols);
-		copyMakeBorder(edges, edges, top, bottom, left, right, BORDER_CONSTANT, Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255)));
-		// Detect blobs
-		detector.detect(edges, keypoints);
-
-		// Draw detected blobs as red circles.
-		// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures
-		// the size of the circle corresponds to the size of blob
-
-		Mat im_with_keypoints;
-		drawKeypoints(edges, keypoints, im_with_keypoints, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
-		// Show blobs
-		imshow("blobs", im_with_keypoints);
-
-		for (std::vector<cv::KeyPoint>::iterator blobIterator = keypoints.begin(); blobIterator != keypoints.end(); blobIterator++) {
-			std::cout << "size of blob is: " << blobIterator->size << std::endl;
-			std::cout << "point is at: " << blobIterator->pt.x << " " << blobIterator->pt.y << std::endl;
-		 }
+Mat src_gray = frame;
+//cvtColor(frame, src_gray, CV_RGB2XYZ);
+//blur(src_gray, src_gray, Size(3, 3));
 
 
-		
+imshow("Control", src_gray);
+Mat canny_output;
+vector<vector<Point> > contours;
+vector<Vec4i> hierarchy;
 
-		totalframe--;
+/// Detect edges using canny
+Canny(src_gray, canny_output, 260,380, 3);
+//imshow("After Canny", canny_output);
+dilate(canny_output, canny_output, cv::Mat(), cv::Point(-1, -1),10);
+
+/// Find contours
+findContours(canny_output, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+
+
+/// Draw contours
+Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
+for (int i = 0; i< contours.size(); i++)
+{
+Scalar color = Scalar(255, 255, 255); //rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+drawContours(drawing, contours, i, color, -10, 8, hierarchy, 0, Point());
+}
+
+
+// Setup a rectangle to define your region of interest
+cv::Rect myROI(10, 20, 1220, 640);
+
+// Crop the full image to that image contained by the rectangle myROI
+// Note that this doesn't copy the data
+drawing = drawing(myROI);
+
+/// Show in a window
+//namedWindow("Contours", CV_WINDOW_AUTOSIZE);
+//imshow("Contours", drawing);
+
+
+
+
+
+/*
+
+//inRange(detectBlue, Scalar(0,0,0), Scalar(255,255,255), detectBlue);
+//imshow("Control", detectBlue);
+//imshow("original", frame);
+
+Mat changeContrast;
+//cvtColor(frame, frame, CV_RGB2GRAY);
+//frame.convertTo(changeContrast, -1, 1.9, 0); //increase the contrast (double)
+//imshow("High Contrast", changeContrast);
+//bitwise_or(detectBlue, changeContrast, changeContrast);
+
+//imshow("bitwise", changeContrast);
+
+
+//GaussianBlur(frame, frame, Size(0, 0), 2.2, 2.2, BORDER_REFLECT);
+//imshow("blur", frame);
+//Canny(changeContrast, edges,180, 180);
+
+// Set up detector with params
+Mat edges;
+edges = frame;
+
+
+SimpleBlobDetector detector(params);
+
+edges = drawing;
+
+//int top = (int)(0.05*edges.rows); int bottom = (int)(0.05*edges.rows);
+//int left = (int)(0.05*edges.cols); int right = (int)(0.05*edges.cols);
+//copyMakeBorder(edges, edges, top, bottom, left, right, BORDER_CONSTANT, Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255)));
+// Detect blobs
+detector.detect(edges, keypoints);
+
+// Draw detected blobs as red circles.
+// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures
+// the size of the circle corresponds to the size of blob
+
+Mat im_with_keypoints;
+drawKeypoints(edges, keypoints, im_with_keypoints, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+// Show blobs
+imshow("blobs", im_with_keypoints);
+//cv::moveWindow("blobs", 10, 20);
+
+for (std::vector<cv::KeyPoint>::iterator blobIterator = keypoints.begin(); blobIterator != keypoints.end(); blobIterator++) {
+	std::cout << "size of blob is: " << blobIterator->size << std::endl;
+	std::cout << "point is at: " << blobIterator->pt.x << " " << blobIterator->pt.y << std::endl;
+}
+
+
+
+
+totalframe--;
+
+cap >> frame;
+totalframe--;
+cap >> frame;
+totalframe--;
 	}
 }
 
 
+
+
+*/
 
 
 
