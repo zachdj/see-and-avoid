@@ -166,9 +166,9 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 
 			GLfloat deltaHeight = activePosition.y + this->position.y;
 			weight = -(2 / (1 + exp(-0.1 * deltaHeight)) - 1); // logistic function between -1 and 1
-			GLfloat newPitch = weight * 55.0f; // max pitch is 45 degrees
+			GLfloat newPitch = weight * 45.0f; // max pitch is 45 degrees
 			GLfloat deltaPitch = newPitch - this->pitch;
-			this->pitch += ((deltaPitch > 0) - (deltaPitch < 0)) * min(abs(deltaPitch), 1.0f);			
+			this->pitch += ((deltaPitch > 0) - (deltaPitch < 0)) * min(abs(deltaPitch), 0.5f);			
 		}
 	}
 

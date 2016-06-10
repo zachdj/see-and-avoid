@@ -126,14 +126,15 @@ int main() {
 	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, -100.0f, -800.0f)));
 	waypoints.push_back(new Waypoint(glm::vec3(-150.0f, 50.0f, -200.0f)));
 	Path myPath = Path(waypoints, 20.0f);
-	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -25.0f), 40.0f, ".\\Models\\plane\\plane.obj");
+	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -25.0f), myPath, 40.0f, ".\\Models\\plane\\plane.obj");
 	plane->SetSpeed(50.0f);
 	plane->SetOrientation(0.0f, 180.0f, 0.0f);
 	myplanes.push_back(plane);
 	PlaneDrawer planeDrawer(woodBoxTexture, planeShader);
-
-	camera.SetPath(myPath);
-	camera.ActivateAutonomousMode();
+	
+	// uncomment for autonomous navigation
+	//camera.SetPath(myPath);
+	//camera.ActivateAutonomousMode();
 
 	//create a cube at each waypoint
 
