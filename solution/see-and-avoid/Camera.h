@@ -6,7 +6,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+#include "Path.h"
 #include "KeyboardHandler.h"
+
+using namespace std;
 
 class Camera
 {
@@ -14,6 +21,11 @@ class Camera
 		Camera();
 		Camera(GLuint screenW, GLuint screenH, glm::vec3 position);
 		void DoMovement(GLfloat timeValue); //should be called at the start of every frame
+		void ActivateAutonomousMode();
+		void DeactivateAutonomousMode();
+		void SetPath(Path & path);
+		Path * GetPath();
+		bool IsAutonomousNavigationActive();
 		glm::mat4 GetCameraViewMatrix();
 		glm::mat4 GetProjectionMatrix();
 		glm::mat4 GetOrthoMatrix();
@@ -21,6 +33,11 @@ class Camera
 		~Camera();
 
 	private :
+		bool autonomousModeActive;
+		Path path;
+		void DoAutonomousMovement(GLfloat timeDelta);
+		void DoKeyboardMovement(GLfloat timeDelta);
+
 		//shared config variables
 		GLfloat viewDistance = 3000.0f;
 		// config variables for flight
@@ -37,6 +54,7 @@ class Camera
 		GLfloat YAW_NG_VELOCITY = 4.0f; // pure yaw without roll is pretty slow for fixed-wings I think
 		GLfloat PITCH_NG_VELOCITY = 15.0f; // degrees / second
 		GLfloat ROLL_NG_VELOCITY = 15.0f;
+		GLfloat YAW_PER_ROLL = 0.5f; // degree of yaw per degree of roll per time
 
 		//rotor-specific config
 		GLfloat ROTOR_YAW_NG_VELOCITY = 60.0f; // yaw is much faster for rotors

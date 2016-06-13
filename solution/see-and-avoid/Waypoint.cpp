@@ -18,6 +18,10 @@ glm::vec3 Waypoint::GetPosition()
 	return this->position;
 }
 
+void Waypoint::Activate() {
+	this->active = true;
+}
+
 bool Waypoint::IsActive()
 {
 	return this->active;

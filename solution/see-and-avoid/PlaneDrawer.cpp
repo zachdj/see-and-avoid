@@ -36,9 +36,13 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 			Waypoint * active = current->GetPath()->GetActiveWaypoint();
 			if (active != nullptr) {
 				glm::vec3 activePosition = active->GetPosition();
+
+				glm::vec3 vectorToObject;
+				vectorToObject.x = activePosition.x - current->position.x;
+				vectorToObject.y = 0; // restrict to horizontal plane
+				vectorToObject.z = activePosition.z - current->position.z;
 				//check if we are within the completion radius of the waypoint
-				GLfloat distSqrd = pow(current->position.x - activePosition.x, 2) + pow(current->position.y - activePosition.y, 2) + pow(current->position.z - activePosition.z, 2);
-				if (distSqrd < pow(current->GetPath()->waypointCompletionRadius, 2)) {
+				if (glm::length(vectorToObject) < current->GetPath()->waypointCompletionRadius) {
 					current->GetPath()->CompleteWaypoint();
 				}
 				else {
@@ -49,10 +53,6 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 					planeDirection.z = cos(glm::radians(current->pitch)) * sin(glm::radians(current->yaw + 90));
 					planeDirection = glm::normalize(planeDirection);
 
-					glm::vec3 vectorToObject;
-					vectorToObject.x = activePosition.x - current->position.x;
-					vectorToObject.y = 0; // restrict to horizontal plane
-					vectorToObject.z = activePosition.z - current->position.z;
 					vectorToObject = glm::normalize(vectorToObject);
 
 					//determine angle b/t vectors
@@ -67,50 +67,18 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 						angleSign = -1.0f;
 					}
 					GLfloat angle = angleSign * angleMagnitude; //angle between vectors
-					angle = max(angle, -1.0f);
-					angle = min(angle, 1.0f);
-
 
 					// weight function goes to zero as we get closer to target line
-					GLfloat sigmoid = 2 / (1 + exp(-25 * (angle))) - 1;
-					GLfloat deltaAngle = -sigmoid * 50.0f - current->roll;
-					GLfloat deltaAngleMag = abs(deltaAngle);
-					GLfloat deltaAngleSign = 1.0f;
-					if (deltaAngle < 0.0f) {
-						deltaAngleSign = -1.0f;
-					}
-					current->roll += min(deltaAngleMag, 1.5f) * deltaAngleSign; //control speed of turn to make it smooth
+					GLfloat weight = 2 / (1 + exp(-25 * (angle))) - 1;
+					GLfloat deltaAngle = -weight * 50.0f - current->roll;
+					current->roll += ((deltaAngle > 0)-(deltaAngle < 0)) * min(abs(deltaAngle), 1.5f); //control speed of turn to make it smooth
 
-					// vertical navigation - change pitch to seek active waypoint
-
-					vectorToObject.x = activePosition.x - current->position.x;
-					vectorToObject.y = activePosition.y - current->position.y;
-					vectorToObject.z = activePosition.z - current->position.z;
-					//create vector in th x-z plane parallel to the the vector to the object - this is essentially the projection of the above on to the horizontal plane
-					glm::vec3 parallelVector;
-					parallelVector.x = activePosition.x - current->position.x;
-					parallelVector.y = 0;
-					parallelVector.z = activePosition.z - current->position.z;
-
-					// determine angle of elevation
-					GLfloat hypotenuseLength = glm::length(vectorToObject);
-					GLfloat length = glm::length(parallelVector);
-					angle = acos(length / hypotenuseLength);
-					angle = max(angle, 0.0f);
-					angle = min(angle, 1.0f);
-
-					sigmoid = 1 / (1 + exp(-35 * (angle - 0.2)));
-					GLfloat sign = 1.0f;
-					if (vectorToObject.y < 0) {
-						sign = -1.0f;
-					}
-					deltaAngle = sign * sigmoid * 50.0f - current->pitch;
-					deltaAngleMag = abs(deltaAngle);
-					deltaAngleSign = 1.0f;
-					if (deltaAngle < 0.0f) {
-						deltaAngleSign = -1.0f;
-					}
-					current->pitch += min(deltaAngleMag, 0.25f) * deltaAngleSign;
+					// vertical navigation: as long as there's a height difference, adjust pitch to accomodate
+					GLfloat deltaHeight = activePosition.y - current->position.y;
+					weight = (2 / (1 + exp(-0.1 * deltaHeight)) - 1); // logistic function between -1 and 1
+					GLfloat newPitch = weight * 45.0f; // max pitch is 45 degrees
+					GLfloat deltaPitch = newPitch - current->pitch;
+					current->pitch += ((deltaPitch > 0) - (deltaPitch < 0)) * min(abs(deltaPitch), 0.5f);
 				}
 			}
 		} // else proceed as normal

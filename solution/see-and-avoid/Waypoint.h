@@ -11,6 +11,7 @@ public:
 	Waypoint(glm::vec3 position);
 	glm::vec3 GetPosition();
 	void Complete();
+	void Activate();
 	bool IsActive();
 	~Waypoint();
 

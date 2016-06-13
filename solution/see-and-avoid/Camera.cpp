@@ -1,7 +1,9 @@
 #include "Camera.h"
 
-#include <iostream>
-using namespace std;
+void PrintVector(glm::vec3 vector, GLchar* name) {
+
+	std::cout << name << ": " << vector.x << ", " << vector.y << ", " << vector.z << std::endl;
+}
 
 Camera::Camera()
 {
@@ -14,6 +16,9 @@ Camera::Camera(GLuint screenW, GLuint screenH, glm::vec3 position)
 	this->SCREEN_W = screenW;
 	this->SCREEN_H = screenH;
 
+	this->autonomousModeActive = false;
+	this->path = Path(); //default path is empty
+
 	this->INITIAL_POSITION = position;
 	this->position = position;
 	this->previousTimeValue = 0;
@@ -23,11 +28,170 @@ Camera::Camera(GLuint screenW, GLuint screenH, glm::vec3 position)
 	this->rotorStrafeSpeed = 0.0f;
 }
 
-// this functio
+// this function advances the camera forward either using autonomous navigation or keyboard navigation
 void Camera::DoMovement(GLfloat timeValue)
 {
 	GLfloat timeDelta = timeValue - this->previousTimeValue;
 
+	if (!this->autonomousModeActive) {
+		this->DoKeyboardMovement(timeDelta);
+	} else {
+		this->DoAutonomousMovement(timeDelta);
+	}
+
+	// key sequence for resetting orientation and velocity
+	if (KeyboardHandler::keys[GLFW_KEY_LEFT_CONTROL] || KeyboardHandler::keys[GLFW_KEY_RIGHT_CONTROL]) {
+		this->ResetOrientation();
+	} 
+	// spacebar resets the whole contraption
+	if (KeyboardHandler::keys[GLFW_KEY_SPACE]) {
+		this->Reset();
+	}
+
+	this->previousTimeValue = timeValue;
+}
+
+void Camera::ActivateAutonomousMode()
+{
+	this->autonomousModeActive = true;
+	this->speed = this->MAX_SPEED;
+}
+
+void Camera::DeactivateAutonomousMode()
+{
+	this->autonomousModeActive = false;
+	this->speed = MIN_SPEED;
+}
+
+void Camera::SetPath(Path & path)
+{
+	this->path = path;
+}
+
+Path * Camera::GetPath()
+{
+	return &this->path;
+}
+
+bool Camera::IsAutonomousNavigationActive()
+{
+	return this->autonomousModeActive;
+}
+
+glm::mat4 Camera::GetCameraViewMatrix()
+{
+	glm::mat4 view; //rotate camera appropriately
+	view = glm::rotate(view, glm::radians(this->roll), glm::vec3(0.0f, 0.0f, -1.0f));
+	view = glm::rotate(view, glm::radians(this->pitch), glm::vec3(1.0f, 0.0f, 0.0f));
+	view = glm::rotate(view, glm::radians(this->yaw), glm::vec3(0.0f, 1.0f, 0.0f));
+	view = glm::translate(view, this->position); //move camera to current position
+	return view;
+
+}
+
+glm::mat4 Camera::GetProjectionMatrix()
+{
+	return glm::perspective(glm::radians(45.0f), (GLfloat)this->SCREEN_W / (GLfloat)this->SCREEN_H, 0.1f, this->viewDistance); // GLM handles creation of perspective transformation matrix
+}
+
+glm::mat4 Camera::GetOrthoMatrix() {
+	return glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+}
+
+glm::vec3 Camera::GetPosition(){
+	return this->position; // GLM handles creation of perspective transformation matrix
+}
+
+void Camera::ResetOrientation() {
+	this->pitch = 0; this->yaw = 0; this->roll = 0;
+	this->speed = 0; this->rotorStrafeSpeed = 0;
+}
+
+void Camera::Reset() {
+	this->ResetOrientation();
+	this->position = this->INITIAL_POSITION;
+}
+
+
+// private methods
+void Camera::DoAutonomousMovement(GLfloat timeDelta) {
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// This code changes the plane's orientation to navigate to its current waypoint
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// get the active waypoint
+	Waypoint * active = this->GetPath()->GetActiveWaypoint();
+	if (active != nullptr) {
+		glm::vec3 activePosition = active->GetPosition();
+		//check if we are within the completion radius of the waypoint
+		glm::vec3 vectorToObject;
+		vectorToObject.x = activePosition.x + this->position.x;
+		vectorToObject.y = 0; // restrict to horizontal plane
+		vectorToObject.z = activePosition.z + this->position.z;
+
+		if (glm::length(vectorToObject) < this->GetPath()->waypointCompletionRadius) {
+			this->GetPath()->CompleteWaypoint();
+		}
+		else {
+			vectorToObject = glm::normalize(vectorToObject);
+
+			glm::vec3 planeDirection;
+			planeDirection.z = -cos(glm::radians(this->pitch)) * cos(glm::radians(this->yaw));
+			planeDirection.y = 0; // restrict to horizontal plane
+			planeDirection.x = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw));
+			planeDirection = glm::normalize(planeDirection);
+
+			//find angle between the current direction and the direction to the object (direction we want to go)
+			GLfloat dotProd = glm::dot(planeDirection, vectorToObject);
+			// safety check before using acos;  prevents exceptions due to floating point roundoff
+			if (dotProd < -1.0) dotProd = -1.0f;
+			else if (dotProd > 1.0) dotProd = 1.0f;
+			GLfloat angleMagnitude = acos(dotProd);
+			GLfloat angleSign = 1.0f;
+			glm::vec3 normalToPlane = glm::cross(vectorToObject, planeDirection);
+			if (glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), normalToPlane) > 0) {
+				angleSign = -1.0f;
+			}
+			GLfloat angle = angleSign * angleMagnitude; //angle between vectors
+
+			//we have the angle between the current orientation and the direction we need to be going.  Now map that angle to a certain degree of roll
+			GLfloat weight = (2 * angleMagnitude + 1)*(2 * angleMagnitude + 1);  // (2x + 1)^2
+			weight = -(weight + 1) / weight + 2; // 2 - ((2x + 1)^2 + 1) / (2x + 1)^2
+			//weight function maps angle into a value between zero and 1 - this is the percentage of max roll
+			GLfloat newRoll = angleSign * weight * 45.0f; // 45 degrees is max roll
+
+			GLfloat deltaRoll = newRoll - this->roll;
+			this->roll += ((deltaRoll > 0) - (deltaRoll < 0)) * min(abs(deltaRoll), 0.5f);
+
+			// vertical navigation: as long as there's a height difference, adjust pitch to accomodate
+
+			GLfloat deltaHeight = activePosition.y + this->position.y;
+			weight = -(2 / (1 + exp(-0.05 * deltaHeight)) - 1); // logistic function between -1 and 1
+			GLfloat newPitch = weight * 45.0f; // max pitch is 45 degrees
+			GLfloat deltaPitch = newPitch - this->pitch;
+			this->pitch += ((deltaPitch > 0) - (deltaPitch < 0)) * min(abs(deltaPitch), 0.5f);			
+		}
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// The following code advances the plane forward along its current orientation
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//account for roll
+	// if there is roll, then yaw should be gradually changed
+	GLfloat deltaYaw = 0.5f * timeDelta * this->roll; //0.5 is yaw per roll rate
+	this->yaw -= deltaYaw;
+
+	// determine aircraft direction from pitch, roll, and velocity and update position
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(this->pitch)) * cos(glm::radians(this->yaw + 90));
+	direction.y = sin(glm::radians(this->pitch));
+	direction.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw + 90));
+	glm::vec3 unitDirection = glm::normalize(direction);
+	this->position = this->position + this->speed * timeDelta * unitDirection;
+
+}
+
+void Camera::DoKeyboardMovement(GLfloat timeDelta) {
 	//set fixed-wing or rotor mode for upcoming loop
 	if (KeyboardHandler::fixedWing) {
 		this->MIN_SPEED = 5.0f;
@@ -45,16 +209,17 @@ void Camera::DoMovement(GLfloat timeValue)
 		GLfloat newRoll = this->roll;
 		if (rollLeftActive && !rollRightActive) {
 			newRoll += timeDelta * this->ROLL_NG_VELOCITY;
-		} else if(rollRightActive && !rollLeftActive){
+		}
+		else if (rollRightActive && !rollLeftActive) {
 			newRoll -= timeDelta * this->ROLL_NG_VELOCITY;
 		}
-		if ( newRoll!=this->roll) {
+		if (newRoll != this->roll) {
 			this->roll = newRoll;
 			this->roll = std::fmin(this->roll, this->MAX_ROLL);
 			this->roll = std::fmax(this->roll, this->MIN_ROLL);
 		}
 		// if there is roll, then yaw should be gradually changed
-		GLfloat deltaYaw = -1.25 * timeDelta * this->roll;
+		GLfloat deltaYaw = -0.5 * timeDelta * this->roll;
 		this->yaw += deltaYaw;
 
 		//pitch
@@ -186,56 +351,12 @@ void Camera::DoMovement(GLfloat timeValue)
 		// move vertically
 		if (KeyboardHandler::keys[GLFW_KEY_W]) {
 			this->position = this->position - this->ROTOR_VERTICAL_VELOCITY * timeDelta * glm::vec3(0.0f, 1.0f, 0.0f);
-		} else if(KeyboardHandler::keys[GLFW_KEY_S]){
+		}
+		else if (KeyboardHandler::keys[GLFW_KEY_S]) {
 			this->position = this->position + this->ROTOR_VERTICAL_VELOCITY * timeDelta * glm::vec3(0.0f, 1.0f, 0.0f);
-		}		
+		}
 	}
 
-
-	// key sequence for resetting orientation and velocity
-	if (KeyboardHandler::keys[GLFW_KEY_LEFT_CONTROL] || KeyboardHandler::keys[GLFW_KEY_RIGHT_CONTROL]) {
-		this->ResetOrientation();
-	} 
-	// spacebar resets the whole contraption
-	if (KeyboardHandler::keys[GLFW_KEY_SPACE]) {
-		this->Reset();
-	}
-
-	this->previousTimeValue = timeValue;
-}
-
-glm::mat4 Camera::GetCameraViewMatrix()
-{
-	glm::mat4 view; //rotate camera appropriately
-	view = glm::rotate(view, glm::radians(this->roll), glm::vec3(0.0f, 0.0f, -1.0f));
-	view = glm::rotate(view, glm::radians(this->pitch), glm::vec3(1.0f, 0.0f, 0.0f));
-	view = glm::rotate(view, glm::radians(this->yaw), glm::vec3(0.0f, 1.0f, 0.0f));
-	view = glm::translate(view, this->position); //move camera to current position
-	return view;
-
-}
-
-glm::mat4 Camera::GetProjectionMatrix()
-{
-	return glm::perspective(glm::radians(45.0f), (GLfloat)this->SCREEN_W / (GLfloat)this->SCREEN_H, 0.1f, this->viewDistance); // GLM handles creation of perspective transformation matrix
-}
-
-glm::mat4 Camera::GetOrthoMatrix() {
-	return glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-}
-
-glm::vec3 Camera::GetPosition(){
-	return this->position; // GLM handles creation of perspective transformation matrix
-}
-
-void Camera::ResetOrientation() {
-	this->pitch = 0; this->yaw = 0; this->roll = 0;
-	this->speed = 0; this->rotorStrafeSpeed = 0;
-}
-
-void Camera::Reset() {
-	this->ResetOrientation();
-	this->position = this->INITIAL_POSITION;
 }
 
 

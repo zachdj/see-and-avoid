@@ -27,7 +27,13 @@ Waypoint* Path::GetActiveWaypoint()
 			}
 		}
 	}
-	// if no active waypoint was found, then return null
+	// if no active waypoint was found, then set all waypoints to active (i.e. loop through course again)
+	for (int i = 0; i < this->waypoints.size(); i++) {
+		this->waypoints[i]->Activate();
+	}
+	if (this->waypoints.size() > 0) {
+		return this->waypoints[0];
+	}
 	return nullptr;
 }
 
