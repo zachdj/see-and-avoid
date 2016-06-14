@@ -6,13 +6,16 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
 #include <vector>
-#include <opencv\cv.h>
+//#include <opencv\cv.h>
+#include <opencv2\opencv.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
+
+#include "BlobTracker.h"
+#include "BlobInfo.h"
 
 
 using namespace std;
@@ -48,7 +51,7 @@ int main(void)
 	namedWindow("Control", CV_WINDOW_NORMAL);
 	cv::moveWindow("Control", 10, 10);
 	namedWindow("Blob Detection", CV_WINDOW_KEEPRATIO);
-	cv::moveWindow("Blob Detection", 10, 438);
+	cv::moveWindow("Blob Detection", 600, 10);
 
 	// Setup SimpleBlobDetector parameters.
 	SimpleBlobDetector::Params params;
@@ -84,6 +87,8 @@ int main(void)
 	//Reduce Frame count so we don't overuse our frames available
 	totalframe--; totalframe--; totalframe--;
 
+	BlobTracker tracker = BlobTracker(10);
+
 	while (waitKey(10) != 27 && totalframe>0)
 		//wait 10 milliseconds and check for esc key
 	{
@@ -109,7 +114,7 @@ int main(void)
 		    }
 
 		// Setup a rectangle to define your region of interest to crop
-		cv::Rect myROI(10, 20, 1220, 640);
+		cv::Rect myROI(30, 35, 1220, 580);
 
 		// Crop the full image to that image contained by the rectangle myROI
 		// Note that this doesn't copy the data
@@ -133,51 +138,27 @@ int main(void)
 		cv::Size s = im_with_keypoints.size();
 		int rows = s.height; cout << rows;
 		int cols = s.width; cout << "    " << cols << endl;
-		Point center = Point(rows / 2, cols / 2); int centerRows = rows / 2; int centerCols = cols / 2;
+		Point center = Point(cols / 2, rows / 2); int centerRows = rows / 2; int centerCols = cols / 2;
 
-		// Show blobs
-		MyLine(im_with_keypoints, Point(cols/2 + 30, rows/2), Point(cols/2 - 30, rows/2 ),250);
-		MyLine(im_with_keypoints, Point(cols / 2, rows / 2 + 30), Point(cols / 2, rows / 2 - 30),250);
+		tracker.AddFrame(keypoints);
 		
+		vector<BlobInfo> info = tracker.GetBlobInfo();
 
-		for (int i = 0; i < keypoints.size(); i++) {
-			cv::KeyPoint currentKeypoint = keypoints[i];
-			std::cout << "Size of blob is: " << currentKeypoint.size << std::endl;
-			float theta = -atan((-currentKeypoint.pt.y + centerRows) / (-currentKeypoint.pt.x + centerCols)) * 180 / PI;
-			if (currentKeypoint.pt.x < centerCols) cout << "Left" << endl; else cout << "Right" << endl;
-			std::cout << "The Angle from center is: " << theta << endl;
-		    }
+		std::cout << "Current x: " << keypoints[keypoints.size() - 1].pt.x << std::endl;
+		std::cout << "Current y: " << keypoints[keypoints.size() - 1].pt.y << std::endl;
 
-		//make sure we aer not working with anything without data
-		if (keypointsOld.empty()) {
-			if (!keypointsOld2.empty())
-				keypointsOld = keypointsOld2;
-			else if (!keypointsOld3.empty())
-				keypointsOld = keypointsOld2;
+		for (int i = 0; i < info.size(); i++) {
+			if (info[i].foundPct >= 0.6) {
+				circle(im_with_keypoints, Point(info[i].currentPositionX, info[i].currentPositionY), 50, Scalar(0, 255, 0), 8, 8);
+				MyLine(im_with_keypoints, 
+					Point(info[i].currentPositionX, info[i].currentPositionY), 
+					Point(info[i].currentPositionX + info[i].deltaX, info[i].currentPositionY + info[i].deltaY),
+					200);
+			}
+			
 		}
 
-		//find things that are close together
-		if (!keypointsOld.empty()) {
-			for (int i = 0; i < keypoints.size(); i++) {
-				for (int j = 0; j < keypointsOld.size(); j++) {
-					if (point2pointDistance(keypointsOld[j].pt.x, keypointsOld[j].pt.y, keypoints[i].pt.x, keypoints[i].pt.y)<60) {
-						cout << "Found something that matches!" << endl;
-						cout << "The Distance we found was: " << point2pointDistance(keypointsOld[j].pt.x, keypointsOld[j].pt.y, keypoints[i].pt.x, keypoints[i].pt.y) << endl;
-						MyLine(im_with_keypoints, Point(keypoints[i].pt.x - 30, keypoints[i].pt.y), Point(keypoints[i].pt.x + 30, keypoints[i].pt.y), 120);
-						if(i==j)
-							MyLine(im_with_keypoints, Point(keypoints[i].pt.x, keypoints[i].pt.y - 30), Point(keypoints[i].pt.x, keypoints[i].pt.y + 30), 120);
-					    
-					
-					
-					    }
-				    }
-			    }
-			}
-
-
 		imshow("Blob Detection", im_with_keypoints);
-		keypointsOld = keypoints;
-
 		//Subtract Frame and throw away 2 more. We do not need these many frames
 		totalframe--; cap >> frame; totalframe--; cap >> frame; totalframe--;
 
