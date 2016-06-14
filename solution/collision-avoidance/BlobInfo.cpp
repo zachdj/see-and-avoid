@@ -7,6 +7,7 @@ BlobInfo::BlobInfo()
 	this->deltaY = 0;
 	this->deltaSize = 0;
 	this->foundPct = 0;
+	this->collisionValue = 0;
 }
 
 BlobInfo::BlobInfo(unsigned int id, double deltaX, double deltaY, double deltaSize, float foundPct)
@@ -16,11 +17,23 @@ BlobInfo::BlobInfo(unsigned int id, double deltaX, double deltaY, double deltaSi
 	this->deltaY = deltaY;
 	this->deltaSize = deltaSize;
 	this->foundPct = foundPct;
+	this->collisionValue = 0;
 }
 
 unsigned int BlobInfo::GetId()
 {
 	return this->id;
+}
+
+unsigned int BlobInfo::GetCollisionValue()
+{
+	return this->collisionValue;
+
+}
+
+void BlobInfo::SetCollisionValue(double val)
+{
+	this->collisionValue = val;
 }
 
 BlobInfo::~BlobInfo()

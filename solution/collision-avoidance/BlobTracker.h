@@ -16,7 +16,7 @@ public:
 	~BlobTracker();
 
 	void AddFrame(vector<cv::KeyPoint> keypoints);
-	vector<BlobInfo> GetBlobInfo();
+	vector<BlobInfo> GetBlobInfo(cv::Point center);
 
 private:
 	static double pointToPointDistance2(double x1, double y1, double x2, double y2);

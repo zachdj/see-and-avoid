@@ -17,5 +17,6 @@ public:
 	double size;
 private:
 	unsigned int id;
+	
 };
 

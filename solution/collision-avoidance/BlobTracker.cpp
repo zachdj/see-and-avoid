@@ -4,6 +4,7 @@ struct TempBlobInfo {
 	double firstOccurrenceX, lastOccurrenceX;
 	double firstOccurrenceY, lastOccurrenceY;
 	double firstOccurrenceSize, lastOccurrenceSize;
+	double cumulativeCollisionValue;
 	double totalOccurrences;
 };
 
@@ -58,7 +59,7 @@ void BlobTracker::AddFrame(vector<cv::KeyPoint> keypoints) {
 }
 
 //returns a list of blob info
-vector<BlobInfo> BlobTracker::GetBlobInfo() {
+vector<BlobInfo> BlobTracker::GetBlobInfo(cv::Point center) {
 	//map will be indexed by blob id - holds information collected about that blob up to this point
 	std::map<unsigned int, TempBlobInfo> blobInfoMap;
 	
@@ -69,11 +70,17 @@ vector<BlobInfo> BlobTracker::GetBlobInfo() {
 		//iterate through each blob in this level
 		for (int i = 0; i < currentLevel.size(); i++) {
 			TrackedBlob currentBlob = currentLevel[i];
+
+			// determine the blob's collision weight at this point
+			int distance = pointToPointDistance2(currentBlob.posX, currentBlob.posY, center.x, center.y);
+			double weight = 10 / (1 + exp(-0.00009 * (-distance + 20000)));
+
 			//if our map already contains this blob, then just update its info
 			if (blobInfoMap.find(currentBlob.GetId()) != blobInfoMap.end()) {
 				blobInfoMap[currentBlob.GetId()].lastOccurrenceSize = currentBlob.size;
 				blobInfoMap[currentBlob.GetId()].lastOccurrenceX = currentBlob.posX;
 				blobInfoMap[currentBlob.GetId()].lastOccurrenceY = currentBlob.posY;
+				blobInfoMap[currentBlob.GetId()].cumulativeCollisionValue += weight;
 				blobInfoMap[currentBlob.GetId()].totalOccurrences++;
 			}
 			// otherwise insert the new TempBlobInfo
@@ -85,6 +92,7 @@ vector<BlobInfo> BlobTracker::GetBlobInfo() {
 				newBlobInfo.lastOccurrenceSize = currentBlob.size;
 				newBlobInfo.lastOccurrenceX = currentBlob.posX;
 				newBlobInfo.lastOccurrenceY = currentBlob.posY;
+				newBlobInfo.cumulativeCollisionValue = weight;
 				newBlobInfo.totalOccurrences = 1;
 
 				//blobInfoMap[currentBlob.GetId()] = newBlobInfo;
@@ -103,9 +111,12 @@ vector<BlobInfo> BlobTracker::GetBlobInfo() {
 			obj.second.lastOccurrenceX - obj.second.firstOccurrenceX,
 			obj.second.lastOccurrenceY - obj.second.firstOccurrenceY,
 			obj.second.lastOccurrenceSize - obj.second.firstOccurrenceSize,
-			(float)obj.second.totalOccurrences / this->historyLength);
+			(float)obj.second.totalOccurrences / this->historyLength); 
+		info.originalPositionX = obj.second.firstOccurrenceX;
+		info.originalPositionY = obj.second.firstOccurrenceY;
 		info.currentPositionX = obj.second.lastOccurrenceX;
 		info.currentPositionY = obj.second.lastOccurrenceY;
+		info.SetCollisionValue(obj.second.cumulativeCollisionValue);
 
 		blobInfo.push_back(info);
 	}

@@ -39,18 +39,25 @@ thickness,
 lineType);
 }
 
-float point2pointDistance(int pt1x, int pt1y, int pt2x, int pt2y) {
-	return  sqrt(pow((pt1x - pt2x),2) + pow((pt1y - pt2y),2));
+float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y) {
+	return  pow((pt1x - pt2x),2) + pow((pt1y - pt2y),2);
+}
+
+float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y) {
+	if (pt1x - pt2x != 0)
+		return  atan((pt1y - pt2y) / (pt1x - pt2x));
+	else
+		return atan((pt1y - pt2y) / (0.000001));
 }
 
 int main(void)
 {
 	Mat frame, canny_output;
-	VideoCapture cap("PlaneSim2.mp4");   //open the capture for video file
+	VideoCapture cap("PlaneSim3.mp4");   //open the capture for video file
 	int totalframe = cap.get(CV_CAP_PROP_FRAME_COUNT); // get total number of frames in video
 	namedWindow("Control", CV_WINDOW_NORMAL);
 	cv::moveWindow("Control", 10, 10);
-	namedWindow("Blob Detection", CV_WINDOW_KEEPRATIO);
+	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
 	cv::moveWindow("Blob Detection", 600, 10);
 
 	// Setup SimpleBlobDetector parameters.
@@ -87,7 +94,7 @@ int main(void)
 	//Reduce Frame count so we don't overuse our frames available
 	totalframe--; totalframe--; totalframe--;
 
-	BlobTracker tracker = BlobTracker(10);
+	BlobTracker tracker = BlobTracker(30);
 
 	while (waitKey(10) != 27 && totalframe>0)
 		//wait 10 milliseconds and check for esc key
@@ -142,11 +149,12 @@ int main(void)
 
 		tracker.AddFrame(keypoints);
 		
-		vector<BlobInfo> info = tracker.GetBlobInfo();
+		vector<BlobInfo> info = tracker.GetBlobInfo(center);
 
 		std::cout << "Current x: " << keypoints[keypoints.size() - 1].pt.x << std::endl;
 		std::cout << "Current y: " << keypoints[keypoints.size() - 1].pt.y << std::endl;
 
+		//This loop draws lines and circles on key elements of interest
 		for (int i = 0; i < info.size(); i++) {
 			if (info[i].foundPct >= 0.6) {
 				circle(im_with_keypoints, Point(info[i].currentPositionX, info[i].currentPositionY), 50, Scalar(0, 255, 0), 8, 8);
@@ -158,18 +166,41 @@ int main(void)
 			
 		}
 
+
+		rectangle(im_with_keypoints, Point(center.x - cols / 10, center.y - rows / 10), Point(center.x + cols / 10, center.y + rows / 10), Scalar(0, 0, 250), 8, 8);
+		rectangle(im_with_keypoints, Point(center.x - cols / 5, center.y - rows / 5), Point(center.x + cols / 5, center.y + rows / 5), Scalar(0, 250,0), 8, 8);
+		rectangle(im_with_keypoints, Point(center.x - cols / 3, center.y - rows / 3), Point(center.x + cols / 3, center.y + rows / 3), Scalar(250, 0,0), 8, 8);
+
+
+		//This loop will 
+		for (int i = 0; i < info.size(); i++) {
+
+			cout << "Weight: " << info[i].GetCollisionValue()<< endl;
+
+
+
+
+			/*
+			//if we are in given coordinates of the center, we must evade
+			if ((info[i].currentPositionX>center.x - 120 && info[i].currentPositionX<center.x + 120) && (info[i].currentPositionY > center.y - 100 && info[i].currentPositionY < center.y + 100)) {
+					cout << "We are within the rectangle - Small" << endl;
+					//if (info[i].deltaSize > 0)
+					//	cout << "This is a collision, we are gaining on them: "<<info[i].GetId() << endl;
+			   }
+			else if ((info[i].currentPositionX>center.x - 120 && info[i].currentPositionX<center.x + 120) && (info[i].currentPositionY > center.y - 100 && info[i].currentPositionY < center.y + 100)) {
+				cout << "We are within the rectangle - Potential Collision course" << endl;
+			}
+			
+			if (abs((point2pointAngle(info[i].currentPositionX, info[i].currentPositionY, center.x, center.y))-(point2pointAngle(info[i].originalPositionX, info[i].originalPositionY, center.x, center.y))) <7 && info[i].deltaX < 40 && info[i].deltaY < 40)
+				cout << "We are on a collision couse - non moving angle" << abs((point2pointAngle(info[i].currentPositionX, info[i].currentPositionY, center.x, center.y)) - (point2pointAngle(info[i].originalPositionX, info[i].originalPositionY, center.x, center.y)))<< endl;
+*/
+		}
+
 		imshow("Blob Detection", im_with_keypoints);
 		//Subtract Frame and throw away 2 more. We do not need these many frames
 		totalframe--; cap >> frame; totalframe--; cap >> frame; totalframe--;
 
-		//use this is we need to hault the program
-		/*if (firstTime) {
-			cout << "Press ENTER to start..." << endl;
-			char a;
-			cin >> a;
-			firstTime = false;
-		}
-		*/ 
+
 
 	}
 }
