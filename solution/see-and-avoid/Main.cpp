@@ -1,6 +1,7 @@
 #pragma once
 
 #define _ITERATOR_DEBUG_LEVEL 0
+#define DEBUG false
 #include <opencv2\opencv.hpp>
 using namespace cv;
 
@@ -78,10 +79,7 @@ int main() {
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		return -1;
 	}
-
-	//initialize Camera
-	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 0.0f));
-
+	
 	//setup the key callback
 	glfwSetKeyCallback(window, key_callback);
 
@@ -98,51 +96,63 @@ int main() {
 
 	//create some cubes!
 	vector<Cube> myCubes;
-	//cube tunnel!
-	/*for (int i = 0; i < 250; i++) {
-		Cube newCube1(glm::vec3(5.0f * sin(i), 5.0 * cos(i) , -10.0f * i));
-		Cube newCube2(glm::vec3(-5.0f * sin(i), -5.0 * cos(i) , -10.0f * i));
-		Cube newCube3(glm::vec3(5.0f * sin(i + 3.14159 / 2), 5.0f * cos(i + 3.14159 / 2) , -10.0f * i));
-		Cube newCube4(glm::vec3(-5.0 * sin(i + 3.14159*2.5), -5.0f * cos(i + 3.14159*2.5) , -10.0f * i));
-		myCubes.push_back(newCube1);
-		myCubes.push_back(newCube2);
-		myCubes.push_back(newCube3);
-		myCubes.push_back(newCube4);
-	}*/
-
 	//create a CubeDrawer
-	Shader defaultShader(".\\Shaders\\Cube\\cube.vs", ".\\Shaders\\Cube\\cube.fs");
+	Shader cubeShader(".\\Shaders\\Cube\\cube.vs", ".\\Shaders\\Cube\\cube.fs");
 	Texture woodBoxTexture(".\\asset\\container.jpg");
 	Texture acmeTexture(".\\asset\\acme.jpg");
-	CubeDrawer drawer(woodBoxTexture, acmeTexture, defaultShader);
+	CubeDrawer drawer(woodBoxTexture, acmeTexture, cubeShader);
 
-	// create a planeDrawer
+	// create a plane that follows a path
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 	vector< Aircraft*> myplanes;
 	vector<Waypoint *> waypoints;
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 200.0f, -750.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(150.0f, -100.0f, 0.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1200.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, -100.0f, -800.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-150.0f, 50.0f, -200.0f)));
-	Path myPath = Path(waypoints, 20.0f);
-	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -25.0f), myPath, 40.0f, ".\\Models\\plane\\plane.obj");
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 750.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 1150.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1650.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1250.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 750.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -750.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -1150.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1650.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1250.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -750.0f)));
+	Path planePath = Path(waypoints, 20.0f);
+	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1000.0f), planePath, 40.0f, ".\\Models\\plane\\plane.obj");
 	plane->SetSpeed(50.0f);
-	plane->SetOrientation(0.0f, 180.0f, 0.0f);
 	myplanes.push_back(plane);
 	PlaneDrawer planeDrawer(woodBoxTexture, planeShader);
 	
-	// uncomment for autonomous navigation
-	//camera.SetPath(myPath);
-	//camera.ActivateAutonomousMode();
+	// create a path for the camera (our plane)
+	//initialize Camera
+	Camera camera(width, height, glm::vec3(0.0f, 0.0f, -1500.0f));
+	vector<Waypoint *> cameraWaypoints;
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -750.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -1150.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1650.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1250.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -750.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 750.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 1150.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1650.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1250.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 750.0f)));
+	Path cameraPath = Path(cameraWaypoints, 20.0f);
+	camera.SetPath(cameraPath);
+	camera.ActivateAutonomousMode();
 
-	//create a cube at each waypoint
-
-	myCubes.push_back( Cube(glm::vec3(0.0f, 200.0f, -750.0f)));
-	myCubes.push_back( Cube(glm::vec3(150.0f, -100.0f, 0.0f)));
-	myCubes.push_back( Cube(glm::vec3(0.0f, 0.0f, -1200.0f)));
-	myCubes.push_back( Cube(glm::vec3(-300.0f, -100.0f, -800.0f)));
-	myCubes.push_back( Cube(glm::vec3(-150.0f, 50.0f, -200.0f)));
+	//create a cube at each waypoint for debugging purposes
+	if (DEBUG) {
+		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, -1000.0f)));
+		myCubes.push_back(Cube(glm::vec3(400.0f, 0.0f, -1400.0f)));
+		myCubes.push_back(Cube(glm::vec3(300.0f, 0.0f, -1900.0f)));
+		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, -1500.0f)));
+		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, -1000.0f)));
+		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, 1000.0f)));
+		myCubes.push_back(Cube(glm::vec3(-400.0f, 0.0f, 1400.0f)));
+		myCubes.push_back(Cube(glm::vec3(-300.0f, 0.0f, 1900.0f)));
+		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, 1500.0f)));
+		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, 1000.0f)));
+	}
 
 	//openCV camera display
 	VideoCapture cap(0); // open the default camera
