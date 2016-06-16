@@ -50,6 +50,9 @@ float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y) {
 		return atan((pt1y - pt2y) / (0.000001));
 }
 
+void renderScene();
+void processScene();
+
 int main(void)
 {
 	Mat frame, canny_output;
@@ -174,33 +177,12 @@ int main(void)
 
 		//This loop will 
 		for (int i = 0; i < info.size(); i++) {
-
 			cout << "Weight: " << info[i].GetCollisionValue()<< endl;
-
-
-
-
-			/*
-			//if we are in given coordinates of the center, we must evade
-			if ((info[i].currentPositionX>center.x - 120 && info[i].currentPositionX<center.x + 120) && (info[i].currentPositionY > center.y - 100 && info[i].currentPositionY < center.y + 100)) {
-					cout << "We are within the rectangle - Small" << endl;
-					//if (info[i].deltaSize > 0)
-					//	cout << "This is a collision, we are gaining on them: "<<info[i].GetId() << endl;
-			   }
-			else if ((info[i].currentPositionX>center.x - 120 && info[i].currentPositionX<center.x + 120) && (info[i].currentPositionY > center.y - 100 && info[i].currentPositionY < center.y + 100)) {
-				cout << "We are within the rectangle - Potential Collision course" << endl;
-			}
-			
-			if (abs((point2pointAngle(info[i].currentPositionX, info[i].currentPositionY, center.x, center.y))-(point2pointAngle(info[i].originalPositionX, info[i].originalPositionY, center.x, center.y))) <7 && info[i].deltaX < 40 && info[i].deltaY < 40)
-				cout << "We are on a collision couse - non moving angle" << abs((point2pointAngle(info[i].currentPositionX, info[i].currentPositionY, center.x, center.y)) - (point2pointAngle(info[i].originalPositionX, info[i].originalPositionY, center.x, center.y)))<< endl;
-*/
 		}
 
 		imshow("Blob Detection", im_with_keypoints);
 		//Subtract Frame and throw away 2 more. We do not need these many frames
 		totalframe--; cap >> frame; totalframe--; cap >> frame; totalframe--;
-
-
 
 	}
 }
