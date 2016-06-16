@@ -23,7 +23,7 @@ class Camera
 		void DoMovement(GLfloat timeValue); //should be called at the start of every frame
 		void ActivateAutonomousMode();
 		void DeactivateAutonomousMode();
-		void SetPath(Path & path);
+		void SetPath(Path * path);
 		Path * GetPath();
 		bool IsAutonomousNavigationActive();
 		glm::mat4 GetCameraViewMatrix();
@@ -34,7 +34,7 @@ class Camera
 
 	private :
 		bool autonomousModeActive;
-		Path path;
+		Path * path;
 		void DoAutonomousMovement(GLfloat timeDelta);
 		void DoKeyboardMovement(GLfloat timeDelta);
 

@@ -106,16 +106,16 @@ int main() {
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 	vector< Aircraft*> myplanes;
 	vector<Waypoint *> waypoints;
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 750.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 1150.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1650.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1250.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 750.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -750.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -1150.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1650.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1250.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -750.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 900.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1400.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -900.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1400.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
 	Path planePath = Path(waypoints, 20.0f);
 	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1000.0f), planePath, 40.0f, ".\\Models\\plane\\plane.obj");
 	plane->SetSpeed(50.0f);
@@ -124,21 +124,22 @@ int main() {
 	
 	// create a path for the camera (our plane)
 	//initialize Camera
-	Camera camera(width, height, glm::vec3(0.0f, 0.0f, -1500.0f));
+	Camera camera(width, height, glm::vec3(0.0f, 0.0f, -1000.0f));
 	vector<Waypoint *> cameraWaypoints;
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -750.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -1150.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1650.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1250.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -750.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 750.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 1150.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1650.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1250.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 750.0f)));
-	Path cameraPath = Path(cameraWaypoints, 20.0f);
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -900.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1400.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 900.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1400.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1000.0f)));
+	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
+	Path * cameraPath = new Path(cameraWaypoints, 20.0f);
 	camera.SetPath(cameraPath);
 	camera.ActivateAutonomousMode();
+	//cameraPath->SetAvoidanceWaypoint(new Waypoint(glm::vec3(0.0f, 10.0f, 750.0f)));
 
 	//create a cube at each waypoint for debugging purposes
 	if (DEBUG) {

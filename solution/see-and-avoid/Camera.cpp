@@ -17,7 +17,7 @@ Camera::Camera(GLuint screenW, GLuint screenH, glm::vec3 position)
 	this->SCREEN_H = screenH;
 
 	this->autonomousModeActive = false;
-	this->path = Path(); //default path is empty
+	this->path = new Path(); //default path is empty
 
 	this->INITIAL_POSITION = position;
 	this->position = position;
@@ -63,14 +63,14 @@ void Camera::DeactivateAutonomousMode()
 	this->speed = MIN_SPEED;
 }
 
-void Camera::SetPath(Path & path)
+void Camera::SetPath(Path * path)
 {
 	this->path = path;
 }
 
 Path * Camera::GetPath()
 {
-	return &this->path;
+	return this->path;
 }
 
 bool Camera::IsAutonomousNavigationActive()
