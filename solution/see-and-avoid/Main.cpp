@@ -35,56 +35,31 @@ using namespace cv;
 #include "CubeDrawer.h"
 #include "Aircraft.h"
 #include "PlaneDrawer.h"
+#include "PathHelper.h"
 
 #include "BlobTracker.h"
 
 using namespace std;
 
-static void error_callback(int error, const char* description)
-{
-	fputs(description, stderr);
-}
-
-//responds to keyboard events
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	KeyboardHandler::handle_key_press(window, key, scancode, action, mods);
-	//handle escape key
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	}
-}
-
-void MyLine(Mat img, Point start, Point end, int color)
-{
-	int thickness = 3;
-	int lineType = 8;
-	line(img,
-		start,
-		end,
-		CV_RGB(color, color, color),
-		thickness,
-		lineType);
-}
-
-float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y) {
-	return  pow((pt1x - pt2x), 2) + pow((pt1y - pt2y), 2);
-}
-
-float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y) {
-	if (pt1x - pt2x != 0)
-		return  atan((pt1y - pt2y) / (pt1x - pt2x));
-	else
-		return atan((pt1y - pt2y) / (0.000001));
-}
-
 //forward declarations go here
 int renderScene();
 int processScene();
-int allThings();
+
+static void error_callback(int error, const char* description);
+
+//responds to keyboard events
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+void MyLine(Mat img, Point start, Point end, int color);
+
+float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y);
+
+float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y);
+
 mutex semaphore;
 cv::Mat img; // this will contain the current view rendered by openGL.  Must be locking before any R/W operations
 bool renderingStopped = false;
+
 
 int main() {
 	thread renderThread(renderScene);
@@ -146,7 +121,7 @@ int renderScene() {
 	//set the clear color
 	glClearColor(0.8f, 0.9f, 1.0f, 1.0f); // sky blue-ish;  We should never see this if the skybox is working
 
-										  //tell openGL to use depth testing
+	//tell openGL to use depth testing
 	glEnable(GL_DEPTH_TEST);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to enable Wireframe mode
@@ -161,21 +136,12 @@ int renderScene() {
 	Texture acmeTexture(".\\asset\\acme.jpg");
 	CubeDrawer * cubeDrawer = new CubeDrawer(woodBoxTexture, acmeTexture, cubeShader);
 
+	// PathHelper for preloaded paths
+	PathHelper * pathHelper = new PathHelper();
+
 	// create a plane that follows a path
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
-	vector<Waypoint *> waypoints;
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 900.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1400.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1000.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -900.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1400.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	Path planePath = Path(waypoints, 20.0f);
-	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1000.0f), planePath, 40.0f, ".\\Models\\plane\\plane.obj");
+	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1000.0f), *pathHelper->GetPreloadedPath(1), 40.0f, ".\\Models\\plane\\plane.obj");
 	plane->SetSpeed(50.0f);
 	vector< Aircraft*> myplanes;
 	myplanes.push_back(plane);
@@ -185,36 +151,9 @@ int renderScene() {
 	//initialize Camera
 
 	Camera camera = Camera(width, height, glm::vec3(0.0f, 0.0f, -1000.0f));
-	vector<Waypoint *> cameraWaypoints;
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -900.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1400.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 900.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1400.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1000.0f)));
-	cameraWaypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	Path * cameraPath = new Path(cameraWaypoints, 20.0f);
-	camera.SetPath(cameraPath);
+	camera.SetPath(pathHelper->GetPreloadedPath(0));
 	camera.ActivateAutonomousMode();
-	//cameraPath->SetAvoidanceWaypoint(new Waypoint(glm::vec3(0.0f, 10.0f, 750.0f)));
-
-	//create a cube at each waypoint for debugging purposes
-	vector< Cube> myCubes; //cubes to be drawn
-	if (DEBUG) {
-		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, -500.0f)));
-		myCubes.push_back(Cube(glm::vec3(400.0f, 0.0f, -900.0f)));
-		myCubes.push_back(Cube(glm::vec3(300.0f, 0.0f, -1400.0f)));
-		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, -1000.0f)));
-		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, -500.0f)));
-		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, 500.0f)));
-		myCubes.push_back(Cube(glm::vec3(-400.0f, 0.0f, 900.0f)));
-		myCubes.push_back(Cube(glm::vec3(-300.0f, 0.0f, 1400.0f)));
-		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, 1000.0f)));
-		myCubes.push_back(Cube(glm::vec3(0.0f, 0.0f, 500.0f)));
-	}
+	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(500.0f, 0.0f, 500.0f)));
 
 	// we have to create openCV windows in this thread!
 	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
@@ -239,8 +178,6 @@ int renderScene() {
 
 		//draw skybox
 		skybox->Draw(view, projection);
-
-		cubeDrawer->Draw(view, projection, timeValue, myCubes);
 
 		//draw aircraft
 		planeDrawer->Draw(view, projection, camera.GetPosition(), timeValue, myplanes);
@@ -353,22 +290,19 @@ int processScene() {
 			//This loop draws lines and circles on key elements of interest
 			for (int i = 0; i < info.size(); i++) {
 				if (info[i].foundPct >= 0.6) {
-					circle(im_with_keypoints, Point(info[i].currentPositionX, info[i].currentPositionY), 50, Scalar(0, 255, 0), 8, 8);
+					double weight = info[i].GetCollisionValue();
+					circle(im_with_keypoints, Point(info[i].currentPositionX, info[i].currentPositionY), weight/250 * 50, Scalar(0, 0, weight), 4, 8);
 					MyLine(im_with_keypoints,
 						Point(info[i].currentPositionX, info[i].currentPositionY),
 						Point(info[i].currentPositionX + info[i].deltaX, info[i].currentPositionY + info[i].deltaY),
 						200);
+					cout << "Weight: " << weight << endl;
 				}
 			}
 
-			rectangle(im_with_keypoints, Point(center.x - cols / 10, center.y - rows / 10), Point(center.x + cols / 10, center.y + rows / 10), Scalar(0, 0, 250), 8, 8);
-			rectangle(im_with_keypoints, Point(center.x - cols / 5, center.y - rows / 5), Point(center.x + cols / 5, center.y + rows / 5), Scalar(0, 250, 0), 8, 8);
-			rectangle(im_with_keypoints, Point(center.x - cols / 3, center.y - rows / 3), Point(center.x + cols / 3, center.y + rows / 3), Scalar(250, 0, 0), 8, 8);
-
-
-			//This loop will 
-			for (int i = 0; i < info.size(); i++) {
-				cout << "Weight: " << info[i].GetCollisionValue() << endl;
+			double step = rows / 5;
+			for (int i = 1; i < 6; i++) {
+				circle(im_with_keypoints, center, i*step, Scalar(0.0f, 255 * (1 - i/6.0), 0.0f), 5);
 			}
 
 			imshow("Blob Detection", im_with_keypoints);
@@ -376,4 +310,43 @@ int processScene() {
 		
 	}
 	return 0;
+}
+
+
+static void error_callback(int error, const char* description)
+{
+	fputs(description, stderr);
+}
+
+//responds to keyboard events
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	KeyboardHandler::handle_key_press(window, key, scancode, action, mods);
+	//handle escape key
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+}
+
+void MyLine(Mat img, Point start, Point end, int color)
+{
+	int thickness = 3;
+	int lineType = 8;
+	line(img,
+		start,
+		end,
+		CV_RGB(color, color, color),
+		thickness,
+		lineType);
+}
+
+float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y) {
+	return  pow((pt1x - pt2x), 2) + pow((pt1y - pt2y), 2);
+}
+
+float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y) {
+	if (pt1x - pt2x != 0)
+		return  atan((pt1y - pt2y) / (pt1x - pt2x));
+	else
+		return atan((pt1y - pt2y) / (0.000001));
 }
