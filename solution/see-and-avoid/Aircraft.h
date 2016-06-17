@@ -9,8 +9,8 @@
 class Aircraft
 {
 public:
-	Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, GLchar* modelFilePath);
-	Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* modelFilePath);
+	Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, GLchar* modelFilePath, GLfloat scale);
+	Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* modelFilePath, GLfloat scale);
 	void SetOrientation(GLfloat pitch, GLfloat yaw, GLfloat roll);
 	void SetPosition(glm::vec3 position);
 	void SetSpeed(GLfloat newSpeed);
@@ -24,7 +24,7 @@ public:
 	bool hasCollided; //keeps track of whether this aircraft has collided with the camera to prevent multiple reportings
 
 	Model model; // Model used for drawing this aircraft
-
+	GLfloat scale;
 	~Aircraft();
 
 private:

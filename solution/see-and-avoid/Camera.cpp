@@ -154,7 +154,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 			GLfloat angle = angleSign * angleMagnitude; //angle between vectors
 
 			//we have the angle between the current orientation and the direction we need to be going.  Now map that angle to a certain degree of roll
-			GLfloat weight = (2 * angleMagnitude + 1)*(2 * angleMagnitude + 1);  // (2x + 1)^2
+			GLfloat weight = (1 * angleMagnitude + 1)*(1 * angleMagnitude + 1);  // (2x + 1)^2
 			weight = -(weight + 1) / weight + 2; // 2 - ((2x + 1)^2 + 1) / (2x + 1)^2
 			//weight function maps angle into a value between zero and 1 - this is the percentage of max roll
 			GLfloat newRoll = angleSign * weight * 45.0f; // 45 degrees is max roll

@@ -1,6 +1,6 @@
 #include "Aircraft.h"
 
-Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, GLchar * modelFilePath) : model(modelFilePath)
+Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, GLchar * modelFilePath, GLfloat scale) : model(modelFilePath)
 {
 	this->position = startingPos;
 	this->pitch = 0.0f;
@@ -8,6 +8,7 @@ Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, 
 	this->yaw = 0.0f;
 	Model aircraftModel(modelFilePath);
 	this->model = aircraftModel;
+	this->scale = scale;
 
 	this->hasCollided = false;
 	this->collisionRadius = collisionRadius;
@@ -18,7 +19,7 @@ Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, 
 
 }
 
-Aircraft::Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* filepath) : model(filepath)
+Aircraft::Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* filepath, GLfloat scale) : model(filepath)
 {
 	this->position = position;
 	this->pitch = 0.0f;
@@ -26,6 +27,7 @@ Aircraft::Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* filepath
 	this->yaw = 0.0f;
 	Model aircraftModel(filepath);
 	this->model = aircraftModel;
+	this->scale = scale;
 
 	this->hasCollided = false;
 	this->collisionRadius = collisionRadius;
