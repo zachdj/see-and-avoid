@@ -136,6 +136,7 @@
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="PathHelper.cpp" />
     <ClCompile Include="PlaneDrawer.cpp" />
+    <ClCompile Include="PlaneGenerator.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Path.h" />
     <ClInclude Include="PathHelper.h" />
     <ClInclude Include="PlaneDrawer.h" />
+    <ClInclude Include="PlaneGenerator.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Texture.h" />

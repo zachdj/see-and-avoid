@@ -3,7 +3,6 @@
 #define _ITERATOR_DEBUG_LEVEL 0
 #define PI 3.14159265
 #define DEBUG false
-#define RANDOM false
 
 //OpenCV includes
 #include <opencv2/highgui/highgui.hpp>
@@ -39,6 +38,7 @@ using namespace cv;
 #include "Aircraft.h"
 #include "PlaneDrawer.h"
 #include "PathHelper.h"
+#include "PlaneGenerator.h"
 
 #include "BlobTracker.h"
 
@@ -46,22 +46,23 @@ using namespace std;
 
 /**************************** forward declarations go here **************************************************/
 
+bool RANDOM = false;
+
 int renderScene();
 int processScene();
 
 static void error_callback(int error, const char* description);
 
+void MyLine(Mat img, Point start, Point end, int red, int green, int blue);
+
 //responds to keyboard events
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-void MyLine(Mat img, Point start, Point end, int red, int green, int blue);
 
 float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y);
 float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y);
 void on_trackbar(int, void*);
 
-vector< Aircraft*> generatePlanes();
-vector< Aircraft*> generateRandomPlanes();
 
 mutex semaphore;
 cv::Mat img; // this will contain the current view rendered by openGL.  Must be locking before any R/W operations
@@ -73,6 +74,7 @@ vector< Aircraft*> myplanes;
 int planeSelection = 0;
 Camera camera;
 
+vector<Mat> trial;
 /***************************** End forward declarations ********************************************************/
 
 int main() {
@@ -157,16 +159,16 @@ int renderScene() {
 	// create a plane that follows a path
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 
+	PlaneGenerator planeGenerator(RANDOM);
+    myplanes = planeGenerator.getPlanes();
+	
+
 	if (RANDOM) {
+		trial = planeGenerator.getPlanePaths();
 		namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
 		cv::moveWindow("Plane Paths", 400, 10);
-		myplanes = generateRandomPlanes();
-		createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planePaths.size() - 1, on_trackbar);
+		createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);
 		on_trackbar(1, 0);
-		//imshow("Plane Paths", planePaths.at(planeSelection));
-	}
-	else {
-		myplanes = generatePlanes();
 	}
 
 	PlaneDrawer * planeDrawer = new PlaneDrawer(woodBoxTexture, planeShader);
@@ -216,6 +218,7 @@ int renderScene() {
 		cv::flip(img, img, 0);
 		semaphore.unlock();
 
+		
 		if (RANDOM) {
 			on_trackbar(1, 0);
 		}
@@ -337,151 +340,9 @@ int processScene() {
 	return 0;
 }
 
-vector< Aircraft*> generatePlanes() {
-	vector< Aircraft*> myLocalplanes;
-	vector<Waypoint *> waypoints;
-
-
-	//plane 1
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 900.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1400.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1000.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -900.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1400.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	Path planePath = Path(waypoints, 20.0f);
-	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -700.0f), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
-	plane->SetSpeed(50.0f);
-	myLocalplanes.push_back(plane);
-
-	//plane 2
-	waypoints.clear();
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 70.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 400.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -40.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -700.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	Path planePath2 = Path(waypoints, 20.0f);
-	Aircraft* plane2 = new Aircraft(glm::vec3(0.0f, 0.0f, -100.0f), planePath2, 40.0f, ".\\Models\\plane\\plane.obj", 0.7);
-	plane2->SetSpeed(100.0f);
-	myLocalplanes.push_back(plane2);
-
-	//plane 3
-	waypoints.clear();
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 0.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
-	Path planePath3 = Path(waypoints, 20.0f);
-	Aircraft* plane3 = new Aircraft(glm::vec3(0.0f, 0.0f, -200.0f), planePath3, 40.0f, ".\\Models\\vought\\vought.obj", 0.01);
-	plane3->SetSpeed(50.0f);
-	plane3->SetOrientation(0.0f, 180.0f, 0.0f);
-	myLocalplanes.push_back(plane3);
-
-	//plane 4
-	waypoints.clear();
-	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, 50.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-900.0f, 0.0f, 90.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 800.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -900.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(350.0f, 0.0f, -20.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, -10.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	Path planePath4 = Path(waypoints, 20.0f);
-	Aircraft* plane4 = new Aircraft(glm::vec3(0.0f, 0.0f, -400.0f), planePath4, 40.0f, ".\\Models\\plane\\plane.obj", 0.7);
-	plane4->SetSpeed(20.0f);
-	myLocalplanes.push_back(plane4);
-
-	//plane 5
-	waypoints.clear();
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 900.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 400.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -900.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(400.0f, 0.0f, -900.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -400.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 900.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(20.0f, 0.0f, -100.0f)));
-	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	Path planePath5 = Path(waypoints, 20.0f);
-	Aircraft* plane5 = new Aircraft(glm::vec3(0.0f, 0.0f, -1000.0f), planePath5, 40.0f, ".\\Models\\plane\\plane.obj", 0.7);
-	plane5->SetSpeed(100.0f);
-	myLocalplanes.push_back(plane5);
-
-	return myLocalplanes;
-
-}
-
-vector< Aircraft*> generateRandomPlanes() {
-	vector< Aircraft*> myLocalplanes;
-	vector<Waypoint *> waypoints;
-	vector<Point> points;
-	vector<vector<Point>> planePoints;
-
-
-	cout << "Enter the number of random generated planes..." << endl;
-	int numberOfPlanes;
-	cin >> numberOfPlanes;
-
-	int widthOfAirspace = 2000;
-	int waypointSize = 4;
-
-	//As many planes as you want
-	for (int i = 0; i < numberOfPlanes; i++) {
-		waypoints.clear();
-		for (int j = 0; j < waypointSize; j++) {
-			float x = (float)(rand() % widthOfAirspace - widthOfAirspace / 2);
-			float z = (float)(rand() % widthOfAirspace - widthOfAirspace / 2);
-			waypoints.push_back(new Waypoint(glm::vec3(x, 0.0f, z)));
-			points.push_back(Point(x, z));
-		}
-		Path planePath = Path(waypoints, 20.0f);
-		int planeType = rand() % 3;
-		Aircraft* plane;
-		if (planeType == 0)
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 40.0f, ".\\Models\\vought\\vought.obj", 0.01);
-		else if (planeType == 1)
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
-		else
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 40.0f, ".\\Models\\plane\\plane.obj", 0.7);
-		plane->SetSpeed(50.0f);
-		myLocalplanes.push_back(plane);
-		planePoints.push_back(points);
-		points.clear();
-	}
-
-	//fix this piece of shit Matrix
-	Mat completeDrawing(500, 500, CV_8UC3, Scalar(255, 255, 255));
-	//As many planes as you want
-	for (int i = 0; i < numberOfPlanes; i++) {
-		Mat individual(500, 500, CV_8UC3, Scalar(255, 255, 255));
-		int red = rand() % 255; int green = rand() % 255; int blue = rand() % 255;
-		for (int j = 1; j <= waypointSize; j++) {
-			if (j != waypointSize) {
-				MyLine(completeDrawing, planePoints.at(i).at(j), planePoints.at(i).at(j - 1), red, green, blue);
-				MyLine(individual, planePoints.at(i).at(j), planePoints.at(i).at(j - 1), red, green, blue);
-			}
-			else {
-				MyLine(completeDrawing, planePoints.at(i).at(j - 1), planePoints.at(i).at(0), red, green, blue);
-				MyLine(individual, planePoints.at(i).at(j - 1), planePoints.at(i).at(0), red, green, blue);
-			}
-		}
-		planePaths.push_back(individual);
-	}
-	planePaths.push_back(completeDrawing);
-
-	return myLocalplanes;
-
-}
 
 void on_trackbar(int, void*) {
-	Mat local = planePaths.at(planeSelection).clone();
+	Mat local = trial.at(planeSelection).clone();
 	if (planeSelection == myplanes.size()) {
 		for (int i = 0; i < myplanes.size(); i++) {
 			circle(local, Point((myplanes.at(i)->position.x + 1000) / 4, (myplanes.at(i)->position.z + 1000) / 4), 10, Scalar(0, 0, 0), 3);
@@ -514,17 +375,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 
-void MyLine(Mat img, Point start, Point end, int red, int green, int blue)
-{
-	int thickness = 3;
-	int lineType = 8;
-	line(img,
-		Point((start.x + 1000) / 4, (start.y + 1000) / 4),
-		Point((end.x + 1000) / 4, (end.y + 1000) / 4),
-		Scalar(red, green, blue),
-		thickness,
-		lineType);
-}
 
 float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y) {
 	return  pow((pt1x - pt2x), 2) + pow((pt1y - pt2y), 2);
@@ -535,4 +385,16 @@ float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y) {
 		return  atan((pt1y - pt2y) / (pt1x - pt2x));
 	else
 		return atan((pt1y - pt2y) / (0.000001));
+}
+
+void MyLine(Mat img, Point start, Point end, int red, int green, int blue)
+{
+	int thickness = 3;
+	int lineType = 8;
+	line(img,
+		Point((start.x + 1000) / 4, (start.y + 1000) / 4),
+		Point((end.x + 1000) / 4, (end.y + 1000) / 4),
+		Scalar(red, green, blue),
+		thickness,
+		lineType);
 }
