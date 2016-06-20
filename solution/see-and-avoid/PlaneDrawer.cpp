@@ -1,10 +1,13 @@
 #include "PlaneDrawer.h"
+#include <time.h>
+#include <ctime>
 
 PlaneDrawer::PlaneDrawer(Texture & tex, Shader & planeShader)
 {
 	this->tex = tex;
 	this->shader = planeShader;
 	this->previousTimeStep = 0;
+
 }
 
 const float PlaneDrawer::YAW_PER_ROLL = 0.5f;
@@ -121,12 +124,32 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 
 		current->model.Draw(this->shader);
 
+
+		
 		//detect collision with camera:
 		GLfloat collisionRadius = current->collisionRadius;
 		if (distanceToCam < collisionRadius && !current->hasCollided) {
-			std::cout << "Collision with Aircraft detected!" << std::endl;
+			//std::cout << "Collision with Aircraft detected!" << std::endl;
+			PrintToFile::print("Collision with Aircraft detected!");
+			stringstream x, y, z; 
+			x << current->position.x; z << current->position.z; z << current->position.z;
+			PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str());
+			stringstream planeNum; planeNum << i;
+			PrintToFile::print("Plane: " + planeNum.str());
+			//time_t t = time(0);
+			//struct tm * now = localtime(&t);
+			//char* dt = ctime(&now);
+			//stringstream time; time << dt;
+			//PrintToFile::print(time.str());
+			//cout << "The local date and time is: " << dt << endl;
+
 			current->hasCollided = true;
 		}
+		else if (distanceToCam < collisionRadius && current->hasCollided) {
+			current->hasCollided = true;
+		}
+		else
+			current->hasCollided = false;
 	}
 
 	glBindVertexArray(0); //unbind vertex array

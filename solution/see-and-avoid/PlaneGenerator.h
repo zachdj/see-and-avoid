@@ -15,7 +15,7 @@ using namespace cv;
 class PlaneGenerator
 {
 public:
-	PlaneGenerator(bool random);
+	PlaneGenerator(bool random, int widthOfAirpace);
 	vector< Aircraft*> getPlanes();
 	vector< Mat> getPlanePaths();
 	~PlaneGenerator();
@@ -26,7 +26,7 @@ private:
 	vector<Point> points;
 	vector<vector<Point>> planePoints;
 	vector< Mat> planePaths;
-	int planeSelection = 0;
+	int widthOfAirspace;
 	bool myRandom;
 
 	void generatePlanes();

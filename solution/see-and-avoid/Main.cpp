@@ -39,7 +39,9 @@ using namespace cv;
 #include "PlaneDrawer.h"
 #include "PathHelper.h"
 #include "PlaneGenerator.h"
+#include "PrintToFile.h"
 
+#include <sstream>
 #include "BlobTracker.h"
 
 using namespace std;
@@ -72,12 +74,17 @@ vector< Mat> planePaths;
 vector< Aircraft*> myplanes;
 
 int planeSelection = 0;
+int widthOfAirspace = 4000;
 Camera camera;
 
-vector<Mat> trial;
+vector<Mat> PlanePathMatrices;
 /***************************** End forward declarations ********************************************************/
 
 int main() {
+
+	PrintToFile::clearFile();
+	PrintToFile::print("Test printing to a file");
+
 	thread renderThread(renderScene);
 
 	thread processThread(processScene);
@@ -115,12 +122,15 @@ int renderScene() {
 
 	//Time to create a window with GLFW
 	GLFWwindow* window = glfwCreateWindow(width / 2.0, height / 2.0, "See and Avoid Sim", nullptr, nullptr);
+	
 	if (window == nullptr) //ensure the window was initialized
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
+	//hide the window for setup
+	glfwHideWindow(window);
 	glfwMakeContextCurrent(window);
 
 	//Initialize GLEW before calling any openGL functions
@@ -159,17 +169,17 @@ int renderScene() {
 	// create a plane that follows a path
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 
-	PlaneGenerator planeGenerator(RANDOM);
+	
+	//Create Planes Before Drawing any new windows
+	PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
     myplanes = planeGenerator.getPlanes();
 	
-
-	if (RANDOM) {
-		trial = planeGenerator.getPlanePaths();
-		namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
-		cv::moveWindow("Plane Paths", 400, 10);
-		createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);
-		on_trackbar(1, 0);
-	}
+	PlanePathMatrices = planeGenerator.getPlanePaths();
+	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
+	cv::moveWindow("Plane Paths", 400, 10);
+	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);
+	on_trackbar(1, 0);
+	
 
 	PlaneDrawer * planeDrawer = new PlaneDrawer(woodBoxTexture, planeShader);
 
@@ -182,6 +192,9 @@ int renderScene() {
 	// we have to create openCV windows in this thread!
 	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
 	cv::moveWindow("Blob Detection", 600, 10);
+
+	//Show the Window again once we are ready
+	glfwShowWindow(window);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -218,11 +231,8 @@ int renderScene() {
 		cv::flip(img, img, 0);
 		semaphore.unlock();
 
+		on_trackbar(1, 0);
 		
-		if (RANDOM) {
-			on_trackbar(1, 0);
-		}
-
 		// swap buffers to display what we just rendered on the back buffer
 		glfwSwapBuffers(window);
 	}
@@ -322,7 +332,7 @@ int processScene() {
 					circle(im_with_keypoints, Point(info[i].currentPositionX, info[i].currentPositionY), weight / 250 * 50, Scalar(0, 0, weight), 4, 8);
 					MyLine(im_with_keypoints,
 						Point(info[i].currentPositionX, info[i].currentPositionY),
-						Point(info[i].currentPositionX + info[i].deltaX, info[i].currentPositionY + info[i].deltaY),
+						Point(info[i].currentPositionX - info[i].deltaX, info[i].currentPositionY - info[i].deltaY),
 						200, 200, 200);
 					cout << "Weight: " << weight << endl;
 				}
@@ -342,18 +352,24 @@ int processScene() {
 
 
 void on_trackbar(int, void*) {
-	Mat local = trial.at(planeSelection).clone();
+	Mat local = PlanePathMatrices.at(planeSelection).clone();
 	if (planeSelection == myplanes.size()) {
 		for (int i = 0; i < myplanes.size(); i++) {
-			circle(local, Point((myplanes.at(i)->position.x + 1000) / 4, (myplanes.at(i)->position.z + 1000) / 4), 10, Scalar(0, 0, 0), 3);
+			stringstream value; value << i;
+			//circle(local, Point((myplanes.at(i)->position.x + widthOfAirspace/2) / (widthOfAirspace / 500), (myplanes.at(i)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(0, 0, 0), 3);
+			putText(local, value.str(), Point((myplanes.at(i)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(i)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), FONT_HERSHEY_SIMPLEX,0.7, Scalar(0, 0, 0),2,8,false);
 		}
 	}
 	else {
-		circle(local, Point((myplanes.at(planeSelection)->position.x + 1000) / 4, (myplanes.at(planeSelection)->position.z + 1000) / 4), 10, Scalar(0, 0, 0), 3);
+		//circle(local, Point((myplanes.at(planeSelection)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(0, 0, 0), 3);
+		stringstream value; value << planeSelection;
+		putText(local, value.str(), Point((myplanes.at(planeSelection)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 0, 0), 2, 8, false);
+		line(local, Point((myplanes.at(planeSelection)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), Point((myplanes.at(planeSelection)->GetPath()->GetActiveWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->GetPath()->GetActiveWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)),Scalar(255,0,0),1, CV_AA);
 	}
 	glm::vec3 pos = camera.GetPosition();
-	cout << pos.x << ", " << pos.z << endl;
-	circle(local, Point(-(camera.GetPosition().x - 1000) / 4, -(camera.GetPosition().z - 1000) / 4), 10, Scalar(0, 0, 255), 3);
+	circle(local, Point(-(camera.GetPosition().x - widthOfAirspace / 2) / (widthOfAirspace / 500), -(camera.GetPosition().z - widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(0, 0, 255), -1);
+	
+	
 	imshow("Plane Paths", local);
 
 }
@@ -392,8 +408,8 @@ void MyLine(Mat img, Point start, Point end, int red, int green, int blue)
 	int thickness = 3;
 	int lineType = 8;
 	line(img,
-		Point((start.x + 1000) / 4, (start.y + 1000) / 4),
-		Point((end.x + 1000) / 4, (end.y + 1000) / 4),
+		Point((start.x), (start.y )),
+		Point((end.x ) , (end.y)),
 		Scalar(red, green, blue),
 		thickness,
 		lineType);
