@@ -37,6 +37,24 @@ Waypoint* Path::GetActiveWaypoint()
 	return nullptr;
 }
 
+Waypoint* Path::GetNextPathWaypoint()
+{
+	for (int i = 0; i < this->waypoints.size(); i++) {
+		if (this->waypoints[i]->IsActive()) {
+			return this->waypoints[i];
+		}
+	}
+	
+	// if no active waypoint was found, then set all waypoints to active (i.e. loop through course again)
+	for (int i = 0; i < this->waypoints.size(); i++) {
+		this->waypoints[i]->Activate();
+	}
+	if (this->waypoints.size() > 0) {
+		return this->waypoints[0];
+	}
+	return nullptr;
+}
+
 void Path::SetAvoidanceWaypoint(Waypoint * waypoint)
 {
 	this->avoidanceWaypoint = waypoint;

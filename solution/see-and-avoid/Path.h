@@ -14,6 +14,7 @@ public:
 	Path();
 	Path(vector<Waypoint *> waypoints, GLfloat completionRadius);
 	Waypoint* GetActiveWaypoint();
+	Waypoint* GetNextPathWaypoint();
 	void SetAvoidanceWaypoint(Waypoint * waypoint);
 	void CompleteWaypoint();
 
