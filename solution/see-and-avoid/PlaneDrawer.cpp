@@ -130,19 +130,18 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 		GLfloat collisionRadius = current->collisionRadius;
 		if (distanceToCam < collisionRadius && !current->hasCollided) {
 			//std::cout << "Collision with Aircraft detected!" << std::endl;
-			PrintToFile::print("Collision with Aircraft detected!");
+			//PrintToFile::print("Collision with Aircraft detected!");
 			stringstream x, y, z; 
-			x << current->position.x; z << current->position.z; z << current->position.z;
-			PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str());
+			x << current->position.x; y << current->position.y; z << current->position.z;
+			PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str(),true);
 			stringstream planeNum; planeNum << i;
 			PrintToFile::print("Plane: " + planeNum.str());
-			//time_t t = time(0);
-			//struct tm * now = localtime(&t);
-			//char* dt = ctime(&now);
-			//stringstream time; time << dt;
-			//PrintToFile::print(time.str());
-			//cout << "The local date and time is: " << dt << endl;
-
+			//Get the current time as well
+			time_t now = time(0);
+			tm *ltm = localtime(&now);
+			stringstream hour, min, sec; hour << ltm->tm_hour; min << 1 + ltm->tm_min; sec << 1 + ltm->tm_sec;
+			PrintToFile::print("Time: " + hour.str() + ":" + min.str() + ":" + sec.str());
+			PrintToFile::print("");
 			current->hasCollided = true;
 		}
 		else if (distanceToCam < collisionRadius && current->hasCollided) {

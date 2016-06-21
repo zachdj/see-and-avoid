@@ -83,7 +83,8 @@ vector<Mat> PlanePathMatrices;
 int main() {
 
 	PrintToFile::clearFile();
-	PrintToFile::print("Test printing to a file");
+	PrintToFile::clearDebugFile();
+	
 
 	thread renderThread(renderScene);
 

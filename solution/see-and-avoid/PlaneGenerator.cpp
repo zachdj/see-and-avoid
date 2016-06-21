@@ -38,7 +38,7 @@ void PlaneGenerator::generatePlanes() {
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
 	Path planePath = Path(waypoints, 20.0f);
-	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -700.0f), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
+	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -700.0f), planePath, 15.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
 	plane->SetSpeed(50.0f);
 	myPlanes.push_back(plane);
 	for (int i = 0; i < waypoints.size(); i++) 
@@ -70,7 +70,7 @@ void PlaneGenerator::generatePlanes() {
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 0.0f)));
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
 	Path planePath3 = Path(waypoints, 20.0f);
-	Aircraft* plane3 = new Aircraft(glm::vec3(0.0f, 0.0f, -200.0f), planePath3, 40.0f, ".\\Models\\vought\\vought.obj", 0.01);
+	Aircraft* plane3 = new Aircraft(glm::vec3(0.0f, 0.0f, -200.0f), planePath3, 10.0f, ".\\Models\\vought\\vought.obj", 0.01);
 	plane3->SetSpeed(50.0f);
 	plane3->SetOrientation(0.0f, 180.0f, 0.0f);
 	myPlanes.push_back(plane3);
@@ -146,9 +146,9 @@ void PlaneGenerator::generateRandomPlanes() {
 		int planeType = rand() % 3;
 		Aircraft* plane;
 		if (planeType == 0)
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 40.0f, ".\\Models\\vought\\vought.obj", 0.01);
+			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 10.0f, ".\\Models\\vought\\vought.obj", 0.01);
 		else if (planeType == 1)
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
+			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 15.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
 		else
 			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 40.0f, ".\\Models\\plane\\plane.obj", 0.7);
 		plane->SetSpeed(50.0f);
