@@ -40,6 +40,7 @@ using namespace cv;
 #include "PathHelper.h"
 #include "PlaneGenerator.h"
 #include "PrintToFile.h"
+#include <math.h>
 
 #include <sstream>
 #include "BlobTracker.h"
@@ -336,6 +337,15 @@ int processScene() {
 						Point(info[i].currentPositionX - info[i].deltaX, info[i].currentPositionY - info[i].deltaY),
 						200, 200, 200);
 					cout << "Weight: " << weight << endl;
+					if (weight > 240) {
+						glm::vec3 active = camera.GetPath()->GetActiveWaypoint()->GetPosition();
+						glm::vec3 current = camera.GetPosition();
+						cout << active.x << " " << active.z << " location: " << current.x << " " << current.z << endl;
+						Waypoint *newWay = new Waypoint(glm::vec3((active.x + current.x) / 2, (current.y-50.0),(active.z + current.z) / 2));
+						camera.GetPath()->SetAvoidanceWaypoint(newWay);
+					}
+
+
 				}
 			}
 
@@ -343,7 +353,6 @@ int processScene() {
 			for (int i = 1; i < 6; i++) {
 				circle(im_with_keypoints, center, i*step, Scalar(0.0f, 255 * (1 - i / 6.0), 0.0f), 5);
 			}
-
 			imshow("Blob Detection", im_with_keypoints);
 		}
 
