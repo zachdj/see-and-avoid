@@ -18,7 +18,9 @@ Path::Path(vector<Waypoint*> waypoints, GLfloat completionRadius)
 // either returns the collision avoidance waypoint or the next active waypoint along the route
 Waypoint* Path::GetActiveWaypoint()
 {
-	if (this->avoidanceWaypoint != NULL && this->avoidanceWaypoint->IsActive()) {
+	if (this->loopBreakWaypoint != NULL && this->loopBreakWaypoint->IsActive()) {
+		return this->loopBreakWaypoint;
+	} else if (this->avoidanceWaypoint != NULL && this->avoidanceWaypoint->IsActive()) {
 		return this->avoidanceWaypoint;
 	} else {
 		for (int i = 0; i < this->waypoints.size(); i++) {
@@ -58,6 +60,12 @@ Waypoint* Path::GetNextPathWaypoint()
 void Path::SetAvoidanceWaypoint(Waypoint * waypoint)
 {
 	this->avoidanceWaypoint = waypoint;
+}
+
+
+void Path::SetLoopBreakWaypoint(Waypoint * waypoint)
+{
+	this->loopBreakWaypoint = waypoint;
 }
 
 void Path::CompleteWaypoint()
