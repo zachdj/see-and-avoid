@@ -134,15 +134,8 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 			direction.y = sin(glm::radians(-this->pitch));
 			direction.z = -cos(glm::radians(-this->pitch)) * sin(glm::radians(this->yaw + 90));
 			direction = normalize(direction);
-			glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-			glm::vec3 cross = glm::normalize(glm::cross(up, direction));
-			PrintVector(direction, "Direction: ");
-			PrintVector(cross, "Cross: ");
-
-			PrintVector(this->position + 500.0f*direction + 500.0f*cross, "Sum: ");
-
-			this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 130.0f*direction + 0.0f*cross));
+			this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 130.0f*direction));
 			active = this->GetPath()->GetActiveWaypoint();
 		}
 
