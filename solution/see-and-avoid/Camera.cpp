@@ -5,6 +5,11 @@ void PrintVector(glm::vec3 vector, GLchar* name) {
 	std::cout << name << ": " << vector.x << ", " << vector.y << ", " << vector.z << std::endl;
 }
 
+GLfloat dist2(glm::vec3 v1, glm::vec3 v2) {
+	glm::vec3 temp = v2 - v1;
+	return dot(temp, temp);
+}
+
 Camera::Camera()
 {
 	this->SCREEN_W = 800;
@@ -121,6 +126,19 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 	// get the active waypoint
 	Waypoint * active = this->GetPath()->GetActiveWaypoint();
 	if (active != nullptr) {
+		//ensure that waypoint isn't unreachable
+		if (dist2(active->GetPosition(), this->position) < 40000  && abs(this->roll) >= this->MAX_ROLL-6) {
+			//set an avoidance waypoint to break the loop
+			glm::vec3 direction;
+			direction.x = -cos(glm::radians(-this->pitch)) * cos(glm::radians(this->yaw + 90));
+			direction.y = sin(glm::radians(-this->pitch));
+			direction.z = -cos(glm::radians(-this->pitch)) * sin(glm::radians(this->yaw + 90));
+			direction = normalize(direction);
+
+			this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 130.0f*direction));
+			active = this->GetPath()->GetActiveWaypoint();
+		}
+
 		glm::vec3 activePosition = active->GetPosition();
 		glm::vec3 vectorToObject;
 		vectorToObject.x = activePosition.x - this->position.x;

@@ -14,8 +14,9 @@ public:
 	Path();
 	Path(vector<Waypoint *> waypoints, GLfloat completionRadius);
 	Waypoint* GetActiveWaypoint();
-	Waypoint* GetNextPathWaypoint();
+	Waypoint* GetNextPathWaypoint(); // returns nextwaypoint on path, ignoring avoidance and loopBreak waypoints
 	void SetAvoidanceWaypoint(Waypoint * waypoint);
+	void SetLoopBreakWaypoint(Waypoint * waypoint);
 	void CompleteWaypoint();
 
 	GLfloat waypointCompletionRadius;
@@ -23,6 +24,7 @@ public:
 
 private:
 	vector<Waypoint *> waypoints;
-	Waypoint * avoidanceWaypoint; // the avoidance waypoint is a waypoint we can set to avoid collisions.  It will always take top navigational priority
+	Waypoint * loopBreakWaypoint; // The loop break waypoint prevents situations where its impossible to reach the current WP because it's inside the turning radius.  It takes priority over every waypoint
+	Waypoint * avoidanceWaypoint; // the avoidance waypoint is a waypoint we can set to avoid collisions.  It will always take top navigational priority over normal waypoints
 };
 
