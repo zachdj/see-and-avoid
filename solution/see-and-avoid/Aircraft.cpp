@@ -52,6 +52,15 @@ void Aircraft::SetSpeed(GLfloat newSpeed)
 	this->speed = newSpeed;
 }
 
+glm::vec3 Aircraft::GetCurrentDirection() {
+	// determine aircraft direction from pitch, roll, and velocity and update position
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(this->pitch)) * cos(glm::radians(this->yaw + 90));
+	direction.y = sin(glm::radians(this->pitch));
+	direction.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw + 90));
+	return glm::normalize(direction);
+}
+
 bool Aircraft::IsAutonomous()
 {
 	return this->autonomousMode;
