@@ -117,7 +117,7 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
 		//apply attenuation based on distance
-		GLfloat distToCamSqrd = pow(camPosition.x - current->position.x, 2) + pow(camPosition.y - current->position.y, 2) + pow(camPosition.z + current->position.z, 2);
+		GLfloat distToCamSqrd = pow(-camPosition.x - current->position.x, 2) + pow(-camPosition.y - current->position.y, 2) + pow(-camPosition.z + current->position.z, 2);
 		GLfloat distanceToCam = sqrtf(distToCamSqrd);
 		float attenuation = 1.0 / (1.0 + 0.00014 * distanceToCam + 0.0000007 * distToCamSqrd);
 		glUniform1f(glGetUniformLocation(this->shader.Program, "attenuation"), attenuation);

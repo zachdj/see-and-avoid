@@ -188,7 +188,7 @@ int renderScene() {
 	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 1000.0f));
 	camera.SetPath(pathHelper->GetPreloadedPath(0));
 	camera.ActivateAutonomousMode();
-	camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(0.0f, 100.0f, -2000.0f)));
+	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(0.0f, 100.0f, -2000.0f)));
 
 	// we have to create openCV windows in this thread!
 	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
@@ -287,6 +287,7 @@ int processScene() {
 			vector<vector<Point> > contours;
 			vector<Vec4i> hierarchy;
 
+			cvtColor(frame, frame, CV_RGB2GRAY);
 			// Detect edges using canny
 			Canny(frame, canny_output, 260, 380, 3);
 			//imshow("After Canny", canny_output);
@@ -338,15 +339,22 @@ int processScene() {
 					//cout << "Weight: " << weight << endl;
 					//cout << "Active waypoint: " << active.x << " " << active.y << " "<< active.z <<  endl;// " location: " << current.x << " " << current.z << endl;
 					//cout << "Current Location: " << -current.x << " " << -current.y << " " << -current.z <<  endl;// " location: " << current.x << " " << current.z << endl;
-					/*if (weight > 240 && camera.IsAutonomousNavigationActive()) {
+					if (weight > 240) {
 						glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
 						glm::vec3 current = camera.GetPosition();
-						Waypoint *newWay = new Waypoint(glm::vec3((-active.x - current.x) / 2.0, (-current.y-50.0),(active.z - current.z) / 2.0));
-						cout << "Current pos: " << -current.x << ", " << -current.y << ", " << -current.z << ", " << endl;
+						Waypoint *newWay = new Waypoint(glm::vec3((-active.x + current.x) / 2.0, (current.y - 100.0), (active.z + current.z) / 2.0));
+						cout << "Current pos: " << current.x << ", " << current.y << ", " << current.z << ", " << endl;
 						cout << "Active WP pos: " << active.x << ", " << active.y << ", " << active.z << ", " << endl;
 						cout << "Setting new WP: " << newWay->GetPosition().x << ", " << newWay->GetPosition().y << ", " << newWay->GetPosition().z << ", " << endl;
+						double dist2 = point2pointDistance2(newWay->GetPosition().x, newWay->GetPosition().z, current.x, current.z);
+						cout << dist2 << endl;
+						if (dist2 < pow(400, 2)) {
+							glm::vec3 direction = glm::normalize(newWay->GetPosition() + current);
+							newWay = new Waypoint(glm::vec3(-300, -100, -800));
+						}
+
 						camera.GetPath()->SetAvoidanceWaypoint(newWay);
-					}*/
+					}
 
 
 				}
