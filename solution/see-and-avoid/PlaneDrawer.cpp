@@ -12,7 +12,7 @@ PlaneDrawer::PlaneDrawer(Texture & tex, Shader & planeShader)
 
 const float PlaneDrawer::YAW_PER_ROLL = 0.5f;
 
-void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPosition, GLfloat timeValue, std::vector<Aircraft*> & toDraw)
+void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, std::vector<Aircraft*> & toDraw)
 {
 	GLfloat timeDelta = timeValue - this->previousTimeStep;
 
@@ -28,8 +28,8 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 		Aircraft* current = toDraw[i];
 
 		// Draw the loaded model
-		glUniformMatrix4fv(glGetUniformLocation(this->shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(this->shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(this->shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(camera.GetProjectionMatrix()));
+		glUniformMatrix4fv(glGetUniformLocation(this->shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetCameraViewMatrix()));
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 		// This code changes the plane's orientation to navigate to its current waypoint
@@ -123,21 +123,40 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 		
 		//detect collision with camera:
 		GLfloat collisionRadius = current->collisionRadius;
+
 		if (distanceToCam < collisionRadius && !current->hasCollided) {
-			//std::cout << "Collision with Aircraft detected!" << std::endl;
-			//PrintToFile::print("Collision with Aircraft detected!");
-			stringstream x, y, z; 
-			x << current->position.x; y << current->position.y; z << current->position.z;
-			PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str(),true);
-			stringstream planeNum; planeNum << i;
-			PrintToFile::print("Plane: " + planeNum.str());
-			//Get the current time as well
-			time_t now = time(0);
-			tm *ltm = localtime(&now);
-			stringstream hour, min, sec; hour << ltm->tm_hour; min << 1 + ltm->tm_min; sec << 1 + ltm->tm_sec;
-			PrintToFile::print("Time: " + hour.str() + ":" + min.str() + ":" + sec.str());
-			PrintToFile::print("");
-			current->hasCollided = true;
+			glm::vec3 planeDir = current->GetCurrentDirection();
+			glm::vec3 cameraDir = camera.GetCurrentDirection();
+			if (atan((cameraDir.z - planeDir.z) / (cameraDir.x - planeDir.x)) < 3.14 && atan((cameraDir.z - planeDir.z) / (cameraDir.x - planeDir.x)) > 0) {
+				PrintToFile::printDebug("Hit in the back");
+				//Get the current time as well
+				time_t now = time(0);
+				tm *ltm = localtime(&now);
+				stringstream hour, min, sec; hour << ltm->tm_hour; min << ltm->tm_min; sec << 1 + ltm->tm_sec;
+				PrintToFile::printDebug("Time: " + hour.str() + ":" + min.str() + ":" + sec.str());
+				PrintToFile::printDebug("");
+				current->hasCollided = true;
+
+
+			}
+				
+			else {
+				//std::cout << "Collision with Aircraft detected!" << std::endl;
+				//PrintToFile::print("Collision with Aircraft detected!");
+				stringstream x, y, z; 
+				x << current->position.x; y << current->position.y; z << current->position.z;
+				PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str(),true);
+				stringstream planeNum; planeNum << i;
+				PrintToFile::print("Plane: " + planeNum.str());
+				//Get the current time as well
+				time_t now = time(0);
+				tm *ltm = localtime(&now);
+				stringstream hour, min, sec; hour << ltm->tm_hour; min << ltm->tm_min; sec << 1 + ltm->tm_sec;
+				PrintToFile::print("Time: " + hour.str() + ":" + min.str() + ":" + sec.str());
+				PrintToFile::print("");
+				current->hasCollided = true;
+			}
+			
 		}
 		else if (distanceToCam < collisionRadius && current->hasCollided) {
 			current->hasCollided = true;

@@ -145,9 +145,9 @@ void PlaneGenerator::generateRandomPlanes() {
 		int planeType = rand() % 3;
 		Aircraft* plane;
 		if (planeType == 0)
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 20.0f, ".\\Models\\vought\\vought.obj", 0.01);
+			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 30.0f, ".\\Models\\vought\\vought.obj", 0.01);
 		else if (planeType == 1)
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 35.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
+			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
 		else
 			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 60.0f, ".\\Models\\plane\\plane.obj", 0.7);
 		plane->SetSpeed(50.0f);
@@ -158,6 +158,43 @@ void PlaneGenerator::generateRandomPlanes() {
 	DrawPathsOnMatrix();
 
 }
+
+void PlaneGenerator::generateApproachingPlanes() {
+	cout << "Enter the number of approaching planes...";
+	int numberOfPlanes;
+	cin >> numberOfPlanes;
+
+	int start = -2500;
+
+	//As many planes as you want
+	for (int i = 0; i < numberOfPlanes; i++) {
+		waypoints.clear();
+		float x = (float)(rand() % widthOfAirspace - widthOfAirspace / 2);
+		float y = (float)(rand() % 200 - 100);
+			waypoints.push_back(new Waypoint(glm::vec3(x, y, start)));
+			points.push_back(Point(x, start));
+			waypoints.push_back(new Waypoint(glm::vec3(x, y,start+13000)));
+			points.push_back(Point(x, start + 13000));
+		
+		Path planePath = Path(waypoints, 20.0f);
+		int planeType = rand() % 3;
+		Aircraft* plane;
+		if (planeType == 0)
+			plane = new Aircraft(glm::vec3(x, y, start), planePath, 30.0f, ".\\Models\\vought\\vought.obj", 0.01);
+		else if (planeType == 1)
+			plane = new Aircraft(glm::vec3(x, y, start), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
+		else
+			plane = new Aircraft(glm::vec3(x, y, start), planePath, 60.0f, ".\\Models\\plane\\plane.obj", 0.7);
+		plane->SetSpeed(50.0f);
+		myPlanes.push_back(plane);
+		planePoints.push_back(points);
+		points.clear();
+		start -= 100;
+	}
+	DrawPathsOnMatrix();
+
+}
+
 
 
 //This function takes our planes and draws a top down view of each of their paths. It also creates a total airspace flight path for all airplanes. 
