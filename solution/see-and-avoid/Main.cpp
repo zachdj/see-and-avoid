@@ -393,7 +393,10 @@ void on_trackbar(int, void*) {
 	}
 	circle(local, Point((camera.GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(0, 0, 255), -1);
 	if (camera.GetPath() != nullptr && camera.GetPath()->GetActiveWaypoint() != nullptr) {
-		circle(local, Point((camera.GetPath()->GetActiveWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetActiveWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(180, 105, 255), -1);
+		circle(local, Point((camera.GetPath()->GetNextPathWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetNextPathWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(180, 105, 255), -1);
+		if(camera.GetPath()->GetActiveWaypoint()->GetPosition() != camera.GetPath()->GetNextPathWaypoint()->GetPosition())
+			circle(local, Point((camera.GetPath()->GetActiveWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetActiveWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 7, Scalar(180, 105, 255), -1);
+	
 	}	
 	imshow("Plane Paths", local);
 
