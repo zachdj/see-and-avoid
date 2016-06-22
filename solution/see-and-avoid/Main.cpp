@@ -339,7 +339,7 @@ int processScene() {
 					//cout << "Weight: " << weight << endl;
 					//cout << "Active waypoint: " << active.x << " " << active.y << " "<< active.z <<  endl;// " location: " << current.x << " " << current.z << endl;
 					//cout << "Current Location: " << -current.x << " " << -current.y << " " << -current.z <<  endl;// " location: " << current.x << " " << current.z << endl;
-					if (weight > 240) {
+					if (weight > 240  || info[i].deltaSize > 100) {
 						glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
 						glm::vec3 current = camera.GetPosition();
 
