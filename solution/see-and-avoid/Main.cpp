@@ -342,21 +342,24 @@ int processScene() {
 					if (weight > 240) {
 						glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
 						glm::vec3 current = camera.GetPosition();
-						glm::vec3 halfdistance = glm::vec3((-active.x + current.x) / 2.0, (current.y - 100.0), (active.z + current.z) / 2.0);
-						glm::vec3 up = glm::vec3(0.0f, 0.10f, 0.0f);
-						glm::vec3 normal = cross(up, halfdistance);
-						Waypoint * newWay = new Waypoint(halfdistance + normal);
-						//Waypoint *newWay = new Waypoint(glm::vec3((-active.x + current.x) / 2.0, (current.y - 100.0), (active.z + current.z) / 2.0));
+
+						glm::vec3 vectorToActive = active - current;
 						
-						/*cout << "Current pos: " << current.x << ", " << current.y << ", " << current.z << ", " << endl;
-						cout << "Active WP pos: " << active.x << ", " << active.y << ", " << active.z << ", " << endl;
-						cout << "Setting new WP: " << newWay->GetPosition().x << ", " << newWay->GetPosition().y << ", " << newWay->GetPosition().z << ", " << endl;
-						double dist2 = point2pointDistance2(newWay->GetPosition().x, newWay->GetPosition().z, current.x, current.z);
-						cout << dist2 << endl;
-						if (dist2 < pow(400, 2)) {
-							glm::vec3 direction = glm::normalize(newWay->GetPosition() + current);
-							newWay = new Waypoint(glm::vec3(direction.x * 600, direction.y-100, direction.z * 600));
-						}*/
+						glm::vec3 vectorToActiveDown = vectorToActive;
+						vectorToActiveDown.y -= 200.0f;
+						glm::vec3 normal = glm::normalize(glm::cross(vectorToActive, vectorToActiveDown));
+
+						Waypoint * newWay = new Waypoint(current + vectorToActiveDown*0.5f + normal*300.0f);// + glm::length(halfdistance)*normal);
+						
+						//TODOS:
+						/*
+							- revert to ATC style if waypoint is far enough away
+							- deterine dodging direction based on 1) obstacle movement path and 2) next waypoint direction
+							- create more debugging tools
+							- introduce more bugs
+							- touch up Gertrude's eyes
+							
+						*/
 
 						camera.GetPath()->SetAvoidanceWaypoint(newWay);
 					}

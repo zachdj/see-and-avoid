@@ -59,12 +59,14 @@ Waypoint* Path::GetNextPathWaypoint()
 
 void Path::SetAvoidanceWaypoint(Waypoint * waypoint)
 {
+	this->loopBreakWaypoint = nullptr;
 	this->avoidanceWaypoint = waypoint;
 }
 
 
 void Path::SetLoopBreakWaypoint(Waypoint * waypoint)
 {
+	this->avoidanceWaypoint = nullptr;
 	this->loopBreakWaypoint = waypoint;
 }
 
