@@ -96,7 +96,7 @@ glm::mat4 Camera::GetCameraViewMatrix()
 
 glm::mat4 Camera::GetProjectionMatrix()
 {
-	return glm::perspective(glm::radians(45.0f), (GLfloat)this->SCREEN_W / (GLfloat)this->SCREEN_H, 0.1f, this->viewDistance); // GLM handles creation of perspective transformation matrix
+	return glm::perspective(glm::radians(this->FOV), (GLfloat)this->SCREEN_W / (GLfloat)this->SCREEN_H, 0.1f, this->viewDistance); // GLM handles creation of perspective transformation matrix
 }
 
 glm::mat4 Camera::GetOrthoMatrix() {
@@ -105,6 +105,14 @@ glm::mat4 Camera::GetOrthoMatrix() {
 
 glm::vec3 Camera::GetPosition(){
 	return this->position;
+}
+
+glm::vec3 Camera::GetCurrentDirection() {
+	glm::vec3 direction;
+	direction.x = -cos(glm::radians(-this->pitch)) * cos(glm::radians(this->yaw + 90));
+	direction.y = sin(glm::radians(-this->pitch));
+	direction.z = -cos(glm::radians(-this->pitch)) * sin(glm::radians(this->yaw + 90));
+	return normalize(direction);
 }
 
 void Camera::ResetOrientation() {
@@ -129,11 +137,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 		//ensure that waypoint isn't unreachable
 		if (dist2(active->GetPosition(), this->position) < 30000  && abs(this->roll) >= this->MAX_ROLL-6) {
 			//set an avoidance waypoint to break the loop
-			glm::vec3 direction;
-			direction.x = -cos(glm::radians(-this->pitch)) * cos(glm::radians(this->yaw + 90));
-			direction.y = sin(glm::radians(-this->pitch));
-			direction.z = -cos(glm::radians(-this->pitch)) * sin(glm::radians(this->yaw + 90));
-			direction = normalize(direction);
+			glm::vec3 direction = this->GetCurrentDirection();
 
 			this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 150.0f*direction));
 			active = this->GetPath()->GetActiveWaypoint();
@@ -151,11 +155,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 		else {
 			vectorToObject = glm::normalize(vectorToObject);
 
-			glm::vec3 planeDirection;
-			planeDirection.z = -cos(glm::radians(this->pitch)) * cos(glm::radians(this->yaw));
-			planeDirection.y = 0; // restrict to horizontal plane
-			planeDirection.x = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw));
-			planeDirection = glm::normalize(planeDirection);
+			glm::vec3 planeDirection = this->GetCurrentDirection();
 
 			//find angle between the current direction and the direction to the object (direction we want to go)
 			GLfloat dotProd = glm::dot(planeDirection, vectorToObject);
@@ -199,11 +199,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 	this->yaw -= deltaYaw;
 
 	// determine aircraft direction from pitch, roll, and velocity and update position
-	glm::vec3 direction;
-	direction.x = -cos(glm::radians(-this->pitch)) * cos(glm::radians(this->yaw + 90));
-	direction.y = sin(glm::radians(-this->pitch));
-	direction.z = -cos(glm::radians(-this->pitch)) * sin(glm::radians(this->yaw + 90));
-	glm::vec3 unitDirection = glm::normalize(direction);
+	glm::vec3 unitDirection = this->GetCurrentDirection();
 	this->position = this->position + this->speed * timeDelta * unitDirection;
 
 }
@@ -288,11 +284,7 @@ void Camera::DoKeyboardMovement(GLfloat timeDelta) {
 		//move UAV forward along current direction if speed > 0
 		if (this->speed > 0) {
 			//find direction
-			glm::vec3 direction;
-			direction.x = -cos(glm::radians(-this->pitch)) * cos(glm::radians(this->yaw + 90));
-			direction.y = sin(glm::radians(-this->pitch));
-			direction.z = -cos(glm::radians(-this->pitch)) * sin(glm::radians(this->yaw + 90));
-			glm::vec3 unitDirection = glm::normalize(direction);
+			glm::vec3 unitDirection = this->GetCurrentDirection();
 			this->position = this->position + this->speed * timeDelta * unitDirection;
 		}
 

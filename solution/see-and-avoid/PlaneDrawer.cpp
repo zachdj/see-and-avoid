@@ -97,11 +97,7 @@ void PlaneDrawer::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 camPositi
 		current->yaw += deltaYaw;
 
 		// determine aircraft direction from pitch, roll, and velocity and update position
-		glm::vec3 direction;
-		direction.x = cos(glm::radians(current->pitch)) * cos(glm::radians(current->yaw + 90));
-		direction.y = sin(glm::radians(current->pitch));
-		direction.z = cos(glm::radians(current->pitch)) * sin(glm::radians(current->yaw + 90));
-		glm::vec3 unitDirection = glm::normalize(direction);
+		glm::vec3 unitDirection = current->GetCurrentDirection();
 		current->position = current->position + current->speed * timeDelta * unitDirection;
 
 
