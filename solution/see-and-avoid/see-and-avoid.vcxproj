@@ -127,6 +127,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Aircraft.cpp" />
+    <ClCompile Include="Algorithms\AtcAvoidance.cpp" />
     <ClCompile Include="BlobInfo.cpp" />
     <ClCompile Include="BlobTracker.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -147,6 +148,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aircraft.h" />
+    <ClInclude Include="Algorithms\AtcAvoidance.h" />
+    <ClInclude Include="Algorithms\AvoidanceAlgorithm.h" />
     <ClInclude Include="BlobInfo.h" />
     <ClInclude Include="BlobTracker.h" />
     <ClInclude Include="Camera.h" />

@@ -29,6 +29,9 @@ using namespace cv;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <math.h>
+#include <sstream>
+
 #include "KeyboardHandler.h"
 #include "Skybox.h"
 #include "Shader.h"
@@ -40,9 +43,7 @@ using namespace cv;
 #include "PathHelper.h"
 #include "PlaneGenerator.h"
 #include "PrintToFile.h"
-#include <math.h>
-
-#include <sstream>
+#include "Algorithms\AtcAvoidance.h"
 #include "BlobTracker.h"
 
 using namespace std;
@@ -61,11 +62,9 @@ void MyLine(Mat img, Point start, Point end, int red, int green, int blue);
 //responds to keyboard events
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-
 float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y);
 float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y);
 void on_trackbar(int, void*);
-
 
 mutex semaphore;
 cv::Mat img; // this will contain the current view rendered by openGL.  Must be locking before any R/W operations
@@ -77,6 +76,8 @@ vector< Aircraft*> myplanes;
 int planeSelection = 0;
 int widthOfAirspace = 4000;
 Camera camera;
+
+AtcAvoidance ai = AtcAvoidance();
 
 vector<Mat> PlanePathMatrices;
 /***************************** End forward declarations ********************************************************/
@@ -168,7 +169,6 @@ int renderScene() {
 	PathHelper * pathHelper = new PathHelper();
 
 	// create a plane that follows a path
-	// create a plane that follows a path
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 
 	
@@ -179,8 +179,7 @@ int renderScene() {
 	PlanePathMatrices = planeGenerator.getPlanePaths();
 	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
 	cv::moveWindow("Plane Paths", 400, 10);
-	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);
-	
+	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);	
 
 	PlaneDrawer * planeDrawer = new PlaneDrawer(woodBoxTexture, planeShader);
 
@@ -290,7 +289,6 @@ int processScene() {
 			cvtColor(frame, frame, CV_RGB2GRAY);
 			// Detect edges using canny
 			Canny(frame, canny_output, 260, 380, 3);
-			//imshow("After Canny", canny_output);
 			dilate(canny_output, canny_output, cv::Mat(), cv::Point(-1, -1), 10);
 
 			// Find contours
@@ -326,7 +324,6 @@ int processScene() {
 			tracker.AddFrame(keypoints);
 
 			vector<BlobInfo> info = tracker.GetBlobInfo(center);
-
 			//This loop draws lines and circles on key elements of interest
 			for (int i = 0; i < info.size(); i++) {
 				if (info[i].foundPct >= 0.6) {
@@ -336,38 +333,11 @@ int processScene() {
 						Point(info[i].currentPositionX, info[i].currentPositionY),
 						Point(info[i].currentPositionX - info[i].deltaX, info[i].currentPositionY - info[i].deltaY),
 						200, 200, 200);
-					//cout << "Weight: " << weight << endl;
-					//cout << "Active waypoint: " << active.x << " " << active.y << " "<< active.z <<  endl;// " location: " << current.x << " " << current.z << endl;
-					//cout << "Current Location: " << -current.x << " " << -current.y << " " << -current.z <<  endl;// " location: " << current.x << " " << current.z << endl;
-					if (weight > 240) {
-						glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
-						glm::vec3 current = camera.GetPosition();
-
-						glm::vec3 vectorToActive = active - current;
-						
-						glm::vec3 vectorToActiveDown = vectorToActive;
-						vectorToActiveDown.y -= 200.0f;
-						glm::vec3 normal = glm::normalize(glm::cross(vectorToActive, vectorToActiveDown));
-
-						Waypoint * newWay = new Waypoint(current + vectorToActiveDown*0.5f + normal*300.0f);// + glm::length(halfdistance)*normal);
-						
-						//TODOS:
-						/*
-							- revert to ATC style if waypoint is far enough away
-							- deterine dodging direction based on 1) obstacle movement path and 2) next waypoint direction
-							- create more debugging tools
-							- introduce more bugs
-							- touch up Gertrude's eyes
-							
-						*/
-
-						camera.GetPath()->SetAvoidanceWaypoint(newWay);
-					}
-
-
+					ai.reactToBlob(info[i], camera);
 				}
 			}
 
+			// this loop draws circles on the radar
 			double step = rows / 5;
 			for (int i = 1; i < 6; i++) {
 				circle(im_with_keypoints, center, i*step, Scalar(0.0f, 255 * (1 - i / 6.0), 0.0f), 5);
@@ -385,7 +355,6 @@ void on_trackbar(int, void*) {
 	if (planeSelection == myplanes.size()) {
 		for (int i = 0; i < myplanes.size(); i++) {
 			stringstream value; value << i;
-			//circle(local, Point((myplanes.at(i)->position.x + widthOfAirspace/2) / (widthOfAirspace / 500), (myplanes.at(i)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(0, 0, 0), 3);
 			putText(local, value.str(), Point((myplanes.at(i)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(i)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), FONT_HERSHEY_SIMPLEX,0.7, Scalar(0, 0, 0),2,8,false);
 		}
 	}
