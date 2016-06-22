@@ -84,7 +84,7 @@ glm::mat4 Camera::GetCameraViewMatrix()
 	view = glm::rotate(view, glm::radians(this->roll), glm::vec3(0.0f, 0.0f, -1.0f));
 	view = glm::rotate(view, glm::radians(this->pitch), glm::vec3(1.0f, 0.0f, 0.0f));
 	view = glm::rotate(view, glm::radians(this->yaw), glm::vec3(0.0f, 1.0f, 0.0f));
-	view = glm::translate(view, this->position); //move camera to current position
+	view = glm::translate(view, glm::vec3(-this->position.x, -this->position.y, -this->position.z)); //move camera to current position
 	return view;
 
 }
@@ -99,7 +99,7 @@ glm::mat4 Camera::GetOrthoMatrix() {
 }
 
 glm::vec3 Camera::GetPosition(){
-	return this->position; // GLM handles creation of perspective transformation matrix
+	return this->position;
 }
 
 void Camera::ResetOrientation() {
@@ -122,11 +122,10 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 	Waypoint * active = this->GetPath()->GetActiveWaypoint();
 	if (active != nullptr) {
 		glm::vec3 activePosition = active->GetPosition();
-		//check if we are within the completion radius of the waypoint
 		glm::vec3 vectorToObject;
-		vectorToObject.x = activePosition.x + this->position.x;
+		vectorToObject.x = activePosition.x - this->position.x;
 		vectorToObject.y = 0; // restrict to horizontal plane
-		vectorToObject.z = activePosition.z + this->position.z;
+		vectorToObject.z = activePosition.z - this->position.z;
 
 		if (glm::length(vectorToObject) < this->GetPath()->waypointCompletionRadius) {
 			this->GetPath()->CompleteWaypoint();
@@ -164,7 +163,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 
 			// vertical navigation: as long as there's a height difference, adjust pitch to accomodate
 
-			GLfloat deltaHeight = activePosition.y + this->position.y;
+			GLfloat deltaHeight = activePosition.y - this->position.y;
 			weight = -(2 / (1 + exp(-0.05 * deltaHeight)) - 1); // logistic function between -1 and 1
 			GLfloat newPitch = weight * 45.0f; // max pitch is 45 degrees
 			GLfloat deltaPitch = newPitch - this->pitch;
@@ -183,9 +182,9 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 
 	// determine aircraft direction from pitch, roll, and velocity and update position
 	glm::vec3 direction;
-	direction.x = cos(glm::radians(this->pitch)) * cos(glm::radians(this->yaw + 90));
-	direction.y = sin(glm::radians(this->pitch));
-	direction.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw + 90));
+	direction.x = -cos(glm::radians(-this->pitch)) * cos(glm::radians(this->yaw + 90));
+	direction.y = sin(glm::radians(-this->pitch));
+	direction.z = -cos(glm::radians(-this->pitch)) * sin(glm::radians(this->yaw + 90));
 	glm::vec3 unitDirection = glm::normalize(direction);
 	this->position = this->position + this->speed * timeDelta * unitDirection;
 
@@ -272,9 +271,9 @@ void Camera::DoKeyboardMovement(GLfloat timeDelta) {
 		if (this->speed > 0) {
 			//find direction
 			glm::vec3 direction;
-			direction.x = cos(glm::radians(this->pitch)) * cos(glm::radians(this->yaw + 90));
-			direction.y = sin(glm::radians(this->pitch));
-			direction.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw + 90));
+			direction.x = -cos(glm::radians(-this->pitch)) * cos(glm::radians(this->yaw + 90));
+			direction.y = sin(glm::radians(-this->pitch));
+			direction.z = -cos(glm::radians(-this->pitch)) * sin(glm::radians(this->yaw + 90));
 			glm::vec3 unitDirection = glm::normalize(direction);
 			this->position = this->position + this->speed * timeDelta * unitDirection;
 		}
@@ -336,9 +335,9 @@ void Camera::DoKeyboardMovement(GLfloat timeDelta) {
 		// find  current direction - this is different for rotors, because they don't work like a Euler-angle gimbal
 		// We treat pitch and roll like they're always zero
 		glm::vec3 direction;
-		direction.x = cos(glm::radians(this->yaw + 90));
+		direction.x = -cos(glm::radians(this->yaw + 90));
 		direction.y = 0.0f;
-		direction.z = sin(glm::radians(this->yaw + 90));
+		direction.z = -sin(glm::radians(this->yaw + 90));
 		glm::vec3 unitDirection = glm::normalize(direction);
 		if (this->speed != 0) {
 			this->position = this->position + this->speed * timeDelta * unitDirection;
@@ -350,10 +349,10 @@ void Camera::DoKeyboardMovement(GLfloat timeDelta) {
 		}
 		// move vertically
 		if (KeyboardHandler::keys[GLFW_KEY_W]) {
-			this->position = this->position - this->ROTOR_VERTICAL_VELOCITY * timeDelta * glm::vec3(0.0f, 1.0f, 0.0f);
+			this->position = this->position + this->ROTOR_VERTICAL_VELOCITY * timeDelta * glm::vec3(0.0f, 1.0f, 0.0f);
 		}
 		else if (KeyboardHandler::keys[GLFW_KEY_S]) {
-			this->position = this->position + this->ROTOR_VERTICAL_VELOCITY * timeDelta * glm::vec3(0.0f, 1.0f, 0.0f);
+			this->position = this->position - this->ROTOR_VERTICAL_VELOCITY * timeDelta * glm::vec3(0.0f, 1.0f, 0.0f);
 		}
 	}
 

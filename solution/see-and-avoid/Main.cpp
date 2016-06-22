@@ -185,10 +185,10 @@ int renderScene() {
 	PlaneDrawer * planeDrawer = new PlaneDrawer(woodBoxTexture, planeShader);
 
 	// create camera and path for camera (our plane)
-	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, -1000.0f));
+	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 1000.0f));
 	camera.SetPath(pathHelper->GetPreloadedPath(0));
 	camera.ActivateAutonomousMode();
-	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(500.0f, 0.0f, 500.0f)));
+	camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(0.0f, 100.0f, -2000.0f)));
 
 	// we have to create openCV windows in this thread!
 	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
@@ -338,7 +338,7 @@ int processScene() {
 					//cout << "Weight: " << weight << endl;
 					//cout << "Active waypoint: " << active.x << " " << active.y << " "<< active.z <<  endl;// " location: " << current.x << " " << current.z << endl;
 					//cout << "Current Location: " << -current.x << " " << -current.y << " " << -current.z <<  endl;// " location: " << current.x << " " << current.z << endl;
-					if (weight > 240) {
+					/*if (weight > 240 && camera.IsAutonomousNavigationActive()) {
 						glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
 						glm::vec3 current = camera.GetPosition();
 						Waypoint *newWay = new Waypoint(glm::vec3((-active.x - current.x) / 2.0, (-current.y-50.0),(active.z - current.z) / 2.0));
@@ -346,7 +346,7 @@ int processScene() {
 						cout << "Active WP pos: " << active.x << ", " << active.y << ", " << active.z << ", " << endl;
 						cout << "Setting new WP: " << newWay->GetPosition().x << ", " << newWay->GetPosition().y << ", " << newWay->GetPosition().z << ", " << endl;
 						camera.GetPath()->SetAvoidanceWaypoint(newWay);
-					}
+					}*/
 
 
 				}
@@ -374,14 +374,14 @@ void on_trackbar(int, void*) {
 		}
 	}
 	else {
-		//circle(local, Point((myplanes.at(planeSelection)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(0, 0, 0), 3);
 		stringstream value; value << planeSelection;
 		putText(local, value.str(), Point((myplanes.at(planeSelection)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 0, 0), 2, 8, false);
 		line(local, Point((myplanes.at(planeSelection)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), Point((myplanes.at(planeSelection)->GetPath()->GetActiveWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->GetPath()->GetActiveWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)),Scalar(255,0,0),1, CV_AA);
 	}
-	//glm::vec3 pos = camera.GetPosition();
-	circle(local, Point(-(camera.GetPosition().x - widthOfAirspace / 2) / (widthOfAirspace / 500), -(camera.GetPosition().z - widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(0, 0, 255), -1);
-	circle(local, Point((camera.GetPath()->GetActiveWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetActiveWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(180, 105, 255), -1);
+	circle(local, Point((camera.GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(0, 0, 255), -1);
+	if (camera.GetPath() != nullptr && camera.GetPath()->GetActiveWaypoint() != nullptr) {
+		circle(local, Point((camera.GetPath()->GetActiveWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetActiveWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(180, 105, 255), -1);
+	}	
 	imshow("Plane Paths", local);
 
 }
