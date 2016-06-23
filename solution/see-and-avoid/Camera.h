@@ -31,6 +31,7 @@ class Camera
 		glm::mat4 GetOrthoMatrix();
 		glm::vec3 GetPosition();
 		glm::vec3 GetCurrentDirection();
+		glm::vec3 GetCurrentDirectionFlat();
 		~Camera();
 
 	private :
