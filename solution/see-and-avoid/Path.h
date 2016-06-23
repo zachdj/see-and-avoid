@@ -15,6 +15,7 @@ public:
 	Path(vector<Waypoint *> waypoints, GLfloat completionRadius);
 	Waypoint* GetActiveWaypoint();
 	Waypoint* GetNextPathWaypoint(); // returns nextwaypoint on path, ignoring avoidance and loopBreak waypoints
+	Waypoint* GetLoopBreakWaypoint(); // returns the current loop break waypoint
 	void SetAvoidanceWaypoint(Waypoint * waypoint);
 	void SetLoopBreakWaypoint(Waypoint * waypoint);
 	void CompleteWaypoint();

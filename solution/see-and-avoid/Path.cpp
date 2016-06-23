@@ -57,6 +57,11 @@ Waypoint* Path::GetNextPathWaypoint()
 	return nullptr;
 }
 
+Waypoint * Path::GetLoopBreakWaypoint()
+{
+	return this->loopBreakWaypoint;
+}
+
 void Path::SetAvoidanceWaypoint(Waypoint * waypoint)
 {
 	this->loopBreakWaypoint = nullptr;
