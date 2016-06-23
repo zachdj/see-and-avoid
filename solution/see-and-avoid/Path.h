@@ -3,6 +3,7 @@
 #include <glew.h>; // Include glew to get all the required OpenGL headers
 
 #include <vector>
+#include <iostream>
 using namespace std;
 
 #include "Waypoint.h"
@@ -15,7 +16,9 @@ public:
 	Path(vector<Waypoint *> waypoints, GLfloat completionRadius);
 	Waypoint* GetActiveWaypoint();
 	Waypoint* GetNextPathWaypoint(); // returns nextwaypoint on path, ignoring avoidance and loopBreak waypoints
+	int GetNextPathWaypointIndex();
 	Waypoint* GetLoopBreakWaypoint(); // returns the current loop break waypoint
+	GLfloat GetPredictorDeltaZ(); // returns difference in z coordinates of the next TWO points to be visited
 	void SetAvoidanceWaypoint(Waypoint * waypoint);
 	void SetLoopBreakWaypoint(Waypoint * waypoint);
 	void CompleteWaypoint();

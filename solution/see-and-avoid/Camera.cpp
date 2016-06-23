@@ -114,6 +114,13 @@ glm::vec3 Camera::GetCurrentDirection() {
 	direction.z = -cos(glm::radians(-this->pitch)) * sin(glm::radians(this->yaw + 90));
 	return normalize(direction);
 }
+glm::vec3 Camera::GetCurrentDirectionFlat() {
+	glm::vec3 direction;
+	direction.x = -cos(glm::radians(this->yaw + 90));
+	direction.y = 0;
+	direction.z = -sin(glm::radians(this->yaw + 90));
+	return normalize(direction);
+}
 
 void Camera::ResetOrientation() {
 	this->pitch = 0; this->yaw = 0; this->roll = 0;
@@ -142,9 +149,19 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 			}
 			else {
 				//set an avoidance waypoint to break the loop
-				glm::vec3 direction = this->GetCurrentDirection();
+				glm::vec3 direction = this->GetCurrentDirectionFlat();
+				glm::vec3 normal = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), direction));
 
-				this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 150.0f*direction));
+				int directionSign = 1;
+				if (this->GetPath()->GetPredictorDeltaZ() > 0) {
+					directionSign = -1;
+				}
+				int normalSign = 1;
+				if (this->position.x > active->GetPosition().x) {
+					normalSign = -1;
+				}
+
+				this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 250.0f*directionSign*direction + 250.0f*normalSign*normal));
 			}
 			active = this->GetPath()->GetActiveWaypoint();
 		}
@@ -161,11 +178,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 		else {
 			vectorToObject = glm::normalize(vectorToObject);
 
-			glm::vec3 planeDirection;
-			planeDirection.x = -cos(glm::radians(this->yaw + 90));
-			planeDirection.y = 0;
-			planeDirection.z = -sin(glm::radians(this->yaw + 90));
-			planeDirection = normalize(planeDirection);
+			glm::vec3 planeDirection = this->GetCurrentDirectionFlat();
 
 			//find angle between the current direction and the direction to the object (direction we want to go)
 			GLfloat dotProd = glm::dot(planeDirection, vectorToObject);
@@ -192,7 +205,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 				deltaRollSign = 1.0f;
 			}
 
-			this->roll += ((deltaRoll > 0) - (deltaRoll < 0)) * min(abs(deltaRoll), 20.0f * timeDelta);
+			this->roll += ((deltaRoll > 0) - (deltaRoll < 0)) * min(abs(deltaRoll), 50.0f * timeDelta);
 
 			// vertical navigation: as long as there's a height difference, adjust pitch to accomodate
 
@@ -200,7 +213,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 			weight = -(2 / (1 + exp(-0.05 * deltaHeight)) - 1); // logistic function between -1 and 1
 			GLfloat newPitch = weight * 45.0f; // max pitch is 45 degrees
 			GLfloat deltaPitch = newPitch - this->pitch;
-			this->pitch += ((deltaPitch > 0) - (deltaPitch < 0)) * min(abs(deltaPitch), 20.0f * timeDelta);			
+			this->pitch += ((deltaPitch > 0) - (deltaPitch < 0)) * min(abs(deltaPitch), 30.0f * timeDelta);			
 		}
 	}
 

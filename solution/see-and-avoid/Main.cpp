@@ -150,7 +150,7 @@ int renderScene() {
 	cv::moveWindow("Blob Detection", 600, 10);
 	PlanePathMatrices = planeGenerator.getPlanePaths();
 	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
-	cv::moveWindow("Plane Paths", 400, 200);
+	cv::moveWindow("Plane Paths", 400, 500);
 	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);	
 
 	Texture defaultPlaneTexture(".\\asset\\container.jpg");
@@ -160,7 +160,7 @@ int renderScene() {
 	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 1000.0f));
 	camera.SetPath(pathHelper->GetPreloadedPath(0));
 	camera.ActivateAutonomousMode();
-	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(0.0f, 100.0f, -2000.0f)));
+	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));
 
 	//Show the Window again once we are ready
 	glfwShowWindow(window);
@@ -171,7 +171,7 @@ int renderScene() {
 		glfwPollEvents();
 		// clear screen and render clear color (this should be covered by skybox)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the screen - will be filled with clear color set above
-															// the current time in seconds
+		// the current time in seconds
 		GLfloat timeValue = glfwGetTime();
 
 		camera.DoMovement(timeValue);
