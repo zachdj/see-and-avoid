@@ -11,6 +11,7 @@
 *.sdf
 *.user
 *.filters
+*.mylog
 
 *.obj
 ~*.model.obj
