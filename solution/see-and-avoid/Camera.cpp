@@ -155,7 +155,11 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 		else {
 			vectorToObject = glm::normalize(vectorToObject);
 
-			glm::vec3 planeDirection = this->GetCurrentDirection();
+			glm::vec3 planeDirection;
+			planeDirection.x = -cos(glm::radians(this->yaw + 90));
+			planeDirection.y = 0;
+			planeDirection.z = -sin(glm::radians(this->yaw + 90));
+			planeDirection = normalize(planeDirection);
 
 			//find angle between the current direction and the direction to the object (direction we want to go)
 			GLfloat dotProd = glm::dot(planeDirection, vectorToObject);
@@ -177,6 +181,11 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 			GLfloat newRoll = angleSign * weight * 45.0f; // 45 degrees is max roll
 
 			GLfloat deltaRoll = newRoll - this->roll;
+			GLfloat deltaRollSign = -1.0f;
+			if (deltaRoll > 0) {
+				deltaRollSign = 1.0f;
+			}
+
 			this->roll += ((deltaRoll > 0) - (deltaRoll < 0)) * min(abs(deltaRoll), 0.5f);
 
 			// vertical navigation: as long as there's a height difference, adjust pitch to accomodate
