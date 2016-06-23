@@ -186,7 +186,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 				deltaRollSign = 1.0f;
 			}
 
-			this->roll += ((deltaRoll > 0) - (deltaRoll < 0)) * min(abs(deltaRoll), 0.5f);
+			this->roll += ((deltaRoll > 0) - (deltaRoll < 0)) * min(abs(deltaRoll), 20.0f * timeDelta);
 
 			// vertical navigation: as long as there's a height difference, adjust pitch to accomodate
 
@@ -194,7 +194,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 			weight = -(2 / (1 + exp(-0.05 * deltaHeight)) - 1); // logistic function between -1 and 1
 			GLfloat newPitch = weight * 45.0f; // max pitch is 45 degrees
 			GLfloat deltaPitch = newPitch - this->pitch;
-			this->pitch += ((deltaPitch > 0) - (deltaPitch < 0)) * min(abs(deltaPitch), 0.5f);			
+			this->pitch += ((deltaPitch > 0) - (deltaPitch < 0)) * min(abs(deltaPitch), 20.0f * timeDelta);			
 		}
 	}
 
