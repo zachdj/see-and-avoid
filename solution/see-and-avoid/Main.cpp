@@ -143,8 +143,7 @@ int renderScene() {
 	
 	//Create Planes Before Drawing any new windows
 	PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
-    myplanes = planeGenerator.getPlanes();
-	
+    myplanes = planeGenerator.getPlanes();	
 
 	// we have to create openCV windows in this thread!
 	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
