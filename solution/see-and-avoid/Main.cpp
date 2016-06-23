@@ -58,6 +58,7 @@ int processScene();
 static void error_callback(int error, const char* description);
 
 void MyLine(Mat img, Point start, Point end, int red, int green, int blue);
+void drawAirplane(Mat & drawer, Camera camera, Aircraft * myplane, Scalar color, bool isCameraObject);
 
 //responds to keyboard events
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -352,20 +353,24 @@ int processScene() {
 
 void on_trackbar(int, void*) {
 	Mat local = PlanePathMatrices.at(planeSelection).clone();
-	if (planeSelection == myplanes.size()) {
+	if (planeSelection == myplanes.size()) { //this is for the master matrix where we place all of our planes on a single matrix
 		for (int i = 0; i < myplanes.size(); i++) {
 			stringstream value; value << i;
 			putText(local, value.str(), Point((myplanes.at(i)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(i)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), FONT_HERSHEY_SIMPLEX,0.7, Scalar(0, 0, 0),2,8,false);
 		}
 	}
-	else {
+	else { //this works for our single airplane matrix
 		stringstream value; value << planeSelection;
-		putText(local, value.str(), Point((myplanes.at(planeSelection)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 0, 0), 2, 8, false);
+		drawAirplane(local, camera, myplanes.at(planeSelection), Scalar(255, 0, 0), false);  //We will now place a plane on our path
 		line(local, Point((myplanes.at(planeSelection)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), Point((myplanes.at(planeSelection)->GetPath()->GetActiveWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(planeSelection)->GetPath()->GetActiveWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)),Scalar(255,0,0),1, CV_AA);
 	}
-	circle(local, Point((camera.GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(0, 0, 255), -1);
+	// we will now draw ourselves on the matrix, and our associated waypoints
+	drawAirplane(local, camera, nullptr, Scalar(0, 0, 0), true);
 	if (camera.GetPath() != nullptr && camera.GetPath()->GetActiveWaypoint() != nullptr) {
-		circle(local, Point((camera.GetPath()->GetNextPathWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetNextPathWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 10, Scalar(180, 105, 255), -1);
+		//This will draw our waypoint
+		rectangle(local, Point((camera.GetPath()->GetNextPathWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetNextPathWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500) - 15), Point((camera.GetPath()->GetNextPathWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500) + 20, (camera.GetPath()->GetNextPathWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500) - 25), Scalar(180, 105, 255), -1);
+		line(local, Point((camera.GetPath()->GetNextPathWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetNextPathWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), Point((camera.GetPath()->GetNextPathWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetNextPathWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)-25), Scalar(0, 0, 0), 3);
+		//This will draw our temporary waypoint if we have one
 		if(camera.GetPath()->GetActiveWaypoint()->GetPosition() != camera.GetPath()->GetNextPathWaypoint()->GetPosition())
 			circle(local, Point((camera.GetPath()->GetActiveWaypoint()->GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500), (camera.GetPath()->GetActiveWaypoint()->GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500)), 7, Scalar(180, 105, 255), -1);
 	
@@ -413,4 +418,29 @@ void MyLine(Mat img, Point start, Point end, int red, int green, int blue)
 		Scalar(red, green, blue),
 		thickness,
 		lineType);
+}
+
+
+void drawAirplane(Mat & drawer, Camera camera,Aircraft* myplane, Scalar color, bool isCameraObject) {
+
+	if (isCameraObject) {
+		float cameraX = (camera.GetPosition().x + widthOfAirspace / 2) / (widthOfAirspace / 500);
+		float cameraZ = (camera.GetPosition().z + widthOfAirspace / 2) / (widthOfAirspace / 500);
+		glm::vec3 upVec = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 orthogonalVec = glm::cross(upVec, camera.GetCurrentDirection());
+		line(drawer, Point(cameraX + 10 * camera.GetCurrentDirection().x, cameraZ + 10 * camera.GetCurrentDirection().z), Point(cameraX - 18 * camera.GetCurrentDirection().x, cameraZ - 18 * camera.GetCurrentDirection().z), color, 6);
+		line(drawer, Point(cameraX + 12 * orthogonalVec.x, cameraZ + 12 * orthogonalVec.z), Point(cameraX - 12 * orthogonalVec.x, cameraZ - 12 * orthogonalVec.z), color, 8);
+		line(drawer, Point(cameraX - 18 * camera.GetCurrentDirection().x + 6 * orthogonalVec.x, cameraZ - 18 * camera.GetCurrentDirection().z + 6 * orthogonalVec.z), Point(cameraX - 18 * camera.GetCurrentDirection().x - 6 * orthogonalVec.x, cameraZ - 18 * camera.GetCurrentDirection().z - 6 * orthogonalVec.z), color, 4);
+	}
+	else {
+		float airplaneX = (myplane->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500);
+		float airplaneZ = (myplane->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500);
+		glm::vec3 upVec = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 orthogonalVec = glm::cross(upVec, myplane->GetCurrentDirection());
+		line(drawer, Point(airplaneX + 10 * myplane->GetCurrentDirection().x, airplaneZ + 10 * myplane->GetCurrentDirection().z), Point(airplaneX - 18 * myplane->GetCurrentDirection().x, airplaneZ - 18 * myplane->GetCurrentDirection().z), color, 6);
+		line(drawer, Point(airplaneX + 12 * orthogonalVec.x, airplaneZ + 12 * orthogonalVec.z), Point(airplaneX - 12 * orthogonalVec.x, airplaneZ - 12 * orthogonalVec.z), color, 8);
+		line(drawer, Point(airplaneX - 18 * myplane->GetCurrentDirection().x + 6 * orthogonalVec.x, airplaneZ - 18 * myplane->GetCurrentDirection().z + 6 * orthogonalVec.z), Point(airplaneX - 18 * myplane->GetCurrentDirection().x - 6 * orthogonalVec.x, airplaneZ - 18 * myplane->GetCurrentDirection().z - 6 * orthogonalVec.z), color, 4);
+	}
+
+	
 }
