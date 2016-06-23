@@ -29,15 +29,12 @@ using namespace cv;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <math.h>
 #include <sstream>
 
 #include "KeyboardHandler.h"
 #include "Skybox.h"
 #include "Shader.h"
 #include "Camera.h"
-#include "Cube.h"
-#include "CubeDrawer.h"
 #include "Aircraft.h"
 #include "PlaneDrawer.h"
 #include "PathHelper.h"
@@ -52,46 +49,38 @@ using namespace std;
 
 bool RANDOM = false;
 
+// functions to run in threads
 int renderScene();
 int processScene();
-
-static void error_callback(int error, const char* description);
-
-void MyLine(Mat img, Point start, Point end, int red, int green, int blue);
-
-//responds to keyboard events
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y);
-float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y);
-void on_trackbar(int, void*);
-
 mutex semaphore;
-cv::Mat img; // this will contain the current view rendered by openGL.  Must be locking before any R/W operations
+cv::Mat img; // this will contain the current view rendered by openGL.  Must be locked before any R/W operations
 bool renderingStopped = false;
 
-vector< Mat> planePaths;
-vector< Aircraft*> myplanes;
+// callback functions
+static void error_callback(int error, const char* description);
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void on_trackbar(int, void*);
 
+//variables for top-down plane tracker
+vector< Mat> planePaths;
+vector<Mat> PlanePathMatrices;
 int planeSelection = 0;
 int widthOfAirspace = 4000;
-Camera camera;
 
-AtcAvoidance ai = AtcAvoidance();
+vector< Aircraft*> myplanes; // planes to render
+Camera camera; // camera object
+AtcAvoidance ai = AtcAvoidance(); // avoidance algorithm to use
 
-vector<Mat> PlanePathMatrices;
 /***************************** End forward declarations ********************************************************/
 
 int main() {
 
 	PrintToFile::clearFile();
-	PrintToFile::clearDebugFile();
-	
+	PrintToFile::clearDebugFile();	
 
 	thread renderThread(renderScene);
 
 	thread processThread(processScene);
-
 
 	if (renderThread.joinable()) {
 		renderThread.join();
@@ -150,48 +139,40 @@ int renderScene() {
 	//set the clear color
 	glClearColor(0.8f, 0.9f, 1.0f, 1.0f); // sky blue-ish;  We should never see this if the skybox is working
 
-										  //tell openGL to use depth testing
+	//tell openGL to use depth testing
 	glEnable(GL_DEPTH_TEST);
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to enable Wireframe mode
 
 	Shader skyboxShader(".\\Shaders\\Skybox\\skybox.vs", ".\\Shaders\\Skybox\\skybox.fs");
 	Skybox * skybox = new Skybox(skyboxShader);
-
-	//create some cubes!
-	//create a CubeDrawer
-	Shader cubeShader(".\\Shaders\\Cube\\cube.vs", ".\\Shaders\\Cube\\cube.fs");
-	Texture woodBoxTexture(".\\asset\\container.jpg");
-	Texture acmeTexture(".\\asset\\acme.jpg");
-	CubeDrawer * cubeDrawer = new CubeDrawer(woodBoxTexture, acmeTexture, cubeShader);
 
 	// PathHelper for preloaded paths
 	PathHelper * pathHelper = new PathHelper();
 
 	// create a plane that follows a path
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
-
 	
 	//Create Planes Before Drawing any new windows
 	PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
     myplanes = planeGenerator.getPlanes();
 	
+
+	// we have to create openCV windows in this thread!
+	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
+	cv::moveWindow("Blob Detection", 600, 10);
+
 	PlanePathMatrices = planeGenerator.getPlanePaths();
 	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
-	cv::moveWindow("Plane Paths", 400, 10);
+	cv::moveWindow("Plane Paths", 400, 200);
 	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);	
 
-	PlaneDrawer * planeDrawer = new PlaneDrawer(woodBoxTexture, planeShader);
+	Texture defaultPlaneTexture(".\\asset\\container.jpg");
+	PlaneDrawer * planeDrawer = new PlaneDrawer(defaultPlaneTexture, planeShader);
 
 	// create camera and path for camera (our plane)
 	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 1000.0f));
 	camera.SetPath(pathHelper->GetPreloadedPath(0));
 	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(0.0f, 100.0f, -2000.0f)));
-
-	// we have to create openCV windows in this thread!
-	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
-	cv::moveWindow("Blob Detection", 600, 10);
 
 	//Show the Window again once we are ready
 	glfwShowWindow(window);
@@ -329,10 +310,10 @@ int processScene() {
 				if (info[i].foundPct >= 0.6) {
 					double weight = info[i].GetCollisionValue();
 					circle(im_with_keypoints, Point(info[i].currentPositionX, info[i].currentPositionY), weight / 250 * 50, Scalar(0, 0, weight), 4, 8);
-					MyLine(im_with_keypoints,
+					line(im_with_keypoints,
 						Point(info[i].currentPositionX, info[i].currentPositionY),
 						Point(info[i].currentPositionX - info[i].deltaX, info[i].currentPositionY - info[i].deltaY),
-						200, 200, 200);
+						Scalar(200, 200, 200), 3, 8);
 					//ai.reactToBlob(info[i], camera);
 				}
 			}
@@ -392,25 +373,5 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 
 
-float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y) {
-	return  pow((pt1x - pt2x), 2) + pow((pt1y - pt2y), 2);
-}
 
-float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y) {
-	if (pt1x - pt2x != 0)
-		return  atan((pt1y - pt2y) / (pt1x - pt2x));
-	else
-		return atan((pt1y - pt2y) / (0.000001));
-}
 
-void MyLine(Mat img, Point start, Point end, int red, int green, int blue)
-{
-	int thickness = 3;
-	int lineType = 8;
-	line(img,
-		Point((start.x), (start.y )),
-		Point((end.x ) , (end.y)),
-		Scalar(red, green, blue),
-		thickness,
-		lineType);
-}
