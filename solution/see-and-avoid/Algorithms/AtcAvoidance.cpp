@@ -12,8 +12,8 @@ void AtcAvoidance::reactToBlob(BlobInfo info, Camera & camera) {
 
 		glm::vec3 vectorToActiveDown = vectorToActive;
 		vectorToActiveDown.y -= 200.0f;
-		glm::vec3 normal = glm::normalize(glm::cross(vectorToActive, vectorToActiveDown));
-		Waypoint * newWay = new Waypoint(current + vectorToActiveDown*0.5f + normal*300.0f);
+		//glm::vec3 normal = glm::normalize(glm::cross(vectorToActive, vectorToActiveDown));
+		Waypoint * newWay = new Waypoint(current + vectorToActiveDown*0.5f);
 
 		camera.GetPath()->SetAvoidanceWaypoint(newWay);
 	}
