@@ -1,5 +1,6 @@
 *.sim
 *.sol
+*.suo
 *.exe
 *.ilk
 *.pdb

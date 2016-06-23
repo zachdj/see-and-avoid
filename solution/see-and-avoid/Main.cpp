@@ -4,16 +4,6 @@
 #define PI 3.14159265
 #define DEBUG false
 
-//OpenCV includes
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2\opencv.hpp>
-#include <opencv2/features2d.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <stdlib.h>     
-
-using namespace cv;
-
 #include <thread>
 #include <mutex>
 
@@ -41,7 +31,7 @@ using namespace cv;
 #include "PlaneGenerator.h"
 #include "PrintToFile.h"
 #include "Algorithms\AtcAvoidance.h"
-#include "BlobTracker.h"
+#include "VisionProcessor.h"
 
 using namespace std;
 
@@ -224,108 +214,17 @@ int renderScene() {
 }
 
 int processScene() {
-	Mat frame, canny_output;
-
-	// Setup SimpleBlobDetector parameters.
-	SimpleBlobDetector::Params params;
-
-	// Change thresholds
-	params.minThreshold = 120;
-	params.maxThreshold = 640;
-
-	//Filter by Color
-	params.filterByColor = true;
-	params.blobColor = 255;
-
-	// Filter by Area.
-	params.filterByArea = true;
-	params.minArea = 10;
-	params.maxArea = 28000;
-
-	// Filter by Circularity
-	params.filterByCircularity = false;
-	params.minCircularity = 0.1;
-
-	// Filter by Convexity
-	params.filterByConvexity = false;
-	params.minConvexity = 0.87;
-
-	// Filter by Inertia
-	params.filterByInertia = false;
-	params.minInertiaRatio = 0.01;
-
-	// Storage for blobs
-	vector<KeyPoint> keypoints;
-	BlobTracker tracker = BlobTracker(30);
-
+	Mat frame;
+	VisionProcessor processor = VisionProcessor();
 	while (!renderingStopped) {
 
 		semaphore.lock();
 		frame = img;
 		semaphore.unlock();
-		if (frame.rows > 0 && frame.cols > 0) {
-			vector<vector<Point> > contours;
-			vector<Vec4i> hierarchy;
-
-			cvtColor(frame, frame, CV_RGB2GRAY);
-			// Detect edges using canny
-			Canny(frame, canny_output, 260, 380, 3);
-			dilate(canny_output, canny_output, cv::Mat(), cv::Point(-1, -1), 10);
-
-			// Find contours
-			findContours(canny_output, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-
-			// Draw contours
-			Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
-			for (int i = 0; i< contours.size(); i++) {
-				Scalar color = Scalar(255, 255, 255); // THIS DOES RANDOM COLORS - rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-				drawContours(drawing, contours, i, color, -10, 8, hierarchy, 0, Point());
-			}
-
-			//Build blob detector
-			SimpleBlobDetector detector(params);
-
-			// Detect blobs
-			detector.detect(drawing, keypoints);
-
-			// Draw detected blobs as red circles.
-			// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures
-			// the size of the circle corresponds to the size of blob
-			Mat im_with_keypoints;
-			drawKeypoints(drawing, keypoints, im_with_keypoints, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
-
-			/* THIS SECTION WILL START LOOKING AT HOW WE CAN KEEP TRACK OF WHAT BLOBS HAVE BEEN DETECTED*/
-
-			cv::Size s = im_with_keypoints.size();
-			int rows = s.height;
-			int cols = s.width;
-			Point center = Point(cols / 2, rows / 2); int centerRows = rows / 2; int centerCols = cols / 2;
-
-			tracker.AddFrame(keypoints);
-
-			vector<BlobInfo> info = tracker.GetBlobInfo(center);
-			//This loop draws lines and circles on key elements of interest
-			for (int i = 0; i < info.size(); i++) {
-				if (info[i].foundPct >= 0.6) {
-					double weight = info[i].GetCollisionValue();
-					circle(im_with_keypoints, Point(info[i].currentPositionX, info[i].currentPositionY), weight / 250 * 50, Scalar(0, 0, weight), 4, 8);
-					line(im_with_keypoints,
-						Point(info[i].currentPositionX, info[i].currentPositionY),
-						Point(info[i].currentPositionX - info[i].deltaX, info[i].currentPositionY - info[i].deltaY),
-						Scalar(200, 200, 200), 3, 8);
-					//ai.reactToBlob(info[i], camera);
-				}
-			}
-
-			// this loop draws circles on the radar
-			double step = rows / 5;
-			for (int i = 1; i < 6; i++) {
-				circle(im_with_keypoints, center, i*step, Scalar(0.0f, 255 * (1 - i / 6.0), 0.0f), 5);
-			}
-			imshow("Blob Detection", im_with_keypoints);
-		}
-
+		vector<BlobInfo> blobs = processor.ProcessScene(frame);
+		for (int i = 0; i < blobs.size(); i++) {
+			ai.reactToBlob(blobs[i], camera);
+		}		
 	}
 	return 0;
 }
@@ -370,8 +269,3 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 }
-
-
-
-
-
