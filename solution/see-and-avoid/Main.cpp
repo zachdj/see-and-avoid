@@ -14,12 +14,11 @@
 #include <iostream>
 #include <cstdio>
 #include <vector>
+#include <sstream>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include <sstream>
 
 #include "KeyboardHandler.h"
 #include "Skybox.h"
@@ -234,7 +233,7 @@ void on_trackbar(int, void*) {
 	if (planeSelection == myplanes.size()) { //this is for the master matrix where we place all of our planes on a single matrix
 		for (int i = 0; i < myplanes.size(); i++) {
 			stringstream value; value << i;
-			putText(local, value.str(), Point((myplanes.at(i)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500), (myplanes.at(i)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)), FONT_HERSHEY_SIMPLEX,0.7, Scalar(0, 0, 0),2,8,false);
+			putText(local, value.str(), Point((myplanes.at(i)->position.x + widthOfAirspace / 2) / (widthOfAirspace / 500)-3, (myplanes.at(i)->position.z + widthOfAirspace / 2) / (widthOfAirspace / 500)+5), FONT_HERSHEY_SIMPLEX,0.7, Scalar(0, 0, 0),2,8,false);
 		}
 	}
 	else { //this works for our single airplane matrix

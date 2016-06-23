@@ -134,9 +134,9 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 				PrintToFile::printDebug("Hit in the back");
 				stringstream x, y, z;
 				x << current->position.x; y << current->position.y; z << current->position.z;
-				PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str(), true);
+				PrintToFile::printDebug("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str());
 				stringstream planeNum; planeNum << i;
-				PrintToFile::print("Plane: " + planeNum.str());
+				PrintToFile::printDebug("Plane: " + planeNum.str());
 				//Get the current time as well
 				time_t now = time(0);
 				tm *ltm = localtime(&now);
