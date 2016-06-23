@@ -136,10 +136,16 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 	if (active != nullptr) {
 		//ensure that waypoint isn't unreachable
 		if (dist2(active->GetPosition(), this->position) < 30000  && abs(this->roll) >= this->MAX_ROLL-6) {
-			//set an avoidance waypoint to break the loop
-			glm::vec3 direction = this->GetCurrentDirection();
+			//if the unreachable waypoint is a loop breaker, ignore it:
+			if (this->GetPath()->GetLoopBreakWaypoint() != nullptr) {
+				this->GetPath()->SetLoopBreakWaypoint(nullptr);
+			}
+			else {
+				//set an avoidance waypoint to break the loop
+				glm::vec3 direction = this->GetCurrentDirection();
 
-			this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 150.0f*direction));
+				this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 150.0f*direction));
+			}
 			active = this->GetPath()->GetActiveWaypoint();
 		}
 

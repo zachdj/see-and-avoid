@@ -4,16 +4,6 @@
 #define PI 3.14159265
 #define DEBUG false
 
-//OpenCV includes
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2\opencv.hpp>
-#include <opencv2/features2d.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <stdlib.h>     
-
-using namespace cv;
-
 #include <thread>
 #include <mutex>
 
@@ -29,22 +19,19 @@ using namespace cv;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <math.h>
 #include <sstream>
 
 #include "KeyboardHandler.h"
 #include "Skybox.h"
 #include "Shader.h"
 #include "Camera.h"
-#include "Cube.h"
-#include "CubeDrawer.h"
 #include "Aircraft.h"
 #include "PlaneDrawer.h"
 #include "PathHelper.h"
 #include "PlaneGenerator.h"
 #include "PrintToFile.h"
 #include "Algorithms\AtcAvoidance.h"
-#include "BlobTracker.h"
+#include "VisionProcessor.h"
 
 using namespace std;
 
@@ -52,47 +39,39 @@ using namespace std;
 
 bool RANDOM = false;
 
+// functions to run in threads
 int renderScene();
 int processScene();
-
-static void error_callback(int error, const char* description);
-
-void MyLine(Mat img, Point start, Point end, int red, int green, int blue);
-void drawAirplane(Mat & drawer, Camera camera, Aircraft * myplane, Scalar color, bool isCameraObject);
-
-//responds to keyboard events
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y);
-float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y);
-void on_trackbar(int, void*);
-
 mutex semaphore;
-cv::Mat img; // this will contain the current view rendered by openGL.  Must be locking before any R/W operations
+cv::Mat img; // this will contain the current view rendered by openGL.  Must be locked before any R/W operations
 bool renderingStopped = false;
 
-vector< Mat> planePaths;
-vector< Aircraft*> myplanes;
+// callback functions
+static void error_callback(int error, const char* description);
+void drawAirplane(Mat & drawer, Camera camera, Aircraft * myplane, Scalar color, bool isCameraObject); 
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void on_trackbar(int, void*);
 
+//variables for top-down plane tracker
+vector< Mat> planePaths;
+vector<Mat> PlanePathMatrices;
 int planeSelection = 0;
 int widthOfAirspace = 4000;
-Camera camera;
 
-AtcAvoidance ai = AtcAvoidance();
+vector< Aircraft*> myplanes; // planes to render
+Camera camera; // camera object
+AtcAvoidance ai = AtcAvoidance(); // avoidance algorithm to use
 
-vector<Mat> PlanePathMatrices;
 /***************************** End forward declarations ********************************************************/
 
 int main() {
 
 	PrintToFile::clearFile();
-	PrintToFile::clearDebugFile();
-	
+	PrintToFile::clearDebugFile();	
 
 	thread renderThread(renderScene);
 
 	thread processThread(processScene);
-
 
 	if (renderThread.joinable()) {
 		renderThread.join();
@@ -151,48 +130,38 @@ int renderScene() {
 	//set the clear color
 	glClearColor(0.8f, 0.9f, 1.0f, 1.0f); // sky blue-ish;  We should never see this if the skybox is working
 
-										  //tell openGL to use depth testing
+	//tell openGL to use depth testing
 	glEnable(GL_DEPTH_TEST);
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to enable Wireframe mode
 
 	Shader skyboxShader(".\\Shaders\\Skybox\\skybox.vs", ".\\Shaders\\Skybox\\skybox.fs");
 	Skybox * skybox = new Skybox(skyboxShader);
-
-	//create some cubes!
-	//create a CubeDrawer
-	Shader cubeShader(".\\Shaders\\Cube\\cube.vs", ".\\Shaders\\Cube\\cube.fs");
-	Texture woodBoxTexture(".\\asset\\container.jpg");
-	Texture acmeTexture(".\\asset\\acme.jpg");
-	CubeDrawer * cubeDrawer = new CubeDrawer(woodBoxTexture, acmeTexture, cubeShader);
 
 	// PathHelper for preloaded paths
 	PathHelper * pathHelper = new PathHelper();
 
 	// create a plane that follows a path
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
-
 	
 	//Create Planes Before Drawing any new windows
 	PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
-    myplanes = planeGenerator.getPlanes();
-	
+    myplanes = planeGenerator.getPlanes();	
+
+	// we have to create openCV windows in this thread!
+	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
+	cv::moveWindow("Blob Detection", 600, 10);
 	PlanePathMatrices = planeGenerator.getPlanePaths();
 	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
-	cv::moveWindow("Plane Paths", 400, 10);
+	cv::moveWindow("Plane Paths", 400, 200);
 	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);	
 
-	PlaneDrawer * planeDrawer = new PlaneDrawer(woodBoxTexture, planeShader);
+	Texture defaultPlaneTexture(".\\asset\\container.jpg");
+	PlaneDrawer * planeDrawer = new PlaneDrawer(defaultPlaneTexture, planeShader);
 
 	// create camera and path for camera (our plane)
 	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 1000.0f));
 	camera.SetPath(pathHelper->GetPreloadedPath(0));
 	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(0.0f, 100.0f, -2000.0f)));
-
-	// we have to create openCV windows in this thread!
-	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
-	cv::moveWindow("Blob Detection", 600, 10);
 
 	//Show the Window again once we are ready
 	glfwShowWindow(window);
@@ -244,108 +213,17 @@ int renderScene() {
 }
 
 int processScene() {
-	Mat frame, canny_output;
-
-	// Setup SimpleBlobDetector parameters.
-	SimpleBlobDetector::Params params;
-
-	// Change thresholds
-	params.minThreshold = 120;
-	params.maxThreshold = 640;
-
-	//Filter by Color
-	params.filterByColor = true;
-	params.blobColor = 255;
-
-	// Filter by Area.
-	params.filterByArea = true;
-	params.minArea = 10;
-	params.maxArea = 28000;
-
-	// Filter by Circularity
-	params.filterByCircularity = false;
-	params.minCircularity = 0.1;
-
-	// Filter by Convexity
-	params.filterByConvexity = false;
-	params.minConvexity = 0.87;
-
-	// Filter by Inertia
-	params.filterByInertia = false;
-	params.minInertiaRatio = 0.01;
-
-	// Storage for blobs
-	vector<KeyPoint> keypoints;
-	BlobTracker tracker = BlobTracker(30);
-
+	Mat frame;
+	VisionProcessor processor = VisionProcessor();
 	while (!renderingStopped) {
 
 		semaphore.lock();
 		frame = img;
 		semaphore.unlock();
-		if (frame.rows > 0 && frame.cols > 0) {
-			vector<vector<Point> > contours;
-			vector<Vec4i> hierarchy;
-
-			cvtColor(frame, frame, CV_RGB2GRAY);
-			// Detect edges using canny
-			Canny(frame, canny_output, 260, 380, 3);
-			dilate(canny_output, canny_output, cv::Mat(), cv::Point(-1, -1), 10);
-
-			// Find contours
-			findContours(canny_output, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-
-			// Draw contours
-			Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
-			for (int i = 0; i< contours.size(); i++) {
-				Scalar color = Scalar(255, 255, 255); // THIS DOES RANDOM COLORS - rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-				drawContours(drawing, contours, i, color, -10, 8, hierarchy, 0, Point());
-			}
-
-			//Build blob detector
-			SimpleBlobDetector detector(params);
-
-			// Detect blobs
-			detector.detect(drawing, keypoints);
-
-			// Draw detected blobs as red circles.
-			// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures
-			// the size of the circle corresponds to the size of blob
-			Mat im_with_keypoints;
-			drawKeypoints(drawing, keypoints, im_with_keypoints, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
-
-			/* THIS SECTION WILL START LOOKING AT HOW WE CAN KEEP TRACK OF WHAT BLOBS HAVE BEEN DETECTED*/
-
-			cv::Size s = im_with_keypoints.size();
-			int rows = s.height;
-			int cols = s.width;
-			Point center = Point(cols / 2, rows / 2); int centerRows = rows / 2; int centerCols = cols / 2;
-
-			tracker.AddFrame(keypoints);
-
-			vector<BlobInfo> info = tracker.GetBlobInfo(center);
-			//This loop draws lines and circles on key elements of interest
-			for (int i = 0; i < info.size(); i++) {
-				if (info[i].foundPct >= 0.6) {
-					double weight = info[i].GetCollisionValue();
-					circle(im_with_keypoints, Point(info[i].currentPositionX, info[i].currentPositionY), weight / 250 * 50, Scalar(0, 0, weight), 4, 8);
-					MyLine(im_with_keypoints,
-						Point(info[i].currentPositionX, info[i].currentPositionY),
-						Point(info[i].currentPositionX - info[i].deltaX, info[i].currentPositionY - info[i].deltaY),
-						200, 200, 200);
-					//ai.reactToBlob(info[i], camera);
-				}
-			}
-
-			// this loop draws circles on the radar
-			double step = rows / 5;
-			for (int i = 1; i < 6; i++) {
-				circle(im_with_keypoints, center, i*step, Scalar(0.0f, 255 * (1 - i / 6.0), 0.0f), 5);
-			}
-			imshow("Blob Detection", im_with_keypoints);
-		}
-
+		vector<BlobInfo> blobs = processor.ProcessScene(frame);
+		for (int i = 0; i < blobs.size(); i++) {
+			ai.reactToBlob(blobs[i], camera);
+		}		
 	}
 	return 0;
 }
@@ -395,32 +273,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
-
-
-float point2pointDistance2(int pt1x, int pt1y, int pt2x, int pt2y) {
-	return  pow((pt1x - pt2x), 2) + pow((pt1y - pt2y), 2);
-}
-
-float point2pointAngle(int pt1x, int pt1y, int pt2x, int pt2y) {
-	if (pt1x - pt2x != 0)
-		return  atan((pt1y - pt2y) / (pt1x - pt2x));
-	else
-		return atan((pt1y - pt2y) / (0.000001));
-}
-
-void MyLine(Mat img, Point start, Point end, int red, int green, int blue)
-{
-	int thickness = 3;
-	int lineType = 8;
-	line(img,
-		Point((start.x), (start.y )),
-		Point((end.x ) , (end.y)),
-		Scalar(red, green, blue),
-		thickness,
-		lineType);
-}
-
-
 void drawAirplane(Mat & drawer, Camera camera,Aircraft* myplane, Scalar color, bool isCameraObject) {
 
 	if (isCameraObject) {
@@ -441,6 +293,4 @@ void drawAirplane(Mat & drawer, Camera camera,Aircraft* myplane, Scalar color, b
 		line(drawer, Point(airplaneX + 12 * orthogonalVec.x, airplaneZ + 12 * orthogonalVec.z), Point(airplaneX - 12 * orthogonalVec.x, airplaneZ - 12 * orthogonalVec.z), color, 8);
 		line(drawer, Point(airplaneX - 18 * myplane->GetCurrentDirection().x + 6 * orthogonalVec.x, airplaneZ - 18 * myplane->GetCurrentDirection().z + 6 * orthogonalVec.z), Point(airplaneX - 18 * myplane->GetCurrentDirection().x - 6 * orthogonalVec.x, airplaneZ - 18 * myplane->GetCurrentDirection().z - 6 * orthogonalVec.z), color, 4);
 	}
-
-	
 }

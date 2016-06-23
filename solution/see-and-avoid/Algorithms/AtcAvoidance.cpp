@@ -4,7 +4,7 @@
 
 void AtcAvoidance::reactToBlob(BlobInfo info, Camera & camera) {
 	double weight = info.GetCollisionValue();
-	if (weight > 240) {
+	if (weight > 240 && camera.IsAutonomousNavigationActive()) {
 		glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
 		glm::vec3 current = camera.GetPosition();
 

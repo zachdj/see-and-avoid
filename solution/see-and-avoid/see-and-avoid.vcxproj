@@ -144,6 +144,7 @@
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TrackedBlob.cpp" />
+    <ClCompile Include="VisionProcessor.cpp" />
     <ClCompile Include="Waypoint.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +170,8 @@
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TrackedBlob.h" />
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="VisionProcessor.h" />
     <ClInclude Include="Waypoint.h" />
   </ItemGroup>
   <ItemGroup>

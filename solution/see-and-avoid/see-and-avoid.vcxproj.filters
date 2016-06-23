@@ -72,6 +72,9 @@
     <ClCompile Include="Algorithms\AtcAvoidance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VisionProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyboardHandler.h">
@@ -141,6 +144,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Algorithms\AtcAvoidance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VisionProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
