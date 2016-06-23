@@ -147,10 +147,11 @@ int renderScene() {
 
 	// we have to create openCV windows in this thread!
 	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
-	cv::moveWindow("Blob Detection", 600, 10);
+	cv::resizeWindow("Blob Detection", width / 2.0, height / 2.0);
+	cv::moveWindow("Blob Detection", width/2.0, 0);
 	PlanePathMatrices = planeGenerator.getPlanePaths();
 	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
-	cv::moveWindow("Plane Paths", 400, 500);
+	cv::moveWindow("Plane Paths", width/2.0, height/2.0);
 	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);	
 
 	Texture defaultPlaneTexture(".\\asset\\container.jpg");
