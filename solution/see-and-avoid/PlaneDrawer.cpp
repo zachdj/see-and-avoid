@@ -127,8 +127,16 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 		if (distanceToCam < collisionRadius && !current->hasCollided) {
 			glm::vec3 planeDir = current->GetCurrentDirection();
 			glm::vec3 cameraDir = camera.GetCurrentDirection();
-			if (atan((cameraDir.z - planeDir.z) / (cameraDir.x - planeDir.x)) < 3.14 && atan((cameraDir.z - planeDir.z) / (cameraDir.x - planeDir.x)) > 0) {
+			double dotProduct = glm::dot(planeDir, cameraDir);
+			float theta = acos(dotProduct); //The denominator here is one because we are using two unit vectors
+			//cout << theta << endl;
+			if (theta > 4.7 || theta < 1.6) { // a direct collision is pi. So, 90 degrees both ways would be pi + pi/2 and pi - pi/2
 				PrintToFile::printDebug("Hit in the back");
+				stringstream x, y, z;
+				x << current->position.x; y << current->position.y; z << current->position.z;
+				PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str(), true);
+				stringstream planeNum; planeNum << i;
+				PrintToFile::print("Plane: " + planeNum.str());
 				//Get the current time as well
 				time_t now = time(0);
 				tm *ltm = localtime(&now);
@@ -136,8 +144,6 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 				PrintToFile::printDebug("Time: " + hour.str() + ":" + min.str() + ":" + sec.str());
 				PrintToFile::printDebug("");
 				current->hasCollided = true;
-
-
 			}
 				
 			else {

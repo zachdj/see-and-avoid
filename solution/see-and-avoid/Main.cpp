@@ -217,7 +217,7 @@ int renderScene() {
 		skybox->Draw(view, projection);
 
 		//draw aircraft
-		planeDrawer->Draw(view, projection, camera.GetPosition(), timeValue, myplanes);
+		planeDrawer->Draw(camera, camera.GetPosition(), timeValue, myplanes);
 
 		//OpenCV stuf
 		//create an empty matrix to hold frame data
@@ -333,7 +333,7 @@ int processScene() {
 						Point(info[i].currentPositionX, info[i].currentPositionY),
 						Point(info[i].currentPositionX - info[i].deltaX, info[i].currentPositionY - info[i].deltaY),
 						200, 200, 200);
-					ai.reactToBlob(info[i], camera);
+					//ai.reactToBlob(info[i], camera);
 				}
 			}
 
