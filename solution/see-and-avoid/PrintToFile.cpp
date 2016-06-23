@@ -37,7 +37,7 @@ void PrintToFile::clearFile() {
 }
 
 void PrintToFile::printDebug(std::string printable) {
-	writeDebugFile.open(name, std::ios::app);
+	writeDebugFile.open(nameDebug, std::ios::app);
 	if (writeDebugFile.is_open()) {
 			writeDebugFile << printable << "\n";
 	}

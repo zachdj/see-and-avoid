@@ -31,6 +31,7 @@ private:
 
 	void generatePlanes();
 	void generateRandomPlanes();
+	void generateApproachingPlanes();
 	void MyLine(Mat img, Point start, Point end, int red, int green, int blue);
 	void DrawPathsOnMatrix();
 
