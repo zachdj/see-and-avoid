@@ -41,7 +41,7 @@ class Camera
 		void DoKeyboardMovement(GLfloat timeDelta);
 
 		//shared config variables
-		GLfloat viewDistance = 3000.0f;
+		GLfloat viewDistance = 5280.0f;
 		GLfloat FOV = 66.0f;
 		// config variables for flight
 		GLfloat MAX_SPEED = 50.0f; // distance units / second

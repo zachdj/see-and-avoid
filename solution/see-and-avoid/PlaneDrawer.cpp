@@ -1,6 +1,4 @@
 #include "PlaneDrawer.h"
-#include <time.h>
-#include <ctime>
 
 PlaneDrawer::PlaneDrawer(Texture & tex, Shader & planeShader)
 {

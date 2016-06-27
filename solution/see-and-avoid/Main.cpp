@@ -31,6 +31,12 @@
 #include "PrintToFile.h"
 #include "Algorithms\AtcAvoidance.h"
 #include "VisionProcessor.h"
+#include "ContourVisionProcessor.h"
+
+//TODO: remove
+#include "Cube.h"
+#include "CubeDrawer.h"
+#include "Utility.h"
 
 using namespace std;
 
@@ -158,10 +164,20 @@ int renderScene() {
 	PlaneDrawer * planeDrawer = new PlaneDrawer(defaultPlaneTexture, planeShader);
 
 	// create camera and path for camera (our plane)
-	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 1000.0f));
-	camera.SetPath(pathHelper->GetPreloadedPath(0));
-	camera.ActivateAutonomousMode();
+	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 0.0f));
+	/*camera.SetPath(pathHelper->GetPreloadedPath(0));
+	camera.ActivateAutonomousMode();*/
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));
+
+	//TODO: remove
+	Cube distCube1 = Cube(glm::vec3(0.0f, 0.0f, -250.0f));
+	//Cube distCube2 = Cube(glm::vec3(-112.0f, -15.0f, 120.0f));
+	vector<Cube> cubesToDraw = vector<Cube>();
+	cubesToDraw.push_back(distCube1);
+	//cubesToDraw.push_back(distCube2);
+
+	Shader cubeShader = Shader(".\\Shaders\\Cube\\cube.vs", ".\\Shaders\\Cube\\Cube.fs");
+	CubeDrawer * cubeDrawer = new CubeDrawer(defaultPlaneTexture, defaultPlaneTexture, cubeShader);
 
 	//Show the Window again once we are ready
 	glfwShowWindow(window);
@@ -189,6 +205,9 @@ int renderScene() {
 		//draw aircraft
 		planeDrawer->Draw(camera, camera.GetPosition(), timeValue, myplanes);
 
+		//TODO: remove
+		//cubeDrawer->Draw(view, projection, timeValue, cubesToDraw);
+
 		//OpenCV stuf
 		//create an empty matrix to hold frame data
 		semaphore.lock();
@@ -214,7 +233,9 @@ int renderScene() {
 
 int processScene() {
 	Mat frame;
-	VisionProcessor processor = VisionProcessor();
+	ContourVisionProcessor processor = ContourVisionProcessor();
+	double focalLengthSum = 0;
+	int focalLengthMeasurements = 0;
 	while (!renderingStopped) {
 
 		semaphore.lock();
@@ -222,6 +243,27 @@ int processScene() {
 		semaphore.unlock();
 		vector<BlobInfo> blobs = processor.ProcessScene(frame);
 		for (int i = 0; i < blobs.size(); i++) {
+			//cout << "Blob indeX: " << i << endl;
+			//cout << "Blob size: " << blobs[i].currentSize << endl;
+			if (i == 0) {
+				cout << "Blob size: " << blobs[i].currentSize << endl;
+				double blobSize = blobs[i].currentSize;
+				double distance = sqrt(Utility::point2pointDistance2(
+					camera.GetPosition().x, camera.GetPosition().z, myplanes[i]->position.x, myplanes[i]->position.z));
+				focalLengthSum += blobSize * distance / AircraftTable::getBestCase().wingspan;
+				focalLengthMeasurements++;
+				cout << "Distance: " << distance << endl;
+				double avgFocalLength = focalLengthSum / focalLengthMeasurements;
+				cout << "avg focal length: " << avgFocalLength << endl;
+				double calculatedDist = AircraftTable::getBestCase().wingspan * avgFocalLength / blobSize;
+				cout << "Calc distance: " << calculatedDist << endl;
+				cout << "error: " << calculatedDist - distance << endl;
+				focalLengthSum += blobs[i].currentSize * sqrt(Utility::point2pointDistance2(
+					camera.GetPosition().x, camera.GetPosition().y, blobs[i].currentPositionX, blobs[i].currentPositionY) /
+					AircraftTable::getBestCase().wingspan);
+				focalLengthMeasurements++;
+				cout << "Focal length avg " << focalLengthSum / focalLengthMeasurements << endl;
+			}
 			ai.reactToBlob(blobs[i], camera);
 		}		
 	}

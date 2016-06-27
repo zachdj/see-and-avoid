@@ -4,8 +4,11 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "PrintToFile.h"
+#include "AircraftTable.h"
 
 #include <vector>
+#include <time.h>
+#include <ctime>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

@@ -116,6 +116,7 @@ vector<BlobInfo> BlobTracker::GetBlobInfo(cv::Point center) {
 		info.originalPositionY = obj.second.firstOccurrenceY;
 		info.currentPositionX = obj.second.lastOccurrenceX;
 		info.currentPositionY = obj.second.lastOccurrenceY;
+		info.currentSize = obj.second.lastOccurrenceSize;
 		info.SetCollisionValue(obj.second.cumulativeCollisionValue);
 
 		blobInfo.push_back(info);

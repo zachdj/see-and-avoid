@@ -15,10 +15,11 @@ public:
 	double originalPositionY;
 	double currentPositionX;
 	double currentPositionY;
+	double currentSize;
 	double deltaSize;
 	double foundPct;
 private:
 	unsigned int id;
-	double collisionValue;
+	double collisionValue; // danger level
 };
 

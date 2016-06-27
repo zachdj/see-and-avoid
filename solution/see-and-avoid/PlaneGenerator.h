@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Aircraft.h"
+#include "AircraftTable.h"
 
 using namespace std;
 #include <opencv2/highgui/highgui.hpp>

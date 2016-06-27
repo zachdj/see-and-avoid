@@ -8,6 +8,9 @@ BlobInfo::BlobInfo()
 	this->deltaSize = 0;
 	this->foundPct = 0;
 	this->collisionValue = 0;
+	this->currentPositionX = 0;
+	this->currentPositionY = 0;
+	this->currentSize = 0;
 }
 
 BlobInfo::BlobInfo(unsigned int id, double deltaX, double deltaY, double deltaSize, float foundPct)
@@ -18,6 +21,9 @@ BlobInfo::BlobInfo(unsigned int id, double deltaX, double deltaY, double deltaSi
 	this->deltaSize = deltaSize;
 	this->foundPct = foundPct;
 	this->collisionValue = 0;
+	this->currentPositionX = 0;
+	this->currentPositionY = 0;
+	this->currentSize = 0;
 }
 
 unsigned int BlobInfo::GetId()

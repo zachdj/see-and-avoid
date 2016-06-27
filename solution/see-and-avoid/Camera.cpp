@@ -223,7 +223,8 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 
 	//account for roll
 	// if there is roll, then yaw should be gradually changed
-	GLfloat deltaYaw = 0.5f * timeDelta * this->roll; //0.5 is yaw per roll rate
+	// determine how much plane should turn based on banking angle - current computation is based on assumption that a plane banked at 30 degrees will complete a 360 deg turn in 2 minutes
+	GLfloat deltaYaw = 1.0f * timeDelta * this->roll; 
 	this->yaw -= deltaYaw;
 
 	// determine aircraft direction from pitch, roll, and velocity and update position

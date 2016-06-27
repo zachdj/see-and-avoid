@@ -131,6 +131,7 @@
     <ClCompile Include="BlobInfo.cpp" />
     <ClCompile Include="BlobTracker.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ContourVisionProcessor.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeDrawer.cpp" />
     <ClCompile Include="KeyboardHandler.cpp" />
@@ -149,11 +150,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aircraft.h" />
+    <ClInclude Include="AircraftTable.h" />
     <ClInclude Include="Algorithms\AtcAvoidance.h" />
     <ClInclude Include="Algorithms\AvoidanceAlgorithm.h" />
     <ClInclude Include="BlobInfo.h" />
     <ClInclude Include="BlobTracker.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ContourVisionProcessor.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="CubeDrawer.h" />
     <ClInclude Include="FileUtils.h" />
@@ -173,9 +176,6 @@
     <ClInclude Include="Utility.h" />
     <ClInclude Include="VisionProcessor.h" />
     <ClInclude Include="Waypoint.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="assimp.dll" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
