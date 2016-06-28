@@ -170,11 +170,11 @@ int renderScene() {
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));
 
 	//TODO: remove
-	Cube distCube1 = Cube(glm::vec3(0.0f, 0.0f, -250.0f));
-	//Cube distCube2 = Cube(glm::vec3(-112.0f, -15.0f, 120.0f));
+	Cube distCube1 = Cube(glm::vec3(200.0f, -15.0f, 20.0f));
+	Cube distCube2 = Cube(glm::vec3(-200.0f, -15.0f, 20.0f));
 	vector<Cube> cubesToDraw = vector<Cube>();
 	cubesToDraw.push_back(distCube1);
-	//cubesToDraw.push_back(distCube2);
+	cubesToDraw.push_back(distCube2);
 
 	Shader cubeShader = Shader(".\\Shaders\\Cube\\cube.vs", ".\\Shaders\\Cube\\Cube.fs");
 	CubeDrawer * cubeDrawer = new CubeDrawer(defaultPlaneTexture, defaultPlaneTexture, cubeShader);
@@ -246,23 +246,21 @@ int processScene() {
 			//cout << "Blob indeX: " << i << endl;
 			//cout << "Blob size: " << blobs[i].currentSize << endl;
 			if (i == 0) {
-				cout << "Blob size: " << blobs[i].currentSize << endl;
-				double blobSize = blobs[i].currentSize;
+				AircraftTableData tableData = AircraftTable::getBestCase();
+				cout << "Blob size: " << blobs[i].currentSize-tableData.pointMassSize << endl;
+				double blobSize = blobs[i].currentSize-tableData.pointMassSize;
 				double distance = sqrt(Utility::point2pointDistance2(
 					camera.GetPosition().x, camera.GetPosition().z, myplanes[i]->position.x, myplanes[i]->position.z));
-				focalLengthSum += blobSize * distance / AircraftTable::getBestCase().wingspan;
+				focalLengthSum += blobSize * distance / tableData.wingspan;
 				focalLengthMeasurements++;
 				cout << "Distance: " << distance << endl;
 				double avgFocalLength = focalLengthSum / focalLengthMeasurements;
 				cout << "avg focal length: " << avgFocalLength << endl;
-				double calculatedDist = AircraftTable::getBestCase().wingspan * avgFocalLength / blobSize;
+				double calculatedDist = AircraftTable::calculateApproximateDistance(tableData.wingspan, tableData.focalLength, blobSize);
 				cout << "Calc distance: " << calculatedDist << endl;
+				cout << "deltaSize: " << blobs[i].deltaSize << endl;
+				
 				cout << "error: " << calculatedDist - distance << endl;
-				focalLengthSum += blobs[i].currentSize * sqrt(Utility::point2pointDistance2(
-					camera.GetPosition().x, camera.GetPosition().y, blobs[i].currentPositionX, blobs[i].currentPositionY) /
-					AircraftTable::getBestCase().wingspan);
-				focalLengthMeasurements++;
-				cout << "Focal length avg " << focalLengthSum / focalLengthMeasurements << endl;
 			}
 			ai.reactToBlob(blobs[i], camera);
 		}		
