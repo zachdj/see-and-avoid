@@ -17,12 +17,12 @@ public:
 
 	double deltaX;
 	double deltaY;
+	double deltaSize;
 	double originalPositionX;
 	double originalPositionY;
 	double currentPositionX;
 	double currentPositionY;
 	double currentSize;
-	double deltaSize;
 	double foundPct;
 private:
 	unsigned int id;

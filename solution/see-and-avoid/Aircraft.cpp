@@ -1,6 +1,6 @@
 #include "Aircraft.h"
 
-Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, GLchar * modelFilePath, GLfloat scale) : model(modelFilePath)
+Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, GLchar * modelFilePath, AircraftScale acScale) : model(modelFilePath)
 {
 	this->position = startingPos;
 	this->pitch = 0.0f;
@@ -8,6 +8,13 @@ Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, 
 	this->yaw = 0.0f;
 	Model aircraftModel(modelFilePath);
 	this->model = aircraftModel;
+
+	double scale;
+	if (acScale == AircraftScale::big) {
+		scale = AircraftTable::getBestCase().wingspan / AircraftTable::GetPlaneModelWingspan();
+	} else if (acScale == AircraftScale::med) {
+		scale = AircraftTable::getTypicalCase().wingspan / AircraftTable::GetFighterModelWingspan();
+	} else {		scale = AircraftTable::getWorstCase().wingspan / AircraftTable::GetCessnaModelWingspan();	}
 	this->scale = scale;
 
 	this->hasCollided = false;
@@ -19,7 +26,7 @@ Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, 
 
 }
 
-Aircraft::Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* filepath, GLfloat scale) : model(filepath)
+Aircraft::Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* filepath, AircraftScale acScale) : model(filepath)
 {
 	this->position = position;
 	this->pitch = 0.0f;
@@ -27,6 +34,13 @@ Aircraft::Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* filepath
 	this->yaw = 0.0f;
 	Model aircraftModel(filepath);
 	this->model = aircraftModel;
+
+	double scale;
+	if (acScale == AircraftScale::big) {
+		scale = AircraftTable::getBestCase().wingspan / AircraftTable::GetPlaneModelWingspan();
+	} else if (acScale == AircraftScale::med) {
+		scale = AircraftTable::getTypicalCase().wingspan / AircraftTable::GetFighterModelWingspan();
+	} else {		scale = AircraftTable::getWorstCase().wingspan / AircraftTable::GetCessnaModelWingspan();	}
 	this->scale = scale;
 
 	this->hasCollided = false;

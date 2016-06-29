@@ -244,24 +244,38 @@ int processScene() {
 		semaphore.unlock();
 		vector<BlobInfo> blobs = processor.ProcessScene(frame);
 		for (int i = 0; i < blobs.size(); i++) {
-			//cout << "Blob indeX: " << i << endl;
-			//cout << "Blob size: " << blobs[i].currentSize << endl;
 			if (i == 0) {
 				AircraftTableData tableData = AircraftTable::getBestCase();
-				cout << "Blob size: " << blobs[i].currentSize-tableData.pointMassSize << endl;
 				double blobSize = blobs[i].currentSize-tableData.pointMassSize;
 				double distance = sqrt(Utility::point2pointDistance2(
 					camera.GetPosition().x, camera.GetPosition().z, myplanes[i]->position.x, myplanes[i]->position.z));
 				focalLengthSum += blobSize * distance / tableData.wingspan;
 				focalLengthMeasurements++;
-				cout << "Distance: " << distance << endl;
 				double avgFocalLength = focalLengthSum / focalLengthMeasurements;
-				cout << "avg focal length: " << avgFocalLength << endl;
 				double calculatedDist = AircraftTable::calculateApproximateDistance(tableData.wingspan, tableData.focalLength, blobSize);
-				cout << "Calc distance: " << calculatedDist << endl;
-				cout << "deltaSize: " << blobs[i].deltaSize << endl;
-				
-				cout << "error: " << calculatedDist - distance << endl;
+				// new stuff below
+
+				double oldDist = AircraftTable::calculateApproximateDistance(tableData.wingspan, tableData.focalLength, blobSize + blobs[i].deltaSize);
+				double deltaZ = calculatedDist - oldDist;
+
+				double horizontalCrossSectionLength = calculatedDist * 2 * sin(20.0 * 3.14159 / 180.0);
+				double horizontalPct = (blobs[i].currentPositionX - 960.0 / 2.0) / 960.0;
+				double currentX = horizontalPct * horizontalCrossSectionLength;
+				double oldHorizontalCrossSectionLength = oldDist * 2 * sin(20.0 * 3.14159 / 180.0);
+				double oldHorizontalPct = (blobs[i].currentPositionX + blobs[i].deltaX - 960.0 / 2.0) / 960.0;
+				double oldX = oldHorizontalPct * oldHorizontalCrossSectionLength;
+				double deltaX = currentX - oldX;
+
+				double verticalCrossSectionLength = calculatedDist * 2 * sin(20.0 * 3.14159 / 180.0);
+				double verticalPct = (blobs[i].currentPositionY - 540.0 / 2.0) / 540.0;
+				double currentY = verticalPct * verticalCrossSectionLength;
+				double oldVerticalCrossSectionLength = oldDist * 2 * sin(20.0 * 3.14159 / 180.0);
+				double oldVerticalPct = (blobs[i].currentPositionY + blobs[i].deltaY - 540.0 / 2.0) / 540.0;
+				double oldY = oldVerticalPct * oldVerticalCrossSectionLength;
+				double deltaY = currentY - oldY;
+
+				cout << "DeltaPos: <" << deltaX << ", " << deltaY << ", " << deltaZ << ">" << endl;
+
 			}
 			ai.reactToBlob(blobs[i], camera);
 		}		
