@@ -109,7 +109,7 @@ int renderScene() {
 	GLuint height = mode->height;
 
 	//Time to create a window with GLFW
-	GLFWwindow* window = glfwCreateWindow(width / 2.0, height / 2.0, "See and Avoid Sim", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(960, 540, "See and Avoid Sim", nullptr, nullptr);
 	
 	if (window == nullptr) //ensure the window was initialized
 	{
