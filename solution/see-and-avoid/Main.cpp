@@ -109,7 +109,7 @@ int renderScene() {
 	GLuint height = mode->height;
 
 	//Time to create a window with GLFW
-	GLFWwindow* window = glfwCreateWindow(960, 540, "See and Avoid Sim", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(width / 2.0, height / 2.0, "See and Avoid Sim", nullptr, nullptr);
 	
 	if (window == nullptr) //ensure the window was initialized
 	{
@@ -218,6 +218,7 @@ int renderScene() {
 		glPixelStorei(GL_PACK_ROW_LENGTH, img.step / img.elemSize());
 		glReadPixels(0, 0, img.cols, img.rows, GL_BGR, GL_UNSIGNED_BYTE, img.data);
 		cv::flip(img, img, 0);
+		resize(img, img, Size(960, 540));
 		semaphore.unlock();
 
 		on_trackbar(1, 0);
