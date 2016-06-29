@@ -153,7 +153,7 @@ int renderScene() {
 
 	// we have to create openCV windows in this thread!
 	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
-	cv::resizeWindow("Blob Detection", width / 2.0, height / 2.0);
+	cv::resizeWindow("Blob Detection", 960, 540);
 	cv::moveWindow("Blob Detection", width/2.0, 0);
 	PlanePathMatrices = planeGenerator.getPlanePaths();
 	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
