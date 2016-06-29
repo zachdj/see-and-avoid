@@ -38,8 +38,7 @@ void PlaneGenerator::generatePlanes() {
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
 	Path planePath = Path(waypoints, 20.0f);
-	double scale = AircraftTable::getBestCase().wingspan / AircraftTable::GetPlaneModelWingspan();
-	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1500.0f), planePath, 40.0f, ".\\Models\\plane\\plane.obj", scale);
+	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1500.0f), planePath, 40.0f, ".\\Models\\plane\\plane.obj", AircraftScale::big);
 	plane->SetSpeed(0.0f);
 	myPlanes.push_back(plane);
 	for (int i = 0; i < waypoints.size(); i++) 
@@ -144,11 +143,11 @@ void PlaneGenerator::generateRandomPlanes() {
 		int planeType = rand() % 3;
 		Aircraft* plane;
 		if (planeType == 0)
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 30.0f, ".\\Models\\vought\\vought.obj", 0.01);
+			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 30.0f, ".\\Models\\vought\\vought.obj", AircraftScale::small);
 		else if (planeType == 1)
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
+			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
 		else
-			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 60.0f, ".\\Models\\plane\\plane.obj", 0.7);
+			plane = new Aircraft(glm::vec3((float)(rand() % widthOfAirspace - widthOfAirspace / 2), 0.0f, (float)(rand() % widthOfAirspace - widthOfAirspace / 2)), planePath, 60.0f, ".\\Models\\plane\\plane.obj", AircraftScale::small);
 		plane->SetSpeed(50.0f);
 		myPlanes.push_back(plane);
 		planePoints.push_back(points);
@@ -179,11 +178,11 @@ void PlaneGenerator::generateApproachingPlanes() {
 		int planeType = rand() % 3;
 		Aircraft* plane;
 		if (planeType == 0)
-			plane = new Aircraft(glm::vec3(x, y, start), planePath, 30.0f, ".\\Models\\vought\\vought.obj", 0.01);
+			plane = new Aircraft(glm::vec3(x, y, start), planePath, 30.0f, ".\\Models\\vought\\vought.obj", AircraftScale::small);
 		else if (planeType == 1)
-			plane = new Aircraft(glm::vec3(x, y, start), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", 0.1);
+			plane = new Aircraft(glm::vec3(x, y, start), planePath, 40.0f, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
 		else
-			plane = new Aircraft(glm::vec3(x, y, start), planePath, 60.0f, ".\\Models\\plane\\plane.obj", 0.7);
+			plane = new Aircraft(glm::vec3(x, y, start), planePath, 60.0f, ".\\Models\\plane\\plane.obj", AircraftScale::big);
 		plane->SetSpeed(50.0f);
 		myPlanes.push_back(plane);
 		planePoints.push_back(points);
