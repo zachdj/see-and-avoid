@@ -1,6 +1,6 @@
 
 /*
-Classthat can assign waypoints to a given aircraft. These waypoints are the flight patterns each aircraft flies between.
+Class that can assign waypoints to a given aircraft. These waypoints are the flight patterns each aircraft flies between.
 */
 
 #pragma once

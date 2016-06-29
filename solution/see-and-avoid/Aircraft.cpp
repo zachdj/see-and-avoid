@@ -1,6 +1,6 @@
 #include "Aircraft.h"
 
-Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, GLchar * modelFilePath, AircraftScale acScale) : model(modelFilePath)
+Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLchar * modelFilePath, AircraftScale acScale) : model(modelFilePath)
 {
 	this->position = startingPos;
 	this->pitch = 0.0f;
@@ -12,13 +12,19 @@ Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, 
 	double scale;
 	if (acScale == AircraftScale::big) {
 		scale = AircraftTable::getBestCase().wingspan / AircraftTable::GetPlaneModelWingspan();
-	} else if (acScale == AircraftScale::med) {
+		this->collisionRadius = AircraftTable::GetPlaneModelWingspan();
+	}
+	else if (acScale == AircraftScale::med) {
 		scale = AircraftTable::getTypicalCase().wingspan / AircraftTable::GetFighterModelWingspan();
-	} else {		scale = AircraftTable::getWorstCase().wingspan / AircraftTable::GetCessnaModelWingspan();	}
+		this->collisionRadius = AircraftTable::GetFighterModelWingspan();
+	}
+	else {
+		scale = AircraftTable::getWorstCase().wingspan / AircraftTable::GetCessnaModelWingspan();
+		this->collisionRadius = AircraftTable::GetCessnaModelWingspan();
+	}
 	this->scale = scale;
 
 	this->hasCollided = false;
-	this->collisionRadius = collisionRadius;
 
 	this->path = path;
 
@@ -26,7 +32,7 @@ Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLfloat collisionRadius, 
 
 }
 
-Aircraft::Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* filepath, AircraftScale acScale) : model(filepath)
+Aircraft::Aircraft(glm::vec3 position, GLchar* filepath, AircraftScale acScale) : model(filepath)
 {
 	this->position = position;
 	this->pitch = 0.0f;
@@ -38,13 +44,17 @@ Aircraft::Aircraft(glm::vec3 position, GLfloat collisionRadius, GLchar* filepath
 	double scale;
 	if (acScale == AircraftScale::big) {
 		scale = AircraftTable::getBestCase().wingspan / AircraftTable::GetPlaneModelWingspan();
+		this->collisionRadius = AircraftTable::GetPlaneModelWingspan();
 	} else if (acScale == AircraftScale::med) {
 		scale = AircraftTable::getTypicalCase().wingspan / AircraftTable::GetFighterModelWingspan();
-	} else {		scale = AircraftTable::getWorstCase().wingspan / AircraftTable::GetCessnaModelWingspan();	}
+		this->collisionRadius = AircraftTable::GetFighterModelWingspan();
+	} else {
+		scale = AircraftTable::getWorstCase().wingspan / AircraftTable::GetCessnaModelWingspan();
+		this->collisionRadius = AircraftTable::GetCessnaModelWingspan();
+	}
 	this->scale = scale;
 
 	this->hasCollided = false;
-	this->collisionRadius = collisionRadius;
 
 	this->autonomousMode = false;
 }

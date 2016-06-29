@@ -30,6 +30,7 @@
 #include "PlaneGenerator.h"
 #include "PrintToFile.h"
 #include "Algorithms\AtcAvoidance.h"
+#include "Algorithms\AvoidanceDistanceAgnostic.h"
 #include "VisionProcessor.h"
 #include "ContourVisionProcessor.h"
 
@@ -65,7 +66,8 @@ int widthOfAirspace = 4000;
 
 vector< Aircraft*> myplanes; // planes to render
 Camera camera; // camera object
-AtcAvoidance ai = AtcAvoidance(); // avoidance algorithm to use
+//AtcAvoidance ai = AtcAvoidance(); // avoidance algorithm to use
+AvoidanceDistanceAgnostic ai = AvoidanceDistanceAgnostic(); //Other type of avoidanceAlgorithm
 
 /***************************** End forward declarations ********************************************************/
 
@@ -164,7 +166,7 @@ int renderScene() {
 	PlaneDrawer * planeDrawer = new PlaneDrawer(defaultPlaneTexture, planeShader);
 
 	// create camera and path for camera (our plane)
-	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 0.0f));
+	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 1400.0f));
 	camera.SetPath(pathHelper->GetPreloadedPath(0));
 	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));

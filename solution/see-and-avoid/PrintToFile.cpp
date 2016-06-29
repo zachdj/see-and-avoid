@@ -6,6 +6,7 @@
 const std::string PrintToFile::name = "Simulation.mylog";
 const std::string PrintToFile::nameDebug = "SimulationDebug.mylog";
 int PrintToFile::collisionNum = 1;
+int PrintToFile::collisionDebugNum = 1;
 std::ofstream writeFile;
 std::ofstream writeDebugFile;
 
@@ -36,9 +37,17 @@ void PrintToFile::clearFile() {
 	writeFile.close();
 }
 
-void PrintToFile::printDebug(std::string printable) {
+void PrintToFile::printDebug(std::string printable, bool printHeader) {
 	writeDebugFile.open(nameDebug, std::ios::app);
 	if (writeDebugFile.is_open()) {
+		if (printHeader) {
+			std::stringstream num; num << collisionDebugNum;
+			writeDebugFile << "Collision #" << collisionDebugNum << "\n";
+			writeDebugFile << printable << "\n";
+			collisionDebugNum++;
+		}
+
+		else
 			writeDebugFile << printable << "\n";
 	}
 	else

@@ -129,7 +129,7 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 			float theta = acos(dotProduct); //The denominator here is one because we are using two unit vectors
 			//cout << theta << endl;
 			if (theta > 4.7 || theta < 1.6) { // a direct collision is pi. So, 90 degrees both ways would be pi + pi/2 and pi - pi/2
-				PrintToFile::printDebug("Hit in the back");
+				PrintToFile::printDebug("Hit in the back",true);
 				stringstream x, y, z;
 				x << current->position.x; y << current->position.y; z << current->position.z;
 				PrintToFile::printDebug("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str());
