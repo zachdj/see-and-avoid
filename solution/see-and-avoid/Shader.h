@@ -1,3 +1,8 @@
+
+/*
+Shader information that is used in OpenGL environment
+*/
+
 #pragma once
 
 #include <string>

@@ -1,5 +1,10 @@
 #pragma once
 
+/*
+This class keeps track of the constants associated with the different types of aircrafts we have available. 
+According to the size of each aircraft, we want to be sure the collision radii are correctly calibrated.
+*/
+
 struct AircraftTableData {
 	double wingspan;
 	double focalLength;

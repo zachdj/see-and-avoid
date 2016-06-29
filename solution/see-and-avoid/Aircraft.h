@@ -1,5 +1,9 @@
 #pragma once
 
+/* 
+This class creates an object of Aircraft. Each airplane we build in the sky will be an aircraft object.
+*/
+
 #include "Texture.h"
 #include "Shader.h"
 

@@ -1,3 +1,8 @@
+
+/*
+Assists in determining the best path. 
+*/
+
 #pragma once
 
 #include "Path.h"

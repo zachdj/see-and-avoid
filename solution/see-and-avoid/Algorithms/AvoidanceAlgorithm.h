@@ -1,4 +1,6 @@
-//interface for avoidance algorithms
+/*
+This is an interface for our different types of avoidance algorithms.
+*/
 
 #pragma once
 

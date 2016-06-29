@@ -1,3 +1,8 @@
+
+/*
+Static class used for creating log files associate with given output and debugging. 
+*/
+
 #pragma once
 #include <fstream>
 #include <string>

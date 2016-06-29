@@ -1,3 +1,9 @@
+
+/*
+Interface for obstacles. Anything we are trying to avoid. 
+*/
+
+
 #pragma once
 
 #include <glew.h>; // Include glew to get all the required OpenGL headers

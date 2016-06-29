@@ -41,7 +41,7 @@
 using namespace std;
 
 /**************************** forward declarations go here **************************************************/
-
+//Determines if planes are randomly generated
 bool RANDOM = false;
 
 // functions to run in threads
@@ -165,8 +165,8 @@ int renderScene() {
 
 	// create camera and path for camera (our plane)
 	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 0.0f));
-	/*camera.SetPath(pathHelper->GetPreloadedPath(0));
-	camera.ActivateAutonomousMode();*/
+	camera.SetPath(pathHelper->GetPreloadedPath(0));
+	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));
 
 	//TODO: remove

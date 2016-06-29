@@ -1,4 +1,11 @@
-//Credit to Joey DeVries of learnopengl.com for the model-loading class.  I've modified it slightly to work on windows and with this application
+
+/*
+Class loads all the meshes for a particular .obj file. Credit to Joey DeVries of learnopengl.com for the model-loading class.  
+I've modified it slightly to work on windows and with this application.
+*/
+
+//
+
 #pragma once
 // Std. Includes
 #include <string>

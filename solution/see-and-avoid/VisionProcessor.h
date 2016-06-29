@@ -1,3 +1,8 @@
+
+/*
+Processes all vision in OpenCV and detects blobs accodingly. 
+*/
+
 #pragma once
 
 //OpenCV includes

@@ -1,3 +1,8 @@
+
+/*
+Tool used for loading in files from project files. This is currently used for importing .obj file and material associated with it. 
+*/
+
 #pragma once
 // Std. Includes
 #include <string>

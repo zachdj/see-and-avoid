@@ -1,3 +1,10 @@
+
+/*
+Class is used for building planes to put in the virutal world. We can either build planes with a given set of waypoints,  or build a set number of
+planes randomly in the environment. Each has a particular research point to focus on.
+*/
+
+
 #pragma once
 #include <vector>
 #include "Aircraft.h"

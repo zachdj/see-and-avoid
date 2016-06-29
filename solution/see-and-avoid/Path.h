@@ -1,3 +1,8 @@
+
+/*
+Declare paths for given aircraft and camera. Here we set waypoints and calculate where we need to go on our path
+*/
+
 #pragma once
 
 #include <glew.h>; // Include glew to get all the required OpenGL headers

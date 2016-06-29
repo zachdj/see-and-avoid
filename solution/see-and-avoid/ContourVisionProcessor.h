@@ -1,3 +1,8 @@
+
+/*
+Vision processor used for looking at contours and detecting blobs for later use. 
+*/
+
 #pragma once
 
 //OpenCV includes

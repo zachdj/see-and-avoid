@@ -1,3 +1,9 @@
+
+/*
+Loads in the skybox (clouds) that are used in the OpenGl environment. It is easy to load in different skyboxes if
+needed
+*/
+
 #pragma once
 
 #define GLEW_STATIC

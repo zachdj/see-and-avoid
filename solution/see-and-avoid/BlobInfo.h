@@ -1,3 +1,9 @@
+
+/*
+This class keeps track of the information associated with each blob. This information is used to track how an aircraft
+may be moving, or how it may be approaching our own aircraft.
+*/
+
 #pragma once
 class BlobInfo
 {

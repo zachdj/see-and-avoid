@@ -1,3 +1,8 @@
+
+/*
+Tracked blob is the class used to obtain information about the currently tracked blob. 
+*/
+
 #pragma once
 
 #include <stdlib.h>     /* srand, rand */

@@ -1,3 +1,9 @@
+
+/*
+Class draws the plane according to what the model tells us it looks like. We draw them in the OpenGL environment
+*/
+
+
 #pragma once
 
 #include "Aircraft.h"

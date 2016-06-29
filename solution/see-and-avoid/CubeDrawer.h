@@ -1,3 +1,8 @@
+
+/*
+Draws the cube in space after it is created by the Cube object.
+*/
+
 #pragma once
 
 #include "Cube.h"

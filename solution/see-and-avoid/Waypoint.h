@@ -1,3 +1,8 @@
+
+/*
+Classthat can assign waypoints to a given aircraft. These waypoints are the flight patterns each aircraft flies between.
+*/
+
 #pragma once
 
 #include <glm/glm.hpp>

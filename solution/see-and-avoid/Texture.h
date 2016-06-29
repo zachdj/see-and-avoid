@@ -1,3 +1,8 @@
+
+/*
+Is used when building the model of an aircraft. We add a texture to it to help give us geometry. 
+*/
+
 #pragma once
 
 #include <string>

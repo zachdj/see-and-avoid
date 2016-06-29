@@ -1,3 +1,9 @@
+
+/*
+This class created contains the methods used to track a blob we have found using OpenCV. We want to track a certain blob and give it a 
+unique ID so that we are aware of how they move. 
+*/
+
 #pragma once
 
 #include "TrackedBlob.h"

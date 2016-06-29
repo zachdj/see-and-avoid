@@ -1,3 +1,7 @@
+/*
+This class is used for loading our mesh model.
+*/
+
 #pragma once
 
 // Std. Includes

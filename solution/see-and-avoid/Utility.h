@@ -1,3 +1,8 @@
+
+/*
+Static class used for given calculations throughout the program
+*/
+
 #pragma once
 
 #include <math.h>

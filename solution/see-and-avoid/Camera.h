@@ -1,3 +1,9 @@
+
+/*
+The camera is actually our own plane. Though we do not have a direct size of our aircraft, the camera is the object used to move
+within the test environment. We will claim this to be our own aircraft.
+*/
+
 #pragma once
 
 #include <glew.h>; // Include glew to get all the required OpenGL headers

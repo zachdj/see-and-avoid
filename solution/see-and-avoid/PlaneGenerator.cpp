@@ -40,7 +40,7 @@ void PlaneGenerator::generatePlanes() {
 	Path planePath = Path(waypoints, 20.0f);
 	double scale = AircraftTable::getBestCase().wingspan / AircraftTable::GetPlaneModelWingspan();
 	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1500.0f), planePath, 40.0f, ".\\Models\\plane\\plane.obj", scale);
-	plane->SetSpeed(0.0f);
+	plane->SetSpeed(50.0f);
 	myPlanes.push_back(plane);
 	for (int i = 0; i < waypoints.size(); i++) 
 		points.push_back(Point(waypoints.at(i)->GetPosition().x , waypoints.at(i)->GetPosition().z));

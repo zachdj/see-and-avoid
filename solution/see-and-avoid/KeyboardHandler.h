@@ -1,3 +1,9 @@
+
+/*
+Class used for original debugging. We were able to control the aircraft using the keyboard of the computer.
+*/
+
+
 #pragma once
 
 #include <glew.h>
