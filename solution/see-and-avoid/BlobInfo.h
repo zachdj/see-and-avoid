@@ -9,7 +9,7 @@ class BlobInfo
 {
 public:
 	BlobInfo();
-	BlobInfo(unsigned int id, double deltaX, double deltaY, double deltaSize, float foundPct);
+	BlobInfo(unsigned int id, double deltaX, double deltaY, double deltaSize, double deltaTime, float foundPct);
 	unsigned int GetId();
 	unsigned int GetCollisionValue();
 	void SetCollisionValue(double val);
@@ -18,6 +18,7 @@ public:
 	double deltaX;
 	double deltaY;
 	double deltaSize;
+	double deltaTime;
 	double originalPositionX;
 	double originalPositionY;
 	double currentPositionX;

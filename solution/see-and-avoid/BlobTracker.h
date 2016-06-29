@@ -21,7 +21,7 @@ public:
 	BlobTracker(unsigned int historyLength);
 	~BlobTracker();
 
-	void AddFrame(vector<cv::KeyPoint> keypoints);
+	void AddFrame(vector<cv::KeyPoint> keypoints, float TimeValue);
 	vector<BlobInfo> GetBlobInfo(cv::Point center);
 
 private:

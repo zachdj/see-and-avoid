@@ -74,7 +74,7 @@ vector<BlobInfo> VisionProcessor::ProcessScene(Mat img, bool shouldRender) {
 		int cols = s.width;
 		Point center = Point(cols / 2, rows / 2); int centerRows = rows / 2; int centerCols = cols / 2;
 
-		tracker.AddFrame(keypoints);
+		tracker.AddFrame(keypoints, glfwGetTime());
 
 		vector<BlobInfo> info = tracker.GetBlobInfo(center);
 		//This loop draws lines and circles on key elements of interest

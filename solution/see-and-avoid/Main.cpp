@@ -30,6 +30,7 @@
 #include "PlaneGenerator.h"
 #include "PrintToFile.h"
 #include "Algorithms\AtcAvoidance.h"
+#include "Algorithms\AvoidanceWithDistance.h"
 #include "VisionProcessor.h"
 #include "ContourVisionProcessor.h"
 
@@ -65,7 +66,9 @@ int widthOfAirspace = 4000;
 
 vector< Aircraft*> myplanes; // planes to render
 Camera camera; // camera object
-AtcAvoidance ai = AtcAvoidance(); // avoidance algorithm to use
+// avoidance algorithm to use
+//AtcAvoidance ai = AtcAvoidance(); 
+AvoidanceWithDistance ai = AvoidanceWithDistance();
 
 /***************************** End forward declarations ********************************************************/
 
@@ -165,8 +168,8 @@ int renderScene() {
 
 	// create camera and path for camera (our plane)
 	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 0.0f));
-	camera.SetPath(pathHelper->GetPreloadedPath(0));
-	camera.ActivateAutonomousMode();
+	//camera.SetPath(pathHelper->GetPreloadedPath(0));
+	//camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));
 
 	//TODO: remove
@@ -244,39 +247,6 @@ int processScene() {
 		semaphore.unlock();
 		vector<BlobInfo> blobs = processor.ProcessScene(frame);
 		for (int i = 0; i < blobs.size(); i++) {
-			if (i == 0) {
-				AircraftTableData tableData = AircraftTable::getBestCase();
-				double blobSize = blobs[i].currentSize-tableData.pointMassSize;
-				double distance = sqrt(Utility::point2pointDistance2(
-					camera.GetPosition().x, camera.GetPosition().z, myplanes[i]->position.x, myplanes[i]->position.z));
-				focalLengthSum += blobSize * distance / tableData.wingspan;
-				focalLengthMeasurements++;
-				double avgFocalLength = focalLengthSum / focalLengthMeasurements;
-				double calculatedDist = AircraftTable::calculateApproximateDistance(tableData.wingspan, tableData.focalLength, blobSize);
-				// new stuff below
-
-				double oldDist = AircraftTable::calculateApproximateDistance(tableData.wingspan, tableData.focalLength, blobSize + blobs[i].deltaSize);
-				double deltaZ = calculatedDist - oldDist;
-
-				double horizontalCrossSectionLength = calculatedDist * 2 * sin(20.0 * 3.14159 / 180.0);
-				double horizontalPct = (blobs[i].currentPositionX - 960.0 / 2.0) / 960.0;
-				double currentX = horizontalPct * horizontalCrossSectionLength;
-				double oldHorizontalCrossSectionLength = oldDist * 2 * sin(20.0 * 3.14159 / 180.0);
-				double oldHorizontalPct = (blobs[i].currentPositionX + blobs[i].deltaX - 960.0 / 2.0) / 960.0;
-				double oldX = oldHorizontalPct * oldHorizontalCrossSectionLength;
-				double deltaX = currentX - oldX;
-
-				double verticalCrossSectionLength = calculatedDist * 2 * sin(20.0 * 3.14159 / 180.0);
-				double verticalPct = (blobs[i].currentPositionY - 540.0 / 2.0) / 540.0;
-				double currentY = verticalPct * verticalCrossSectionLength;
-				double oldVerticalCrossSectionLength = oldDist * 2 * sin(20.0 * 3.14159 / 180.0);
-				double oldVerticalPct = (blobs[i].currentPositionY + blobs[i].deltaY - 540.0 / 2.0) / 540.0;
-				double oldY = oldVerticalPct * oldVerticalCrossSectionLength;
-				double deltaY = currentY - oldY;
-
-				cout << "DeltaPos: <" << deltaX << ", " << deltaY << ", " << deltaZ << ">" << endl;
-
-			}
 			ai.reactToBlob(blobs[i], camera);
 		}		
 	}

@@ -6,6 +6,7 @@ BlobInfo::BlobInfo()
 	this->deltaX = 0;
 	this->deltaY = 0;
 	this->deltaSize = 0;
+	this->deltaTime = 0;
 	this->foundPct = 0;
 	this->collisionValue = 0;
 	this->currentPositionX = 0;
@@ -13,12 +14,13 @@ BlobInfo::BlobInfo()
 	this->currentSize = 0;
 }
 
-BlobInfo::BlobInfo(unsigned int id, double deltaX, double deltaY, double deltaSize, float foundPct)
+BlobInfo::BlobInfo(unsigned int id, double deltaX, double deltaY, double deltaSize, double deltaTime, float foundPct)
 {
 	this->id = id;
 	this->deltaX = deltaX;
 	this->deltaY = deltaY;
 	this->deltaSize = deltaSize;
+	this->deltaTime = deltaTime;
 	this->foundPct = foundPct;
 	this->collisionValue = 0;
 	this->currentPositionX = 0;

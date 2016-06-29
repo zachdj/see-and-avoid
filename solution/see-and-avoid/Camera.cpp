@@ -106,6 +106,9 @@ glm::mat4 Camera::GetOrthoMatrix() {
 glm::vec3 Camera::GetPosition(){
 	return this->position;
 }
+GLfloat Camera::GetSpeed() {
+	return this->speed;
+}
 
 glm::vec3 Camera::GetCurrentDirection() {
 	glm::vec3 direction;

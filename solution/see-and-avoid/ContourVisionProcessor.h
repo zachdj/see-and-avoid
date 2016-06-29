@@ -4,6 +4,8 @@ Vision processor used for looking at contours and detecting blobs for later use.
 */
 
 #pragma once
+#include <glew.h>
+#include <glfw3.h>
 
 //OpenCV includes
 #include <opencv2/highgui/highgui.hpp>
