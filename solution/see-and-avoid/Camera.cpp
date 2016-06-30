@@ -106,6 +106,7 @@ glm::mat4 Camera::GetOrthoMatrix() {
 glm::vec3 Camera::GetPosition(){
 	return this->position;
 }
+
 GLfloat Camera::GetSpeed() {
 	return this->speed;
 }
@@ -224,11 +225,14 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 	// The following code advances the plane forward along its current orientation
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//account for roll
-	// if there is roll, then yaw should be gradually changed
-	// determine how much plane should turn based on banking angle - current computation is based on assumption that a plane banked at 30 degrees will complete a 360 deg turn in 2 minutes
-	GLfloat deltaYaw = 1.0f * timeDelta * this->roll; 
-	this->yaw -= deltaYaw;
+	// determine how much plane should turn based on banking angle and speed
+	// rate of turn in deg/second is 1091 * tan(roll) / TAS
+	// 0.592484 is conversion factor from ft/s to knots
+	if (this->speed != 0) {
+		GLfloat rateOfTurn = 1091 * tan(glm::radians(this->roll)) / (this->speed * 0.592484);
+		GLfloat deltaYaw = rateOfTurn * timeDelta;
+		this->yaw -= deltaYaw;
+	}
 
 	// determine aircraft direction from pitch, roll, and velocity and update position
 	glm::vec3 unitDirection = this->GetCurrentDirection();
@@ -239,7 +243,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 void Camera::DoKeyboardMovement(GLfloat timeDelta) {
 	//set fixed-wing or rotor mode for upcoming loop
 	if (KeyboardHandler::fixedWing) {
-		this->MIN_SPEED = 5.0f;
+		this->MIN_SPEED = 25.0f;
 	}
 	else {
 		this->MIN_SPEED = -this->MAX_SPEED;
@@ -263,9 +267,14 @@ void Camera::DoKeyboardMovement(GLfloat timeDelta) {
 			this->roll = std::fmin(this->roll, this->MAX_ROLL);
 			this->roll = std::fmax(this->roll, this->MIN_ROLL);
 		}
-		// if there is roll, then yaw should be gradually changed
-		GLfloat deltaYaw = -0.5 * timeDelta * this->roll;
-		this->yaw += deltaYaw;
+		// determine how much plane should turn based on banking angle and speed
+		// rate of turn in deg/second is 1091 * tan(roll) / TAS
+		// 0.592484 is conversion factor from ft/s to knots
+		if (this->speed != 0) {
+			GLfloat rateOfTurn = 1091 * tan(glm::radians(this->roll)) / (this->speed * 0.592484);
+			GLfloat deltaYaw = rateOfTurn * timeDelta;
+			this->yaw -= deltaYaw;
+		}
 
 		//pitch
 		bool pitchForwardActive = KeyboardHandler::keys[GLFW_KEY_W];
