@@ -51,7 +51,7 @@ vector<BlobInfo> ContourVisionProcessor::ProcessScene(Mat img, bool shouldRender
 			//rectangle(canvas, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0);
 			circle(canvas, contourCenters[i], (int)radius[i], color, 2, 8, 0);
 			stringstream rad; rad << round(radius[i]);
-			putText(canvas, rad.str(), Point(contourCenters[i].x-10, contourCenters[i].y), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 255, 0));
+			putText(canvas, rad.str(), Point(contourCenters[i].x-10, contourCenters[i].y), FONT_HERSHEY_PLAIN, 1.5, Scalar(0, 255, 0),2);
 			keypoints.push_back(KeyPoint(contourCenters[i], radius[i]));
 		}
 

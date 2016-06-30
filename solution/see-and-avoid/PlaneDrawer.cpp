@@ -69,13 +69,13 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 
 					// weight function goes to zero as we get closer to target line
 					GLfloat weight = 2 / (1 + exp(-10 * (angle))) - 1;
-					GLfloat deltaAngle = -weight * 45.0f - current->roll;
+					GLfloat deltaAngle = -weight * MAX_ROLL - current->roll;
 					current->roll += ((deltaAngle > 0)-(deltaAngle < 0)) * min(abs(deltaAngle), 1.5f); //control speed of turn to make it smooth
 
 					// vertical navigation: as long as there's a height difference, adjust pitch to accomodate
 					GLfloat deltaHeight = activePosition.y - current->position.y;
 					weight = (2 / (1 + exp(-0.1 * deltaHeight)) - 1); // logistic function between -1 and 1
-					GLfloat newPitch = weight * 45.0f; // max pitch is 45 degrees
+					GLfloat newPitch = weight * MAX_PITCH; // max pitch is 45 degrees
 					GLfloat deltaPitch = newPitch - current->pitch;
 					current->pitch += ((deltaPitch > 0) - (deltaPitch < 0)) * min(abs(deltaPitch), 0.5f);
 				}
@@ -134,7 +134,7 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 			double dotProduct = glm::dot(planeDir, cameraDir);
 			float theta = acos(dotProduct); //The denominator here is one because we are using two unit vectors
 			//cout << theta << endl;
-			if (theta > 3.9 || theta < 2.35) { // a direct collision is pi. So, 45 degrees both ways would be pi + pi/4 and pi - pi/4 TOTAL = 90 degree collision hit
+			if (theta > 3.67 || theta < 2.62) { // a direct collision is pi. So, 45 degrees both ways would be pi + pi/6 and pi - pi/6 TOTAL = 60 degree collision hit
 				PrintToFile::printDebug("Hit in the back",true);
 				stringstream x, y, z;
 				x << current->position.x; y << current->position.y; z << current->position.z;
@@ -156,10 +156,11 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 				stringstream x, y, z; 
 				x << current->position.x; y << current->position.y; z << current->position.z;
 				PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str(),true);
-				x.clear(); y.clear(); z.clear();
-				x << camera.GetPosition().x; y << camera.GetPosition().y; z << camera.GetPosition().z;
-				PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str());
-
+				stringstream a, b, c;
+				a << camera.GetPosition().x; b << camera.GetPosition().y; c << camera.GetPosition().z;
+				PrintToFile::print("Location of our aircraft -> X: " + a.str() + " Y: " + b.str() + " Z:" + c.str());
+				stringstream distance, collRadius; distance << distanceToCam; collRadius << collisionRadius;
+				PrintToFile::print("Distance to Cam: " + distance.str()+ " Collision Radius: " + collRadius.str());
 				stringstream planeNum; planeNum << i;
 				PrintToFile::print("Plane: " + planeNum.str());
 				//Get the current time as well

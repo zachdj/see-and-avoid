@@ -47,6 +47,9 @@ class Camera
 		void DoAutonomousMovement(GLfloat timeDelta);
 		void DoKeyboardMovement(GLfloat timeDelta);
 
+		Waypoint * lastWay = nullptr;
+		int waypointsCompleted = 1;
+
 		//shared config variables
 		GLfloat viewDistance = 8000.0f;
 		GLfloat FOV = 40.0f; // chosen to minimize perspective distortion
@@ -59,7 +62,7 @@ class Camera
 		GLuint SCREEN_H;
 
 		//fixed-wing config
-		GLfloat MIN_PITCH = -90.0f; GLfloat MAX_PITCH = 90.0f;
+		GLfloat MIN_PITCH = -60.0f; GLfloat MAX_PITCH = 45.0f;
 		GLfloat MIN_ROLL = -45.0f; GLfloat MAX_ROLL = 45.0f;
 		GLfloat YAW_NG_VELOCITY = 4.0f; // pure yaw without roll is pretty slow for fixed-wings I think
 		GLfloat PITCH_NG_VELOCITY = 15.0f; // degrees / second
