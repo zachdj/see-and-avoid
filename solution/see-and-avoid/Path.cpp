@@ -105,16 +105,44 @@ GLfloat Path::GetPredictorDeltaZ() {
 	else return 0;
 }
 
+GLfloat Path::GetPredictorDeltaX() {
+	Waypoint * p1 = nullptr;
+	Waypoint * p2 = nullptr;
+	if (this->loopBreakWaypoint && this->loopBreakWaypoint->IsActive()
+		&& this->avoidanceWaypoint && this->avoidanceWaypoint->IsActive()) {
+		p1 = this->loopBreakWaypoint;
+		p2 = avoidanceWaypoint;
+	}
+	else if (this->loopBreakWaypoint && this->loopBreakWaypoint->IsActive()) {
+		p1 = this->loopBreakWaypoint;
+		p2 = this->GetNextPathWaypoint();
+	}
+	else if (this->avoidanceWaypoint && this->avoidanceWaypoint->IsActive()) {
+		p1 = this->avoidanceWaypoint;
+		p2 = this->GetNextPathWaypoint();
+	}
+	else {
+		int index = this->GetNextPathWaypointIndex();
+		p1 = this->waypoints[index];
+		p2 = this->waypoints[(index + 1) % this->waypoints.size()];
+	}
+
+	if (p1 != nullptr && p2 != nullptr) {
+		return p1->GetPosition().x - p2->GetPosition().x;
+	}
+	else return 0;
+}
+
 void Path::SetAvoidanceWaypoint(Waypoint * waypoint)
 {
-	//this->loopBreakWaypoint = nullptr;
+	this->loopBreakWaypoint = nullptr;
 	this->avoidanceWaypoint = waypoint;
 }
 
 
 void Path::SetLoopBreakWaypoint(Waypoint * waypoint)
 {
-	//this->avoidanceWaypoint = nullptr;
+	this->avoidanceWaypoint = nullptr;
 	this->loopBreakWaypoint = waypoint;
 }
 

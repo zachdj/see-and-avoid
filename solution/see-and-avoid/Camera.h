@@ -51,7 +51,7 @@ class Camera
 		GLfloat viewDistance = 8000.0f;
 		GLfloat FOV = 40.0f; // chosen to minimize perspective distortion
 		// config variables for flight
-		GLfloat MAX_SPEED = 60.0f; // distance units / second
+		GLfloat MAX_SPEED = 50.0f; // distance units / second
 		GLfloat ACCELERATION = 10.0f; // units / second
 		GLfloat MIN_SPEED;
 		glm::vec3 INITIAL_POSITION;
