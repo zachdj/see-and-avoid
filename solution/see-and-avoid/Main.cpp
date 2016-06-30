@@ -166,7 +166,7 @@ int renderScene() {
 	PlaneDrawer * planeDrawer = new PlaneDrawer(defaultPlaneTexture, planeShader);
 
 	// create camera and path for camera (our plane)
-	camera = Camera(width, height, glm::vec3(25.0f, 0.0f, 1400.0f));
+	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, -1000.0f));
 	camera.SetPath(pathHelper->GetPreloadedPath(0));
 	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));

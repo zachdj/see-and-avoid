@@ -18,6 +18,7 @@ using namespace std;
 
 #include "Path.h"
 #include "KeyboardHandler.h"
+#include "PrintToFile.h"
 
 using namespace std;
 
@@ -47,7 +48,6 @@ class Camera
 		void DoAutonomousMovement(GLfloat timeDelta);
 		void DoKeyboardMovement(GLfloat timeDelta);
 
-		Waypoint * lastWay = nullptr;
 		int waypointsCompleted = 1;
 
 		//shared config variables
