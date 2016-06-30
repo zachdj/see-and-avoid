@@ -8,8 +8,6 @@ PlaneDrawer::PlaneDrawer(Texture & tex, Shader & planeShader)
 
 }
 
-const float PlaneDrawer::YAW_PER_ROLL = 0.5f;
-
 void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, std::vector<Aircraft*> & toDraw)
 {
 	GLfloat timeDelta = timeValue - this->previousTimeStep;
@@ -70,8 +68,8 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 					GLfloat angle = angleSign * angleMagnitude; //angle between vectors
 
 					// weight function goes to zero as we get closer to target line
-					GLfloat weight = 2 / (1 + exp(-25 * (angle))) - 1;
-					GLfloat deltaAngle = -weight * 50.0f - current->roll;
+					GLfloat weight = 2 / (1 + exp(-10 * (angle))) - 1;
+					GLfloat deltaAngle = -weight * 45.0f - current->roll;
 					current->roll += ((deltaAngle > 0)-(deltaAngle < 0)) * min(abs(deltaAngle), 1.5f); //control speed of turn to make it smooth
 
 					// vertical navigation: as long as there's a height difference, adjust pitch to accomodate
@@ -94,6 +92,9 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 		// 0.592484 is conversion factor from ft/s to knots
 		if (current->speed != 0) {
 			GLfloat rateOfTurn = 1091 * tan(glm::radians(current->roll)) / (current->speed * 0.592484);
+			if (abs(rateOfTurn) > 40) {
+				rateOfTurn = 40 * ((rateOfTurn > 0) - (rateOfTurn < 0));
+			}
 			GLfloat deltaYaw = rateOfTurn * timeDelta;
 			current->yaw += deltaYaw;
 		}
@@ -154,6 +155,10 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 				stringstream x, y, z; 
 				x << current->position.x; y << current->position.y; z << current->position.z;
 				PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str(),true);
+				x.clear(); y.clear(); z.clear();
+				x << camera.GetPosition().x; y << camera.GetPosition().y; z << camera.GetPosition().z;
+				PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str());
+
 				stringstream planeNum; planeNum << i;
 				PrintToFile::print("Plane: " + planeNum.str());
 				//Get the current time as well

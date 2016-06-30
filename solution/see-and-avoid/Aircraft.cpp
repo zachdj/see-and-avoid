@@ -44,13 +44,13 @@ Aircraft::Aircraft(glm::vec3 position, GLchar* filepath, AircraftScale acScale) 
 	double scale;
 	if (acScale == AircraftScale::big) {
 		scale = AircraftTable::getBestCase().wingspan / AircraftTable::GetPlaneModelWingspan();
-		this->collisionRadius = AircraftTable::GetPlaneModelWingspan();
+		this->collisionRadius = AircraftTable::getBestCase().wingspan;
 	} else if (acScale == AircraftScale::med) {
 		scale = AircraftTable::getTypicalCase().wingspan / AircraftTable::GetFighterModelWingspan();
-		this->collisionRadius = AircraftTable::GetFighterModelWingspan();
+		this->collisionRadius = AircraftTable::getTypicalCase().wingspan;
 	} else {
 		scale = AircraftTable::getWorstCase().wingspan / AircraftTable::GetCessnaModelWingspan();
-		this->collisionRadius = AircraftTable::GetCessnaModelWingspan();
+		this->collisionRadius = AircraftTable::getWorstCase().wingspan;
 	}
 	this->scale = scale;
 
