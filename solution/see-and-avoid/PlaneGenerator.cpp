@@ -88,7 +88,7 @@ void PlaneGenerator::generatePlanes() {
 	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 600.0f)));
 	Path planePath4 = Path(waypoints, 20.0f);
 	Aircraft* plane4 = new Aircraft(glm::vec3(0.0f, 0.0f, -400.0f), planePath4, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
-	plane4->SetSpeed(20.0f);
+	plane4->SetSpeed(80.0f);
 	myPlanes.push_back(plane4);
 	for (int i = 0; i < waypoints.size(); i++)
 		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));

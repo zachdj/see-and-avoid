@@ -177,7 +177,7 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 					normalSign = -1;
 				}
 
-				this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 250.0f*directionSign*direction + 250.0f*normalSign*normal));
+				this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 300.0f*directionSign*direction + 300.0f*normalSign*normal));
 			}
 			active = this->GetPath()->GetActiveWaypoint();
 		}
