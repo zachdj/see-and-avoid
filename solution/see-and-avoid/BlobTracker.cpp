@@ -4,6 +4,7 @@ struct TempBlobInfo {
 	double firstOccurrenceX, lastOccurrenceX;
 	double firstOccurrenceY, lastOccurrenceY;
 	double firstOccurrenceSize, lastOccurrenceSize;
+	double firstOccurrenceTime, lastOccurrenceTime;
 	double cumulativeCollisionValue;
 	double totalOccurrences;
 };
@@ -20,7 +21,7 @@ BlobTracker::BlobTracker(unsigned int historyLength)
 	this->history = vector<vector<TrackedBlob> >(this->historyLength);
 }
 
-void BlobTracker::AddFrame(vector<cv::KeyPoint> keypoints) {
+void BlobTracker::AddFrame(vector<cv::KeyPoint> keypoints, float timeValue) {
 	vector<TrackedBlob> blobs; // represents the blobs found at the current frame
 	vector<TrackedBlob> lastFrame = vector<TrackedBlob>(0);
 	if (this->history.size() > 0) {
@@ -41,12 +42,15 @@ void BlobTracker::AddFrame(vector<cv::KeyPoint> keypoints) {
 		}
 
 		// create a new tracked blob for this keypoint
+		//get time
 		if (newBlobId == 0) { //if a match wasn't found
-			double yVal = currentKeypoint.pt.y;
-			blobs.insert(blobs.begin(), TrackedBlob(currentKeypoint.pt.x, yVal, currentKeypoint.size));
+			TrackedBlob tracked = TrackedBlob(currentKeypoint.pt.x, currentKeypoint.pt.y, currentKeypoint.size);
+			tracked.time = timeValue;
+			blobs.insert(blobs.begin(), tracked);
 		} else {
-			double yVal = currentKeypoint.pt.y;
-			blobs.insert(blobs.begin(), TrackedBlob(newBlobId, currentKeypoint.pt.x, yVal , currentKeypoint.size));
+			TrackedBlob tracked = TrackedBlob(newBlobId, currentKeypoint.pt.x, currentKeypoint.pt.y, currentKeypoint.size);
+			tracked.time = timeValue;
+			blobs.insert(blobs.begin(), tracked);
 		}
 	}
 
@@ -80,6 +84,7 @@ vector<BlobInfo> BlobTracker::GetBlobInfo(cv::Point center) {
 				blobInfoMap[currentBlob.GetId()].lastOccurrenceSize = currentBlob.size;
 				blobInfoMap[currentBlob.GetId()].lastOccurrenceX = currentBlob.posX;
 				blobInfoMap[currentBlob.GetId()].lastOccurrenceY = currentBlob.posY;
+				blobInfoMap[currentBlob.GetId()].lastOccurrenceTime = currentBlob.time;
 				blobInfoMap[currentBlob.GetId()].cumulativeCollisionValue += weight;
 				blobInfoMap[currentBlob.GetId()].totalOccurrences++;
 			}
@@ -89,9 +94,11 @@ vector<BlobInfo> BlobTracker::GetBlobInfo(cv::Point center) {
 				newBlobInfo.firstOccurrenceSize = currentBlob.size;
 				newBlobInfo.firstOccurrenceX = currentBlob.posX;
 				newBlobInfo.firstOccurrenceY = currentBlob.posY;
+				newBlobInfo.firstOccurrenceTime = currentBlob.time;
 				newBlobInfo.lastOccurrenceSize = currentBlob.size;
 				newBlobInfo.lastOccurrenceX = currentBlob.posX;
 				newBlobInfo.lastOccurrenceY = currentBlob.posY;
+				newBlobInfo.lastOccurrenceTime = currentBlob.time;
 				newBlobInfo.cumulativeCollisionValue = weight;
 				newBlobInfo.totalOccurrences = 1;
 
@@ -111,6 +118,7 @@ vector<BlobInfo> BlobTracker::GetBlobInfo(cv::Point center) {
 			obj.second.lastOccurrenceX - obj.second.firstOccurrenceX,
 			obj.second.lastOccurrenceY - obj.second.firstOccurrenceY,
 			obj.second.lastOccurrenceSize - obj.second.firstOccurrenceSize,
+			obj.second.lastOccurrenceTime - obj.second.firstOccurrenceTime,
 			(float)obj.second.totalOccurrences / this->historyLength); 
 		info.originalPositionX = obj.second.firstOccurrenceX;
 		info.originalPositionY = obj.second.firstOccurrenceY;

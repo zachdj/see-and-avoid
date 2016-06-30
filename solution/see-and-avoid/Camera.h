@@ -36,6 +36,7 @@ class Camera
 		glm::mat4 GetProjectionMatrix();
 		glm::mat4 GetOrthoMatrix();
 		glm::vec3 GetPosition();
+		GLfloat GetSpeed();
 		glm::vec3 GetCurrentDirection();
 		glm::vec3 GetCurrentDirectionFlat();
 		~Camera();

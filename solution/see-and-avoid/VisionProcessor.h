@@ -4,6 +4,8 @@ Processes all vision in OpenCV and detects blobs accodingly.
 */
 
 #pragma once
+#include <glew.h>
+#include <glfw3.h>
 
 //OpenCV includes
 #include <opencv2/highgui/highgui.hpp>

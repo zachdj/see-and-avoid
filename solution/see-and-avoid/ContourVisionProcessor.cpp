@@ -4,32 +4,6 @@
 
 ContourVisionProcessor::ContourVisionProcessor()
 {
-	this->params = SimpleBlobDetector::Params();
-	// Change thresholds
-	params.minThreshold = 120;
-	params.maxThreshold = 640;
-
-	//Filter by Color
-	params.filterByColor = true;
-	params.blobColor = 255;
-
-	// Filter by Area.
-	params.filterByArea = true;
-	params.minArea = 10;
-	params.maxArea = 28000;
-
-	// Filter by Circularity
-	params.filterByCircularity = false;
-	params.minCircularity = 0.1;
-
-	// Filter by Convexity
-	params.filterByConvexity = false;
-	params.minConvexity = 0.87;
-
-	// Filter by Inertia
-	params.filterByInertia = false;
-	params.minInertiaRatio = 0.01;
-
 	this->tracker = BlobTracker(30);
 }
 
@@ -86,7 +60,7 @@ vector<BlobInfo> ContourVisionProcessor::ProcessScene(Mat img, bool shouldRender
 		int cols = s.width;
 		Point center = Point(cols / 2, rows / 2); int centerRows = rows / 2; int centerCols = cols / 2;
 
-		tracker.AddFrame(keypoints);
+		tracker.AddFrame(keypoints, glfwGetTime());
 
 		vector<BlobInfo> info = tracker.GetBlobInfo(center);
 		//This loop draws lines and circles on key elements of interest

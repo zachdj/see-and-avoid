@@ -24,6 +24,7 @@ public:
 	double posX;
 	double posY;
 	double size;
+	float time;
 private:
 	unsigned int id;
 	
