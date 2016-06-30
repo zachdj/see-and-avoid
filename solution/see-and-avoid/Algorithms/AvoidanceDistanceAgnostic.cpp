@@ -5,9 +5,9 @@
 void AvoidanceDistanceAgnostic::reactToBlob(BlobInfo info, Camera & camera) {
 	double weight = info.GetCollisionValue();
 	int deltaSize = info.deltaSize;
-	unsigned int currentSize = info.currentSize;
+	int currentSize = info.currentSize;
 	int deltaX = info.deltaX;
-	if ((weight > 240 && camera.IsAutonomousNavigationActive() && currentSize > 80 && deltaSize > -5)|| deltaSize > 100) {
+	if ((weight > 240 && camera.IsAutonomousNavigationActive() && currentSize > 75 && deltaSize > -5)|| deltaSize > 100 || currentSize > 250) {
 		glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
 		glm::vec3 current = camera.GetPosition();
 
@@ -18,10 +18,10 @@ void AvoidanceDistanceAgnostic::reactToBlob(BlobInfo info, Camera & camera) {
 		glm::vec3 normal = glm::normalize(glm::cross(vectorToActive, vectorToActiveDown));
 
 		Waypoint * newWay;
-		if(deltaX < 0)
-			newWay = new Waypoint(current + vectorToActiveDown*0.5f + normal*300.0f);
+		if(deltaX < 0) // move the opposite way that the plane is currently moving
+			newWay = new Waypoint(current + vectorToActiveDown*0.5f  - normal*300.0f);
 		else 
-			newWay = new Waypoint(current + vectorToActiveDown*0.5f - normal*300.0f);
+			newWay = new Waypoint(current + vectorToActiveDown*0.5f  + normal*300.0f);
 
 		camera.GetPath()->SetAvoidanceWaypoint(newWay);
 	}
