@@ -1,4 +1,6 @@
 #include "Camera.h"
+#include "PrintToFile.h"
+#include <sstream>
 
 void PrintVector(glm::vec3 vector, GLchar* name) {
 
@@ -144,6 +146,16 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// get the active waypoint
 	Waypoint * active = this->GetPath()->GetActiveWaypoint();
+	Waypoint * nextMajorWay = this->GetPath()->GetNextPathWaypoint();
+
+	//count number of waypoints finished
+	if (nextMajorWay != lastWay && lastWay != nullptr) {
+		stringstream num; num << waypointsCompleted;
+		PrintToFile::print("Completed waypoint... " + num.str());
+		waypointsCompleted++;
+	}
+		
+
 	if (active != nullptr) {
 		//ensure that waypoint isn't unreachable
 		if (dist2(active->GetPosition(), this->position) < 30000  && abs(this->roll) >= this->MAX_ROLL-6) {
@@ -238,6 +250,8 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 	glm::vec3 unitDirection = this->GetCurrentDirection();
 	this->position = this->position + this->speed * timeDelta * unitDirection;
 
+
+	lastWay = nextMajorWay;
 }
 
 void Camera::DoKeyboardMovement(GLfloat timeDelta) {

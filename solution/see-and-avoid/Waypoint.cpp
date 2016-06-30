@@ -1,6 +1,5 @@
 #include "Waypoint.h"
 
-
 Waypoint::Waypoint()
 {
 	this->position = glm::vec3(0.0f, 0.0f, 0.0f);
