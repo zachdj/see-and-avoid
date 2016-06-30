@@ -92,6 +92,7 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 		// 0.592484 is conversion factor from ft/s to knots
 		if (current->speed != 0) {
 			GLfloat rateOfTurn = 1091 * tan(glm::radians(current->roll)) / (current->speed * 0.592484);
+			//sort of a hacky check to limit the turning rate at low speeds:
 			if (abs(rateOfTurn) > 40) {
 				rateOfTurn = 40 * ((rateOfTurn > 0) - (rateOfTurn < 0));
 			}
