@@ -51,7 +51,7 @@ class Camera
 		GLfloat viewDistance = 8000.0f;
 		GLfloat FOV = 40.0f; // chosen to minimize perspective distortion
 		// config variables for flight
-		GLfloat MAX_SPEED = 50.0f; // distance units / second
+		GLfloat MAX_SPEED = 60.0f; // distance units / second
 		GLfloat ACCELERATION = 10.0f; // units / second
 		GLfloat MIN_SPEED;
 		glm::vec3 INITIAL_POSITION;
@@ -63,8 +63,7 @@ class Camera
 		GLfloat MIN_ROLL = -45.0f; GLfloat MAX_ROLL = 45.0f;
 		GLfloat YAW_NG_VELOCITY = 4.0f; // pure yaw without roll is pretty slow for fixed-wings I think
 		GLfloat PITCH_NG_VELOCITY = 15.0f; // degrees / second
-		GLfloat ROLL_NG_VELOCITY = 15.0f;
-		GLfloat YAW_PER_ROLL = 0.5f; // degree of yaw per degree of roll per time
+		GLfloat ROLL_NG_VELOCITY = 25.0f;
 
 		//rotor-specific config
 		GLfloat ROTOR_YAW_NG_VELOCITY = 60.0f; // yaw is much faster for rotors

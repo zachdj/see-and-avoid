@@ -89,10 +89,14 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 		// The following code advances the plane forward along its current orientation
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		//account for roll
-		// if there is roll, then yaw should be gradually changed
-		GLfloat deltaYaw = PlaneDrawer::YAW_PER_ROLL * timeDelta * current->roll;
-		current->yaw += deltaYaw;
+		// determine how much plane should turn based on banking angle and speed
+		// rate of turn in deg/second is 1091 * tan(roll) / TAS
+		// 0.592484 is conversion factor from ft/s to knots
+		if (current->speed != 0) {
+			GLfloat rateOfTurn = 1091 * tan(glm::radians(current->roll)) / (current->speed * 0.592484);
+			GLfloat deltaYaw = rateOfTurn * timeDelta;
+			current->yaw += deltaYaw;
+		}
 
 		// determine aircraft direction from pitch, roll, and velocity and update position
 		glm::vec3 unitDirection = current->GetCurrentDirection();
