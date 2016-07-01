@@ -81,7 +81,7 @@
     <ClCompile Include="Algorithms\AvoidanceDistanceAgnostic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Algorithms\AvoidanceWithDistance.cpp">
+    <ClCompile Include="Algorithms\AvoidanceAgnosticElevation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -170,7 +170,7 @@
     <ClInclude Include="Algorithms\AvoidanceDistanceAgnostic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Algorithms\AvoidanceWithDistance.h">
+    <ClInclude Include="Algorithms\AvoidanceAgnosticElevation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
