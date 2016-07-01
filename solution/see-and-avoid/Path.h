@@ -24,6 +24,7 @@ public:
 	int GetNextPathWaypointIndex();
 	Waypoint* GetLoopBreakWaypoint(); // returns the current loop break waypoint
 	GLfloat GetPredictorDeltaZ(); // returns difference in z coordinates of the next TWO points to be visited
+	GLfloat GetPredictorDeltaX(); // returns difference in x coordinates of the next TWO points to be visited
 	void SetAvoidanceWaypoint(Waypoint * waypoint);
 	void SetLoopBreakWaypoint(Waypoint * waypoint);
 	void CompleteWaypoint();

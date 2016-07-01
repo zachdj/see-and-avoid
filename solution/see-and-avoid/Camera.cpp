@@ -1,6 +1,4 @@
 #include "Camera.h"
-#include "PrintToFile.h"
-#include <sstream>
 
 void PrintVector(glm::vec3 vector, GLchar* name) {
 
@@ -146,16 +144,6 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// get the active waypoint
 	Waypoint * active = this->GetPath()->GetActiveWaypoint();
-	Waypoint * nextMajorWay = this->GetPath()->GetNextPathWaypoint();
-
-	//count number of waypoints finished
-	if (nextMajorWay != lastWay && lastWay != nullptr) {
-		stringstream num; num << waypointsCompleted;
-		PrintToFile::print("Completed waypoint... " + num.str());
-		waypointsCompleted++;
-	}
-		
-
 	if (active != nullptr) {
 		//ensure that waypoint isn't unreachable
 		if (dist2(active->GetPosition(), this->position) < 30000  && abs(this->roll) >= this->MAX_ROLL-6) {
@@ -168,16 +156,23 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 				glm::vec3 direction = this->GetCurrentDirectionFlat();
 				glm::vec3 normal = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), direction));
 
-				int directionSign = 1;
+				/*int directionSign = 1;
 				if (this->GetPath()->GetPredictorDeltaZ() > 0) {
 					directionSign = -1;
 				}
 				int normalSign = 1;
 				if (this->position.x > active->GetPosition().x) {
 					normalSign = -1;
-				}
+				}*/
 
-				this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 300.0f*directionSign*direction + 300.0f*normalSign*normal));
+				glm::vec3 predictorDirection;
+				predictorDirection.x = this->GetPath()->GetPredictorDeltaX();
+				predictorDirection.y = this->GetPosition().y;
+				predictorDirection.z = this->GetPath()->GetPredictorDeltaZ();
+				predictorDirection = glm::normalize(predictorDirection);
+				this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->GetPath()->GetNextPathWaypoint()->GetPosition() + 350.0f*predictorDirection));
+
+				//this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 300.0f*directionSign*direction + 300.0f*normalSign*normal));
 			}
 			active = this->GetPath()->GetActiveWaypoint();
 		}
@@ -190,6 +185,9 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 
 		if (glm::length(vectorToObject) < this->GetPath()->waypointCompletionRadius) {
 			this->GetPath()->CompleteWaypoint();
+			stringstream num; num << waypointsCompleted;
+			PrintToFile::print("Completed waypoint... " + num.str());
+			waypointsCompleted++;
 		}
 		else {
 			vectorToObject = glm::normalize(vectorToObject);
@@ -250,8 +248,6 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 	glm::vec3 unitDirection = this->GetCurrentDirection();
 	this->position = this->position + this->speed * timeDelta * unitDirection;
 
-
-	lastWay = nextMajorWay;
 }
 
 void Camera::DoKeyboardMovement(GLfloat timeDelta) {

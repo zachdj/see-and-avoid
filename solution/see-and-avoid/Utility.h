@@ -20,6 +20,10 @@ public:
 		return  pow((pt1x - pt2x), 2) + pow((pt1y - pt2y), 2);
 	};
 
+	static void printVector(glm::vec3 vector) {
+		cout << "<" << vector.x << ", " << vector.y << ", " << vector.z << ">" << endl;
+	}
+
 
 
 };

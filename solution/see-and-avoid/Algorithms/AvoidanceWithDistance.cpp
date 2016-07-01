@@ -1,17 +1,10 @@
 #include "AvoidanceWithDistance.h"
 
 void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
-	//if(camera.IsAutonomousNavigationActive()){
+	if(/*camera.IsAutonomousNavigationActive()*/ true){
 		AircraftTableData tableData = AircraftTable::getBestCase();
 		double blobSize = info.currentSize - tableData.pointMassSize;
-		/*double distance = sqrt(Utility::point2pointDistance2(
-			camera.GetPosition().x, camera.GetPosition().z, myplanes[i]->position.x, myplanes[i]->position.z));
-		focalLengthSum += blobSize * distance / tableData.wingspan;
-		focalLengthMeasurements++;
-		double avgFocalLength = focalLengthSum / focalLengthMeasurements;*/
 		double calculatedDist = AircraftTable::calculateApproximateDistance(tableData.wingspan, tableData.focalLength, blobSize);
-		// new stuff below
-
 		double oldDist = AircraftTable::calculateApproximateDistance(tableData.wingspan, tableData.focalLength, blobSize - info.deltaSize);
 		double deltaZ = calculatedDist - oldDist;
 
@@ -49,12 +42,30 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 			+ pow(obstaclePosition.y + minDistTime*obstacleVelocity.y, 2)
 			+ pow(obstaclePosition.z + minDistTime*(obstacleVelocity.z - cameraVelocity), 2);
 
-		cout << "Obstacle Position: <" << obstaclePosition.x << ", " << obstaclePosition.y << ", " << obstaclePosition.z << ">" << endl;
-		cout << "Obstacle Velocity: <" << obstacleVelocity.x << ", " << obstacleVelocity.y << ", " << obstacleVelocity.z << ">" << endl;
-		cout << "DeltaTime: " << info.deltaTime << endl;
-		cout << "Min Dist Time: " << minDistTime << endl;
-		cout << "Min Dist: " << sqrt(minDistSqrd) << endl;
-	//}
+		//cout << "Obstacle Position: <" << obstaclePosition.x << ", " << obstaclePosition.y << ", " << obstaclePosition.z << ">" << endl;
+		//cout << "Obstacle Velocity: <" << obstacleVelocity.x << ", " << obstacleVelocity.y << ", " << obstacleVelocity.z << ">" << endl;
+		//cout << "DeltaTime: " << info.deltaTime << endl;
+		//cout << "Min Dist Time: " << minDistTime << endl;
+		//cout << "Projected Min Dist: " << sqrt(minDistSqrd) << endl;
+
+		if (minDistSqrd < 19600 && calculatedDist < 1000) {
+			cout << "AVOIDING!" << endl << endl;
+			//glm::vec3 direction = camera.GetCurrentDirectionFlat();
+			//glm::vec3 position = camera.GetPosition();
+
+
+
+			//glm::vec3 newWayPos = position + direction*((GLfloat)calculatedDist*0.75f);
+			//newWayPos.y = position.y - 300;
+			//Waypoint * newWay = new Waypoint(newWayPos);
+			//camera.GetPath()->SetAvoidanceWaypoint(newWay);
+		}
+		else {
+			cout << "NOT AVOIDING!" << endl << endl;
+		}
+
+
+	}
 
 
 	//double weight = info.GetCollisionValue();

@@ -6,23 +6,13 @@
 
 const std::string PrintToFile::name = "Simulation.mylog";
 const std::string PrintToFile::nameDebug = "SimulationDebug.mylog";
-int PrintToFile::collisionNum = 1;
-int PrintToFile::collisionDebugNum = 1;
 std::ofstream writeFile;
 std::ofstream writeDebugFile;
 
-void PrintToFile::print(std::string printable, bool printHeader) {
+void PrintToFile::print(std::string printable) {
 	writeFile.open(name, std::ios::app);
 	if (writeFile.is_open()) {
-		if (printHeader) {
-			std::stringstream num; num << collisionNum;
-			writeFile << "Collision #" << collisionNum <<  "\n";
-			writeFile << printable << "\n";
-			collisionNum++;
-		}
-			
-		else
-			writeFile << printable << "\n";
+		writeFile << printable << std::endl;
 	}
 	else
 		std::cout << "Cannot open file..." << std::endl;
@@ -43,18 +33,10 @@ void PrintToFile::clearFile() {
 	writeFile.close();
 }
 
-void PrintToFile::printDebug(std::string printable, bool printHeader) {
+void PrintToFile::printDebug(std::string printable) {
 	writeDebugFile.open(nameDebug, std::ios::app);
 	if (writeDebugFile.is_open()) {
-		if (printHeader) {
-			std::stringstream num; num << collisionDebugNum;
-			writeDebugFile << "Collision #" << collisionDebugNum << "\n";
-			writeDebugFile << printable << "\n";
-			collisionDebugNum++;
-		}
-
-		else
-			writeDebugFile << printable << "\n";
+		writeDebugFile << printable << "\n";
 	}
 	else
 		std::cout << "Cannot open file..." << std::endl;

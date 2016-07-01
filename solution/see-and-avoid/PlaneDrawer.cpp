@@ -5,7 +5,8 @@ PlaneDrawer::PlaneDrawer(Texture & tex, Shader & planeShader)
 	this->tex = tex;
 	this->shader = planeShader;
 	this->previousTimeStep = 0;
-
+	this->frontCollisionCount = 0;
+	this->backCollisionCount = 0;
 }
 
 void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, std::vector<Aircraft*> & toDraw)
@@ -133,42 +134,30 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 			glm::vec3 cameraDir = camera.GetCurrentDirection();
 			double dotProduct = glm::dot(planeDir, cameraDir);
 			float theta = acos(dotProduct); //The denominator here is one because we are using two unit vectors
-			//cout << theta << endl;
-			if (theta > 4.67 || theta < 1.62) { // a direct collision is pi. So, 90 degrees both ways would be pi + pi/2 and pi - pi/2 TOTAL = 180 degree collision hit
-				PrintToFile::printDebug("Hit in the back",true);
-				stringstream x, y, z;
-				x << current->position.x; y << current->position.y; z << current->position.z;
-				PrintToFile::printDebug("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str());
-				stringstream planeNum; planeNum << i;
-				PrintToFile::printDebug("Plane: " + planeNum.str());
-				//Get the current time as well
+			if (theta > 3.67 || theta < 2.62) { // a direct collision is pi. So, 45 degrees both ways would be pi + pi/6 and pi - pi/6 TOTAL = 60 degree collision hit
+				backCollisionCount++;
+				stringstream stream;
+				stream << endl << "Hit in the back #" << backCollisionCount << endl;
+				stream << "X: " << current->position.x << " Y: " << current->position.y << " Z: " << current->position.z << endl;
+				stream << "Plane: " << i << endl; 
 				time_t now = time(0);
 				tm *ltm = localtime(&now);
-				stringstream hour, min, sec; hour << ltm->tm_hour; min << ltm->tm_min; sec << 1 + ltm->tm_sec;
-				PrintToFile::printDebug("Time: " + hour.str() + ":" + min.str() + ":" + sec.str());
-				PrintToFile::printDebug("");
+				stream << "Time: " << ltm->tm_hour << ":" << ltm->tm_min << ":" << 1 + ltm->tm_sec << endl << endl;				
+				PrintToFile::printDebug(stream.str());
 				current->hasCollided = true;
-			}
-				
+			}				
 			else {
-				//std::cout << "Collision with Aircraft detected!" << std::endl;
-				//PrintToFile::print("Collision with Aircraft detected!");
-				stringstream x, y, z; 
-				x << current->position.x; y << current->position.y; z << current->position.z;
-				PrintToFile::print("X: " + x.str() + " Y: " + y.str() + " Z:" + z.str(),true);
-				stringstream a, b, c;
-				a << camera.GetPosition().x; b << camera.GetPosition().y; c << camera.GetPosition().z;
-				PrintToFile::print("Location of our aircraft -> X: " + a.str() + " Y: " + b.str() + " Z:" + c.str());
-				stringstream distance, collRadius; distance << distanceToCam; collRadius << collisionRadius;
-				PrintToFile::print("Distance to Cam: " + distance.str()+ " Collision Radius: " + collRadius.str());
-				stringstream planeNum; planeNum << i;
-				PrintToFile::print("Plane: " + planeNum.str());
-				//Get the current time as well
+				frontCollisionCount++;
+				stringstream stream; 
+				stream << endl << "Front collision # " << frontCollisionCount << endl;
+				stream << "Location of obstacle-> X: " << current->position.x << " Y: " << current->position.y << " Z: " << current->position.z << endl;
+				stream << "Location of our aircraft-> X: " << camera.GetPosition().x << " Y: " << camera.GetPosition().y << " Z: " << camera.GetPosition().z << endl;
+				stream << "Distance to Cam: " << distanceToCam << " Collision Radius: " << collisionRadius << endl;
+				stream << "Plane: " << i << endl;
 				time_t now = time(0);
 				tm *ltm = localtime(&now);
-				stringstream hour, min, sec; hour << ltm->tm_hour; min << ltm->tm_min; sec << 1 + ltm->tm_sec;
-				PrintToFile::print("Time: " + hour.str() + ":" + min.str() + ":" + sec.str());
-				PrintToFile::print("");
+				stream << "Time: " << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec + 1 << endl;
+				PrintToFile::print(stream.str());
 				current->hasCollided = true;
 			}
 			
