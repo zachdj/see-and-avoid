@@ -32,6 +32,7 @@
 #include "Algorithms\AtcAvoidance.h"
 #include "Algorithms\AvoidanceDistanceAgnostic.h"
 #include "Algorithms\AvoidanceWithDistance.h"
+#include "Algorithms\AvoidanceAgnosticElevation.h"
 #include "VisionProcessor.h"
 #include "ContourVisionProcessor.h"
 
@@ -67,7 +68,7 @@ int widthOfAirspace = 4000;
 
 vector< Aircraft*> myplanes; // planes to render
 Camera camera; // camera object
-AvoidanceDistanceAgnostic ai = AvoidanceDistanceAgnostic(); 
+AvoidanceAgnosticElevation ai = AvoidanceAgnosticElevation();
 
 /***************************** End forward declarations ********************************************************/
 

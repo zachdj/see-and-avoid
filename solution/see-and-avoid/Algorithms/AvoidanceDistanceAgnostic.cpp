@@ -9,7 +9,7 @@ void AvoidanceDistanceAgnostic::reactToBlob(BlobInfo info, Camera & camera) {
 	int deltaX = info.deltaX;
 	if (abs(camera.GetPosition().z - camera.GetPath()->GetActiveWaypoint()->GetPosition().z) < 40);
 
-	else if ((weight > 220 && camera.IsAutonomousNavigationActive() && currentSize > 90 && deltaSize > -5)|| deltaSize > 80 || currentSize > 160) {
+	else if ((weight > 220 && camera.IsAutonomousNavigationActive() && currentSize > 90 && deltaSize > -5)|| deltaSize > 80 || currentSize > 140) {
 		glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
 		glm::vec3 current = camera.GetPosition();
 
