@@ -50,15 +50,15 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 
 		if (minDistSqrd < 19600 && calculatedDist < 1000) {
 			cout << "AVOIDING!" << endl << endl;
-			glm::vec3 direction = camera.GetCurrentDirectionFlat();
-			glm::vec3 position = camera.GetPosition();
+			//glm::vec3 direction = camera.GetCurrentDirectionFlat();
+			//glm::vec3 position = camera.GetPosition();
 
 
 
-			glm::vec3 newWayPos = position + direction*((GLfloat)calculatedDist*0.75f);
-			newWayPos.y = position.y - 300;
-			Waypoint * newWay = new Waypoint(newWayPos);
-			camera.GetPath()->SetAvoidanceWaypoint(newWay);
+			//glm::vec3 newWayPos = position + direction*((GLfloat)calculatedDist*0.75f);
+			//newWayPos.y = position.y - 300;
+			//Waypoint * newWay = new Waypoint(newWayPos);
+			//camera.GetPath()->SetAvoidanceWaypoint(newWay);
 		}
 		else {
 			cout << "NOT AVOIDING!" << endl << endl;

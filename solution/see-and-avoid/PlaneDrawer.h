@@ -35,6 +35,8 @@ private:
 	static const GLfloat MAX_NG_ROLL_VELOCITY;
 	GLfloat MAX_PITCH = 40.0f;
 	GLfloat MAX_ROLL = 45.0f;
+	int frontCollisionCount;
+	int backCollisionCount;
 	
 };
 
