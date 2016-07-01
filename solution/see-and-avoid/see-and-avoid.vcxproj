@@ -130,6 +130,7 @@
     <ClCompile Include="Algorithms\AtcAvoidance.cpp" />
     <ClCompile Include="Algorithms\AvoidanceDistanceAgnostic.cpp" />
     <ClCompile Include="Algorithms\AvoidanceAgnosticElevation.cpp" />
+    <ClCompile Include="Algorithms\AvoidanceWithDistance.cpp" />
     <ClCompile Include="BlobInfo.cpp" />
     <ClCompile Include="BlobTracker.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Algorithms\AvoidanceAlgorithm.h" />
     <ClInclude Include="Algorithms\AvoidanceDistanceAgnostic.h" />
     <ClInclude Include="Algorithms\AvoidanceAgnosticElevation.h" />
+    <ClInclude Include="Algorithms\AvoidanceWithDistance.h" />
     <ClInclude Include="BlobInfo.h" />
     <ClInclude Include="BlobTracker.h" />
     <ClInclude Include="Camera.h" />

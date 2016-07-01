@@ -84,6 +84,9 @@
     <ClCompile Include="Algorithms\AvoidanceAgnosticElevation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Algorithms\AvoidanceWithDistance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyboardHandler.h">
@@ -171,6 +174,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Algorithms\AvoidanceAgnosticElevation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithms\AvoidanceWithDistance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

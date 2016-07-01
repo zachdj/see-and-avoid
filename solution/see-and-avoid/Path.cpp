@@ -154,6 +154,14 @@ void Path::CompleteWaypoint()
 	}
 }
 
+void Path::CompleteNextPathWaypoint()
+{
+	Waypoint * nextPath = this->GetNextPathWaypoint();
+	if (nextPath != nullptr) {
+		nextPath->Complete();
+	}
+}
+
 Path::~Path()
 {
 }
