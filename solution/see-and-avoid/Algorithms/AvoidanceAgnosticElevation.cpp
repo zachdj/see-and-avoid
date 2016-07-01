@@ -13,7 +13,7 @@ void AvoidanceAgnosticElevation::reactToBlob(BlobInfo info, Camera & camera) {
 		glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
 		glm::vec3 current = camera.GetPosition();
 
-		glm::vec3 vectorToActive = active - current;
+		glm::vec3 vectorToActive = -active + current;
 
 		//For drop when blob isnt moving
 		glm::vec3 vectorToActiveDown = vectorToActive;
