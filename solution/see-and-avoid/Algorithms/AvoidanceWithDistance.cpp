@@ -42,45 +42,63 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 			+ pow(obstaclePosition.y + minDistTime*obstacleVelocity.y, 2)
 			+ pow(obstaclePosition.z + minDistTime*(obstacleVelocity.z - cameraVelocity), 2);
 
+		//glm::vec3 position 
+
 		//cout << "Obstacle Position: <" << obstaclePosition.x << ", " << obstaclePosition.y << ", " << obstaclePosition.z << ">" << endl;
 		//cout << "Obstacle Velocity: <" << obstacleVelocity.x << ", " << obstacleVelocity.y << ", " << obstacleVelocity.z << ">" << endl;
 		//cout << "DeltaTime: " << info.deltaTime << endl;
 		//cout << "Min Dist Time: " << minDistTime << endl;
 		//cout << "Projected Min Dist: " << sqrt(minDistSqrd) << endl;
 
-		if (minDistSqrd < 19600 && calculatedDist < 1000) {
-			cout << "AVOIDING!" << endl << endl;
-			//glm::vec3 direction = camera.GetCurrentDirectionFlat();
-			//glm::vec3 position = camera.GetPosition();
+		if (/*minDistSqrd < 19600 && calculatedDist < 1000*/true) {
+			/*cout << "Obstacle Position: <" << obstaclePosition.x << ", " << obstaclePosition.y << ", " << obstaclePosition.z << ">" << endl;
+			cout << "Obstacle Velocity: <" << obstacleVelocity.x << ", " << obstacleVelocity.y << ", " << obstacleVelocity.z << ">" << endl;
+			cout << "Min Dist Time: " << minDistTime << endl;
+			cout << "Projected Min Dist: " << sqrt(minDistSqrd) << endl;*/
+			//cout << "AVOIDING!" << endl << endl;
+			glm::vec3 direction = camera.GetCurrentDirectionFlat();
+			glm::vec3 position = camera.GetPosition();
+			//glm::vec3 targetPos = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
+			glm::vec3 targetPos = camera.GetPath()->GetActiveWaypoint()->GetPosition();
+			glm::vec3 targetDir = glm::normalize(targetPos - position);
+			glm::vec3 targetDirDown = targetDir;
+			targetDirDown.y -= 1;
+			glm::vec3 normal = glm::cross(targetDir, targetDirDown);
 
+			double distToTarget2 = pow(position.x - obstaclePosition.x, 2) + pow(position.y - obstaclePosition.y, 2) + pow(position.z - obstaclePosition.z, 2);
+			double distToTarget = sqrt(distToTarget2);
+			Waypoint * newWay;
 
+			double theta = acos(glm::dot(direction, glm::vec3(0.0f, 0.0f, 1.0f)));
+			cout << "Angle: " << theta << endl;
+			if (theta > 2.5 || theta < 0.6) {
+				if (info.deltaX > 0) {
+					//turn to the right
+					newWay = new Waypoint(position + (float)distToTarget*0.75f*direction + 20.0f*normal);
+				}
+				else {
+					//turn to the left
+					newWay = new Waypoint(position + (float)distToTarget*0.75f*direction - 20.0f*normal);
+				}
+				//camera.GetPath()->SetAvoidanceWaypoint(newWay);
+			} 
+			//if(theta > 2.5)
+			//newWay = new Waypoint(position + (GLfloat)calculatedDist*0.5f*normal + (GLfloat)calculatedDist*0.5f*targetDir);
+			//if (distToTarget > calculatedDist) {
+			//	//avoid by changing elevation down
+			//	newWay = new Waypoint(position + glm::vec3(0.0f, -200.0f, 0.0f) + (GLfloat)distToTarget*0.75f*targetDir);
+			//} else {
+			//	//temporary avoidance maneuver will take us in a loop then reevaluate
+			//	newWay = new Waypoint(position - (GLfloat)distToTarget*0.75f*targetDir);
+			//}
 
-			//glm::vec3 newWayPos = position + direction*((GLfloat)calculatedDist*0.75f);
-			//newWayPos.y = position.y - 300;
-			//Waypoint * newWay = new Waypoint(newWayPos);
-			//camera.GetPath()->SetAvoidanceWaypoint(newWay);
+			////glm::vec3 newWayPos = position + direction*((GLfloat)calculatedDist*0.75f);
+			////newWayPos.y = position.y - 300;
+			////Waypoint * newWay = new Waypoint(newWayPos);
 		}
 		else {
-			cout << "NOT AVOIDING!" << endl << endl;
+			//cout << "NOT AVOIDING!" << endl << endl;
 		}
-
-
 	}
-
-
-	//double weight = info.GetCollisionValue();
-	//if (weight > 240 && camera.IsAutonomousNavigationActive()) {
-	//	glm::vec3 active = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
-	//	glm::vec3 current = camera.GetPosition();
-
-	//	glm::vec3 vectorToActive = active - current;
-
-	//	glm::vec3 vectorToActiveDown = vectorToActive;
-	//	vectorToActiveDown.y -= 200.0f;
-	//	glm::vec3 normal = glm::normalize(glm::cross(vectorToActive, vectorToActiveDown));
-	//	Waypoint * newWay = new Waypoint(current + vectorToActiveDown*0.5f + normal*10.0f);
-
-	//	camera.GetPath()->SetAvoidanceWaypoint(newWay);
-	//}
 
 }

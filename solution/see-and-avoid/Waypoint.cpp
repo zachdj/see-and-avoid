@@ -1,4 +1,5 @@
 #include "Waypoint.h"
+#include "Utility.h"
 
 Waypoint::Waypoint()
 {
@@ -15,6 +16,20 @@ Waypoint::Waypoint(glm::vec3 position)
 glm::vec3 Waypoint::GetPosition()
 {
 	return this->position;
+}
+
+bool Waypoint::Equals(Waypoint * other)
+{
+	std::cout << "Checking Waypoint: " << std::endl;
+	Utility::printVector(this->position);
+	std::cout << "Against: " << std::endl;
+	Utility::printVector(other->GetPosition());
+
+	glm::vec3 otherPos = other->GetPosition();
+	if (this->position.x != otherPos.x) return false;
+	if (this->position.y != otherPos.y) return false;
+	if (this->position.z != otherPos.z) return false;
+	return true;
 }
 
 void Waypoint::Activate() {

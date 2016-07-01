@@ -184,10 +184,12 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 		vectorToObject.z = activePosition.z - this->position.z;
 
 		if (glm::length(vectorToObject) < this->GetPath()->waypointCompletionRadius) {
+			if (active->Equals(this->GetPath()->GetNextPathWaypoint())) {
+				stringstream num; num << waypointsCompleted;
+				PrintToFile::print("Completed waypoint... " + num.str());
+				waypointsCompleted++;
+			}
 			this->GetPath()->CompleteWaypoint();
-			stringstream num; num << waypointsCompleted;
-			PrintToFile::print("Completed waypoint... " + num.str());
-			waypointsCompleted++;
 		}
 		else {
 			vectorToObject = glm::normalize(vectorToObject);
