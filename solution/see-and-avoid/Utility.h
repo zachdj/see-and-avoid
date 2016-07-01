@@ -6,6 +6,7 @@ Static class used for given calculations throughout the program
 #pragma once
 
 #include <math.h>
+#include <iostream>
 
 class Utility {
 public:
@@ -21,7 +22,7 @@ public:
 	};
 
 	static void printVector(glm::vec3 vector) {
-		cout << "<" << vector.x << ", " << vector.y << ", " << vector.z << ">" << endl;
+		std::cout << "<" << vector.x << ", " << vector.y << ", " << vector.z << ">" << std::endl;
 	}
 
 
