@@ -6,6 +6,7 @@ void AvoidanceDistanceAgnostic::reactToBlob(BlobInfo info, Camera & camera) {
 	double weight = info.GetCollisionValue();
 	int deltaSize = info.deltaSize;
 	int currentSize = info.currentSize;
+	int currentElevation = info.currentPositionY;
 	int deltaX = info.deltaX;
 	if (abs(camera.GetPosition().z - camera.GetPath()->GetActiveWaypoint()->GetPosition().z) < 40);
 
@@ -16,7 +17,10 @@ void AvoidanceDistanceAgnostic::reactToBlob(BlobInfo info, Camera & camera) {
 		glm::vec3 vectorToActive = active - current;
 
 		glm::vec3 vectorToActiveDown = vectorToActive;
-		vectorToActiveDown.y -= 400.0f;
+		if(currentElevation > 270)
+			vectorToActiveDown.y += 500.0f;
+		else
+			vectorToActiveDown.y -= 500.0f;
 		glm::vec3 normal = glm::normalize(glm::cross(vectorToActive, vectorToActiveDown));
 
 		Waypoint * newWay;
