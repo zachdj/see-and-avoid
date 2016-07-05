@@ -156,23 +156,12 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 				glm::vec3 direction = this->GetCurrentDirectionFlat();
 				glm::vec3 normal = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), direction));
 
-				/*int directionSign = 1;
-				if (this->GetPath()->GetPredictorDeltaZ() > 0) {
-					directionSign = -1;
-				}
-				int normalSign = 1;
-				if (this->position.x > active->GetPosition().x) {
-					normalSign = -1;
-				}*/
-
 				glm::vec3 predictorDirection;
 				predictorDirection.x = this->GetPath()->GetPredictorDeltaX();
 				predictorDirection.y = this->GetPosition().y;
 				predictorDirection.z = this->GetPath()->GetPredictorDeltaZ();
 				predictorDirection = glm::normalize(predictorDirection);
 				this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->GetPath()->GetNextPathWaypoint()->GetPosition() + 350.0f*predictorDirection));
-
-				//this->GetPath()->SetLoopBreakWaypoint(new Waypoint(this->position + 300.0f*directionSign*direction + 300.0f*normalSign*normal));
 			}
 			active = this->GetPath()->GetActiveWaypoint();
 		}

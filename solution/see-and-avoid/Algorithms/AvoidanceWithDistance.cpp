@@ -5,7 +5,7 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 	double const SCREENH = 540.0;
 
 	if(/*camera.IsAutonomousNavigationActive()*/ true){
-		AircraftTableData tableData = AircraftTable::getBestCase();
+		AircraftTableData tableData = AircraftTable::getMidsizeJet();
 		double blobSize = info.currentSize - tableData.pointMassSize;
 		double calculatedDist = AircraftTable::calculateApproximateDistance(tableData.wingspan, tableData.focalLength, blobSize);
 		double oldDist = AircraftTable::calculateApproximateDistance(tableData.wingspan, tableData.focalLength, blobSize - info.deltaSize);
@@ -51,7 +51,7 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 		//cout << "Min Dist Time: " << minDistTime << endl;
 		//cout << "Projected Min Dist: " << sqrt(minDistSqrd) << endl;
 
-		if (minDistSqrd < 19600 && calculatedDist < 1000) {
+		if (minDistSqrd < 19600 && calculatedDist < 1250) {
 			glm::vec3 direction = camera.GetCurrentDirectionFlat();
 			glm::vec3 position = camera.GetPosition();
 			//glm::vec3 targetPos = camera.GetPath()->GetNextPathWaypoint()->GetPosition();
