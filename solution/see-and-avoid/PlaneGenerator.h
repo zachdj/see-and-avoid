@@ -23,25 +23,25 @@ using namespace cv;
 class PlaneGenerator
 {
 public:
-	PlaneGenerator(bool random, int widthOfAirpace);
-	vector< Aircraft*> getPlanes();
-	vector< Mat> getPlanePaths();
-	~PlaneGenerator();
+	//PlaneGenerator(bool random, int widthOfAirpace);
+	static vector< Aircraft*> getPlanes();
+	static vector< Mat> getPlanePaths();
+	//~PlaneGenerator();
+	static void generateAirspacePlanes(int widthOfAirspace);
+	static void generateRandomPlanes(int widthOfAirspace);
+	static void generateApproachingPlanes(int widthOfAirspace);
+	static void generateAirportPlanes(int width);
+	
 
 private:
-	vector< Aircraft*> myPlanes;
-	vector<Waypoint *> waypoints;
-	vector<Point> points;
-	vector<vector<Point>> planePoints;
-	vector< Mat> planePaths;
-	int widthOfAirspace;
-	bool myRandom;
-
-	void generatePlanes();
-	void generateRandomPlanes();
-	void generateApproachingPlanes();
-	void MyLine(Mat img, Point start, Point end, int red, int green, int blue);
-	void DrawPathsOnMatrix();
+	//static vector< Aircraft*> myPlanes;
+	//static vector< Mat> planePaths;
+	//static vector<Waypoint *> waypoints;
+	//static vector<Point> points;
+	//static vector<vector<Point>> planePoints;
+	//static int widthOfAirspace;
+	static void MyLine(Mat img, Point start, Point end, int red, int green, int blue, int widthOfAirspace);
+	static void DrawPathsOnMatrix(int widthOfAirspace);
 
 };
 

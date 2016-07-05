@@ -68,7 +68,7 @@ int widthOfAirspace = 4000;
 
 vector< Aircraft*> myplanes; // planes to render
 Camera camera; // camera object
-AvoidanceAgnosticElevation ai = AvoidanceAgnosticElevation();
+AvoidanceDistanceAgnostic ai = AvoidanceDistanceAgnostic();
 
 /***************************** End forward declarations ********************************************************/
 
@@ -151,17 +151,18 @@ int renderScene() {
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 	
 	//Create Planes Before Drawing any new windows
-	PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
-    myplanes = planeGenerator.getPlanes();	
+	//PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
+	PlaneGenerator::generateAirportPlanes(widthOfAirspace);
+    myplanes = PlaneGenerator::getPlanes();	
 
 	// we have to create openCV windows in this thread!
 	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
 	cv::resizeWindow("Blob Detection", width/2.0, height/2.0);
 	cv::moveWindow("Blob Detection", width/2.0, 0);
-	PlanePathMatrices = planeGenerator.getPlanePaths();
+	PlanePathMatrices = PlaneGenerator::getPlanePaths();
 	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
 	cv::moveWindow("Plane Paths", width/2.0, height/2.0);
-	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, planeGenerator.getPlanePaths().size() - 1, on_trackbar);	
+	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, PlaneGenerator::getPlanePaths().size() - 1, on_trackbar);	
 
 	Texture defaultPlaneTexture(".\\asset\\container.jpg");
 	PlaneDrawer * planeDrawer = new PlaneDrawer(defaultPlaneTexture, planeShader);
