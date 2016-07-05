@@ -68,7 +68,7 @@ int widthOfAirspace = 4000;
 
 vector< Aircraft*> myplanes; // planes to render
 Camera camera; // camera object
-AvoidanceDistanceAgnostic ai = AvoidanceDistanceAgnostic();
+AvoidanceWithDistance ai = AvoidanceWithDistance();
 
 /***************************** End forward declarations ********************************************************/
 
@@ -223,6 +223,14 @@ int renderScene() {
 		glReadPixels(0, 0, img.cols, img.rows, GL_BGR, GL_UNSIGNED_BYTE, img.data);
 		cv::flip(img, img, 0);
 		resize(img, img, Size(960, 540));
+
+		//check if planedrawer has recently detected a collision and export the current openGL view to a file
+		if (planeDrawer->recentCollisionTime != nullptr) {
+			stringstream filename; tm* ltm = planeDrawer->recentCollisionTime;
+			filename << "collisions/" << ltm->tm_hour << "_" << ltm->tm_min << "_" << ltm->tm_sec + 1 << ".jpg";
+			imwrite(filename.str(), img);
+			planeDrawer->recentCollisionTime = nullptr;
+		}
 		semaphore.unlock();
 
 		on_trackbar(1, 0);

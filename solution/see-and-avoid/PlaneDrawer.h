@@ -31,6 +31,10 @@ public:
 	Shader shader;
 	~PlaneDrawer();
 
+	// this indicator will become true if we have recently collided with something head-on
+	// used in main to check if we need to write out the current viewport
+	tm * recentCollisionTime = nullptr;
+
 private:
 	static const GLfloat MAX_NG_ROLL_VELOCITY;
 	GLfloat MAX_PITCH = 40.0f;

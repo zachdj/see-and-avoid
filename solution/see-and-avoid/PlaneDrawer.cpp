@@ -159,6 +159,7 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 				stream << "Time: " << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec + 1 << endl;
 				PrintToFile::print(stream.str());
 				current->hasCollided = true;
+				this->recentCollisionTime = ltm;
 			}
 			
 		}
