@@ -46,54 +46,54 @@ void PlaneGenerator::generatePlanes() {
 	planePoints.push_back(points);
 	points.clear();
 
-	////plane 2
-	//waypoints.clear();
-	//waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 0.0f, 0.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(250.0f, 0.0f, 1000.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(-250.0f, 0.0f, 1000.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(-1000.0f, 0.0f, -0.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(-250.0f, 0.0f, -1000.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(250.0f, 0.0f, -1000.0f)));
-	//Path planePath2 = Path(waypoints, 20.0f);
-	//Aircraft* plane2 = new Aircraft(glm::vec3(0.0f, 0.0f, -100.0f), planePath2, ".\\Models\\plane\\plane.obj", AircraftScale::big);
-	//plane2->SetSpeed(100.0f);
-	//myPlanes.push_back(plane2);
-	//for (int i = 0; i < waypoints.size(); i++)
-	//	points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
-	//planePoints.push_back(points);
-	//points.clear();
+	//plane 2
+	waypoints.clear();
+	waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 0.0f, 0.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(250.0f, 0.0f, 1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-250.0f, 0.0f, 1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-1000.0f, 0.0f, -0.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-250.0f, 0.0f, -1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(250.0f, 0.0f, -1000.0f)));
+	Path planePath2 = Path(waypoints, 20.0f);
+	Aircraft* plane2 = new Aircraft(glm::vec3(0.0f, 0.0f, -100.0f), planePath2, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+	plane2->SetSpeed(100.0f);
+	myPlanes.push_back(plane2);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
 
 
-	////plane 3
-	//waypoints.clear();
-	//waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 0.0f, -1000.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(-1000.0f, 0.0f, -1000.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 0.0f, 1000.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(-1000.0f, 0.0f, 1000.0f)));
-	//Path planePath3 = Path(waypoints, 20.0f);
-	//Aircraft* plane3 = new Aircraft(glm::vec3(0.0f, 0.0f, -200.0f), planePath3, ".\\Models\\vought\\vought.obj", AircraftScale::small);
-	//plane3->SetSpeed(50.0f);
-	//plane3->SetOrientation(0.0f, 180.0f, 0.0f);
-	//myPlanes.push_back(plane3);
-	//for (int i = 0; i < waypoints.size(); i++)
-	//	points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
-	//planePoints.push_back(points);
-	//points.clear();
+	//plane 3
+	waypoints.clear();
+	waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 0.0f, -1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-1000.0f, 0.0f, -1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 0.0f, 1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-1000.0f, 0.0f, 1000.0f)));
+	Path planePath3 = Path(waypoints, 20.0f);
+	Aircraft* plane3 = new Aircraft(glm::vec3(0.0f, 0.0f, -200.0f), planePath3, ".\\Models\\vought\\vought.obj", AircraftScale::small);
+	plane3->SetSpeed(50.0f);
+	plane3->SetOrientation(0.0f, 180.0f, 0.0f);
+	myPlanes.push_back(plane3);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
 
 
-	////plane 4
-	//waypoints.clear();
-	//waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -600.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, 600.0f)));
-	//waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 600.0f)));
-	//Path planePath4 = Path(waypoints, 20.0f);
-	//Aircraft* plane4 = new Aircraft(glm::vec3(0.0f, 0.0f, -400.0f), planePath4, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
-	//plane4->SetSpeed(80.0f);
-	//myPlanes.push_back(plane4);
-	//for (int i = 0; i < waypoints.size(); i++)
-	//	points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
-	//planePoints.push_back(points);
-	//points.clear();
+	//plane 4
+	waypoints.clear();
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -600.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, 600.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 600.0f)));
+	Path planePath4 = Path(waypoints, 20.0f);
+	Aircraft* plane4 = new Aircraft(glm::vec3(0.0f, 0.0f, -400.0f), planePath4, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
+	plane4->SetSpeed(80.0f);
+	myPlanes.push_back(plane4);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
 
 
 	////plane 5
