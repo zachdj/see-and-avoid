@@ -134,7 +134,7 @@ void PlaneDrawer::Draw(Camera camera, glm::vec3 camPosition, GLfloat timeValue, 
 			glm::vec3 cameraDir = camera.GetCurrentDirection();
 			double dotProduct = glm::dot(planeDir, cameraDir);
 			float theta = acos(dotProduct); //The denominator here is one because we are using two unit vectors
-			if (theta > 3.67 || theta < 2.62) { // a direct collision is pi. So, 45 degrees both ways would be pi + pi/6 and pi - pi/6 TOTAL = 60 degree collision hit
+			if (theta > 4.2 || theta < 2.1) { // a direct collision is pi. So, 60 degrees both ways would be pi + pi/3 and pi - pi/3 TOTAL = 120 degree collision hit
 				backCollisionCount++;
 				stringstream stream;
 				stream << endl << "Hit in the back #" << backCollisionCount << endl;

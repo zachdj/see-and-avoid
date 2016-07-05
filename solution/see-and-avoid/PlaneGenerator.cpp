@@ -4,28 +4,17 @@
 
 using namespace std;
 
-PlaneGenerator::PlaneGenerator(bool randomPick, int width)
-{
+static vector< Aircraft*> myPlanes;
+static vector< Mat> planePaths;
+static vector<Waypoint *> waypoints;
+static vector<Point> points;
+static vector<vector<Point>> planePoints;
 
-	this->widthOfAirspace = width;
-
-	if (randomPick) {
-		generateRandomPlanes();
-	}
-	else {
-		generatePlanes();
-		//generateApproachingPlanes();
-	}
-}
-
-
-PlaneGenerator::~PlaneGenerator()
-{
-}
 
 /*Generate Planes for later use*/
-void PlaneGenerator::generatePlanes() {
+void PlaneGenerator::generateAirspacePlanes(int width) {
 
+	int widthOfAirspace = width;
 	////plane 1
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
 	waypoints.push_back(new Waypoint(glm::vec3(-400.0f, 0.0f, 900.0f)));
@@ -133,16 +122,78 @@ void PlaneGenerator::generatePlanes() {
 	//planePoints.push_back(points);
 	//points.clear();
 
-	DrawPathsOnMatrix();
+	DrawPathsOnMatrix(widthOfAirspace);
 
 }
 
-void PlaneGenerator::generateRandomPlanes() {
+
+void PlaneGenerator::generateAirportPlanes(int width) {
+
+	int widthOfAirspace = width;
+	////plane 1
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, -200.0f, 0.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 0.0f, -1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 0.0f, 1000.0f)));
+	Path planePath = Path(waypoints, 20.0f);
+	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1500.0f), planePath, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+	plane->SetSpeed(50.0f);
+	myPlanes.push_back(plane);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
+	
+
+	////plane 2
+	waypoints.clear();
+	waypoints.push_back(new Waypoint(glm::vec3(-1000.0f, 0.0f, 0.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, -200.0f, 0.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 0.0f, 0.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(1200.0f, 0.0f, 1400.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(-1200.0f, 0.0f, 1600.0f)));
+	Path planePath2 = Path(waypoints, 20.0f);
+	Aircraft* plane2 = new Aircraft(glm::vec3(-1000.0f, 0.0f, 200.0f), planePath2, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+	plane2->SetSpeed(50.0f);
+	myPlanes.push_back(plane2);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
+
+	////plane 3
+	waypoints.clear();
+	waypoints.push_back(new Waypoint(glm::vec3(-1000.0f, 200.0f, 1500.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, -0.0f, 0.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 100.0f, -1000.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(800.0f, 100.0f, -900.0f)));
+	waypoints.push_back(new Waypoint(glm::vec3(1000.0f, 150.0f, 1100.0f)));
+	Path planePath3 = Path(waypoints, 20.0f);
+	Aircraft* plane3 = new Aircraft(glm::vec3(-1500.0f, 0.0f, 1700.0f), planePath3, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+	plane3->SetSpeed(50.0f);
+	myPlanes.push_back(plane3);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
+
+
+
+	DrawPathsOnMatrix(widthOfAirspace);
+
+}
+
+
+
+
+
+void PlaneGenerator::generateRandomPlanes(int width) {
 	cout << "Enter the number of random generated planes..." << endl;
 	int numberOfPlanes;
 	cin >> numberOfPlanes;
 
-	
+	int widthOfAirspace = width;
 	int waypointSize = 4;
 
 	//As many planes as you want
@@ -168,15 +219,16 @@ void PlaneGenerator::generateRandomPlanes() {
 		planePoints.push_back(points);
 		points.clear();
 	}
-	DrawPathsOnMatrix();
+	DrawPathsOnMatrix(widthOfAirspace);
 
 }
 
-void PlaneGenerator::generateApproachingPlanes() {
+void PlaneGenerator::generateApproachingPlanes(int width) {
 	cout << "Enter the number of approaching planes...";
 	int numberOfPlanes;
 	cin >> numberOfPlanes;
 
+	int widthOfAirspace = width;
 	int start = -2500;
 
 	//As many planes as you want
@@ -204,7 +256,7 @@ void PlaneGenerator::generateApproachingPlanes() {
 		points.clear();
 		start -= 100;
 	}
-	DrawPathsOnMatrix();
+	DrawPathsOnMatrix(widthOfAirspace);
 
 }
 
@@ -212,7 +264,7 @@ void PlaneGenerator::generateApproachingPlanes() {
 
 //This function takes our planes and draws a top down view of each of their paths. It also creates a total airspace flight path for all airplanes. 
 //There are several loops in this function because we are iterating through all of the vectors we have available for our airplanes.
-void PlaneGenerator::DrawPathsOnMatrix() {
+void PlaneGenerator::DrawPathsOnMatrix(int widthOfAirspace) {
 	int numberOfPlanes = myPlanes.size();
 	//Mat completeDrawing(500, 500, CV_8UC3, Scalar(255, 255, 255)); //Matrix for complete matrix with all paths
 	Mat completeDrawing = imread("background.png");
@@ -223,16 +275,16 @@ void PlaneGenerator::DrawPathsOnMatrix() {
 		int red = rand() % 255; int green = rand() % 255; int blue = rand() % 255; //random colors
 		for (int j = 1; j <= planePoints.at(i).size(); j++) { //iteratre through all points to that individual plane
 			if (j != planePoints.at(i).size()) { //draw lines accordingly on both matrices, while also puting point coordinates on the individual matrix
-				MyLine(completeDrawing, planePoints.at(i).at(j), planePoints.at(i).at(j - 1), red, green, blue);
-				MyLine(individual, planePoints.at(i).at(j), planePoints.at(i).at(j - 1), red, green, blue);
+				MyLine(completeDrawing, planePoints.at(i).at(j), planePoints.at(i).at(j - 1), red, green, blue, widthOfAirspace);
+				MyLine(individual, planePoints.at(i).at(j), planePoints.at(i).at(j - 1), red, green, blue, widthOfAirspace);
 				stringstream x, y;
 				x << planePoints.at(i).at(j-1).x;
 				y << planePoints.at(i).at(j-1).y;
 				putText(individual, "(" + x.str() + " , " + y.str() + ")", Point((planePoints.at(i).at(j - 1).x + widthOfAirspace / 2) / (widthOfAirspace / 500), (planePoints.at(i).at(j - 1).y + widthOfAirspace / 2) / (widthOfAirspace / 500)) , FONT_HERSHEY_PLAIN, 1, Scalar(red, green, blue));
 			}
 			else {
-				MyLine(completeDrawing, planePoints.at(i).at(j - 1), planePoints.at(i).at(0), red, green, blue);
-				MyLine(individual, planePoints.at(i).at(j - 1), planePoints.at(i).at(0), red, green, blue);
+				MyLine(completeDrawing, planePoints.at(i).at(j - 1), planePoints.at(i).at(0), red, green, blue, widthOfAirspace);
+				MyLine(individual, planePoints.at(i).at(j - 1), planePoints.at(i).at(0), red, green, blue, widthOfAirspace);
 				stringstream x, y;
 				x << planePoints.at(i).at(j - 1).x;
 				y << planePoints.at(i).at(j - 1).y;
@@ -246,7 +298,7 @@ void PlaneGenerator::DrawPathsOnMatrix() {
 }
 
 
-void PlaneGenerator::MyLine(Mat img, Point start, Point end, int red, int green, int blue)
+void PlaneGenerator::MyLine(Mat img, Point start, Point end, int red, int green, int blue, int widthOfAirspace)
 {
 	int thickness = 3;
 	int lineType = 8;
