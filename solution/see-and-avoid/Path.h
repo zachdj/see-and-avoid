@@ -27,7 +27,8 @@ public:
 	GLfloat GetPredictorDeltaX(); // returns difference in x coordinates of the next TWO points to be visited
 	void SetAvoidanceWaypoint(Waypoint * waypoint);
 	void SetLoopBreakWaypoint(Waypoint * waypoint);
-	void CompleteWaypoint();
+	void CompleteWaypoint(); // marks currently active waypoint as completed
+	void CompleteNextPathWaypoint(); // marks next path waypoint as completed
 
 	GLfloat waypointCompletionRadius;
 	~Path();

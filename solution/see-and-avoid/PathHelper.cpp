@@ -16,7 +16,7 @@ PathHelper::PathHelper()
 	waypoints.push_back(new Waypoint(glm::vec3(-300.0f, 0.0f, 1400.0f)));
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 1000.0f)));
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 500.0f)));
-	this->preloadedPaths.push_back( new Path(waypoints, 20.0f) );
+	this->preloadedPaths.push_back( new Path(waypoints, 40.0f) );
 	waypoints.clear();
 	// End Path 1
 
@@ -31,7 +31,7 @@ PathHelper::PathHelper()
 	waypoints.push_back(new Waypoint(glm::vec3(300.0f, 0.0f, -1400.0f)));
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -1000.0f)));
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, -500.0f)));
-	this->preloadedPaths.push_back(new Path(waypoints, 20.0f));
+	this->preloadedPaths.push_back(new Path(waypoints, 40.0f));
 	waypoints.clear();
 	// End Path 2
 }
