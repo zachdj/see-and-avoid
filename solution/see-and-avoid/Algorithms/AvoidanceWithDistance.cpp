@@ -45,12 +45,6 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 			+ pow(obstaclePosition.y + minDistTime*obstacleVelocity.y, 2)
 			+ pow(obstaclePosition.z + minDistTime*(obstacleVelocity.z - cameraVelocity), 2);
 
-		//cout << "Obstacle Position: <" << obstaclePosition.x << ", " << obstaclePosition.y << ", " << obstaclePosition.z << ">" << endl;
-		//cout << "Obstacle Velocity: <" << obstacleVelocity.x << ", " << obstacleVelocity.y << ", " << obstacleVelocity.z << ">" << endl;
-		//cout << "DeltaTime: " << info.deltaTime << endl;
-		//cout << "Min Dist Time: " << minDistTime << endl;
-		//cout << "Projected Min Dist: " << sqrt(minDistSqrd) << endl;
-
 		if (minDistSqrd < 19600 && calculatedDist < 1250) {
 			glm::vec3 direction = camera.GetCurrentDirectionFlat();
 			glm::vec3 position = camera.GetPosition();
@@ -66,28 +60,36 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 			Waypoint * newWay;
 
 			double theta = acos(glm::dot(direction, glm::vec3(0.0f, 0.0f, 1.0f)));
+			glm::vec3 newWayPos = position;
 			if (theta > 2.5 || theta < 0.6) {
 				if (info.currentPositionX <= SCREENW/2 && info.deltaX >= 0) {
 					//if blob is on the left and moving right, turn hard left
-					newWay = new Waypoint(position + 300.0f*direction + 175.0f*normal);
+					newWayPos = position + 300.0f*direction + 175.0f*normal;
 				}
 				else if(info.currentPositionX <= SCREENW/2 && info.deltaX < 0) {
 					//if blob is on the left and moving left, turn slight right
-					newWay = new Waypoint(position + 250.0f*direction - 40.0f*normal);
+					newWayPos = position + 250.0f*direction - 40.0f*normal;
 					//uncomment below for harder turn
 					//newWay = new Waypoint(position + 300.0f*direction - 175.0f*normal);
 				}
 				else if (info.currentPositionX > SCREENW / 2 && info.deltaX >= 0) {
 					//if blob is on the right and moving right, turn slight left
-					newWay = new Waypoint(position + 250.0f*direction + 40.0f*normal);
+					newWayPos = position + 250.0f*direction + 40.0f*normal;
 					//uncomment below for harder turn
 					//newWay = new Waypoint(position + 300.0f*direction + 175.0f*normal);
 				}
 				else{ //if (info.currentPositionX > SCREENW / 2 && info.deltaX < 0) {
 					//if blob is on the right and moving left, turn hard right
-					newWay = new Waypoint(position + 300.0f*direction - 175.0f*normal);
-				}				
-				camera.GetPath()->SetAvoidanceWaypoint(newWay);
+					newWayPos = position + 300.0f*direction - 175.0f*normal;
+				}
+				//if (info.deltaY >= 0) {
+				//	newWayPos = newWayPos + glm::vec3(0.0f, -100.0f, 0.0f);
+				//}
+				//else {
+				//	newWayPos = newWayPos + glm::vec3(0.0f, 100.0f, 0.0f);
+				//}
+	
+				camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(newWayPos));
 			}
 		}
 	}

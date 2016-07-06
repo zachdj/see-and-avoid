@@ -19,8 +19,8 @@ Aircraft::Aircraft(glm::vec3 startingPos, Path & path, GLchar * modelFilePath, A
 		this->collisionRadius = AircraftTable::getMidsizeJet().wingspan;
 	}
 	else {
-		scale = AircraftTable::getCessna172Case().wingspan / AircraftTable::GetCessnaModelWingspan();
-		this->collisionRadius = AircraftTable::getCessna172Case().wingspan;
+		scale = AircraftTable::getCessna172().wingspan / AircraftTable::GetCessnaModelWingspan();
+		this->collisionRadius = AircraftTable::getCessna172().wingspan;
 	}
 	this->scale = scale;
 
@@ -51,8 +51,8 @@ Aircraft::Aircraft(glm::vec3 position, GLchar* filepath, AircraftScale acScale) 
 		this->collisionRadius = AircraftTable::getMidsizeJet().wingspan;
 	}
 	else {
-		scale = AircraftTable::getCessna172Case().wingspan / AircraftTable::GetCessnaModelWingspan();
-		this->collisionRadius = AircraftTable::getCessna172Case().wingspan;
+		scale = AircraftTable::getCessna172().wingspan / AircraftTable::GetCessnaModelWingspan();
+		this->collisionRadius = AircraftTable::getCessna172().wingspan;
 	}
 	this->scale = scale;
 

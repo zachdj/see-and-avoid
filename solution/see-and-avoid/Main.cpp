@@ -258,7 +258,7 @@ int processScene() {
 		semaphore.unlock();
 		vector<BlobInfo> blobs = processor.ProcessScene(frame);
 		for (int i = 0; i < blobs.size(); i++) {
-			//ai.reactToBlob(blobs[i], camera);
+			ai.reactToBlob(blobs[i], camera);
 		}		
 	}
 	return 0;
