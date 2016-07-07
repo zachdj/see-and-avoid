@@ -137,6 +137,7 @@
     <ClCompile Include="ContourVisionProcessor.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeDrawer.cpp" />
+    <ClCompile Include="Algorithms\DoNothingAvoidance.cpp" />
     <ClCompile Include="KeyboardHandler.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Path.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="ContourVisionProcessor.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="CubeDrawer.h" />
+    <ClInclude Include="Algorithms\DoNothingAvoidance.h" />
     <ClInclude Include="FileUtils.h" />
     <ClInclude Include="IObstacle.h" />
     <ClInclude Include="KeyboardHandler.h" />
