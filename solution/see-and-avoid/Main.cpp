@@ -157,13 +157,10 @@ int renderScene() {
 	
 	//Create Planes Before Drawing any new windows
 	//PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
-	PlaneGenerator::generateBigPlane45Degree(widthOfAirspace);
+	PlaneGenerator::generatePlane90Degree(widthOfAirspace, AircraftScale::med);
     myplanes = PlaneGenerator::getPlanes();	
 
 	// we have to create openCV windows in this thread!
-	namedWindow("Cockpit Sim", CV_WINDOW_NORMAL);
-	cv::resizeWindow("Cockpit Sim", width / 2.0, height / 2.0);
-	cv::moveWindow("CockpitSim", 0, 0);
 
 	namedWindow("Blob Detection", CV_WINDOW_NORMAL);
 	cv::resizeWindow("Blob Detection", width/2.0, height/2.0);
@@ -171,7 +168,7 @@ int renderScene() {
 
 	PlanePathMatrices = PlaneGenerator::getPlanePaths();
 	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
-	cv::moveWindow("Plane Paths", width/2.0, height/2.0 + 50);
+	cv::moveWindow("Plane Paths", 0, 50);
 	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, PlaneGenerator::getPlanePaths().size() - 1, on_trackbar);	
 
 	Texture defaultPlaneTexture(".\\asset\\container.jpg");
@@ -179,7 +176,7 @@ int renderScene() {
 
 	// create camera and path for camera (our plane)
 	float scale = widthOfAirspace / 4000.0; // 4000 was default width of airspace
-	camera = Camera(width, height, scale*glm::vec3(0.0f, 0.0f, 250.0f));
+	camera = Camera(width, height, scale*glm::vec3(0.0f, 0.0f, 350.0f));
 	camera.SetPath(pathHelper->GetStraightLine());
 	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));
@@ -195,7 +192,7 @@ int renderScene() {
 	CubeDrawer * cubeDrawer = new CubeDrawer(defaultPlaneTexture, defaultPlaneTexture, cubeShader);
 
 	//Show the Window again once we are ready
-	//glfwShowWindow(window);
+	glfwShowWindow(window);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -234,8 +231,6 @@ int renderScene() {
 		glReadPixels(0, 0, img.cols, img.rows, GL_BGR, GL_UNSIGNED_BYTE, img.data);
 		cv::flip(img, img, 0);
 		resize(img, img, Size(960, 540));
-
-		imshow("Cockpit Sim", img);
 
 		//check if planedrawer has recently detected a collision and export the current openGL view to a file
 		if (planeDrawer->recentCollisionTime != nullptr) {
