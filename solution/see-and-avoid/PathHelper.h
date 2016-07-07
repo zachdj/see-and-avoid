@@ -1,8 +1,4 @@
-
-/*
-Assists in determining the best path. 
-*/
-
+//Utility class for creating paths
 #pragma once
 
 #include "Path.h"
@@ -10,12 +6,14 @@ class PathHelper
 {
 public:
 	PathHelper();
+	PathHelper(GLfloat scale);
 	~PathHelper();
 
-	Path* GetPreloadedPath(int identifier);
+	Path* GetLinearPath();
+	Path* GetCircularPath();
+	Path* GetFigureEightPath();
 
 private:
-	vector<Path*> preloadedPaths;
-
+	GLfloat scale;
 };
 

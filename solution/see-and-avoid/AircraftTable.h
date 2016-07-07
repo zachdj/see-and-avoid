@@ -41,7 +41,7 @@ public:
 		return midsize;
 	}
 	//worst case is a small passenger plane like a cessna 172
-	static AircraftTableData getCessna172Case() {
+	static AircraftTableData getCessna172() {
 		AircraftTableData cessna;
 		cessna.wingspan = 36;
 		cessna.focalLength = 500;
