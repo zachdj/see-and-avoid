@@ -33,8 +33,10 @@ public:
 	static void generateAirportPlanes(int width);
 
 	//All scenarios for testing for paper
-	static void generateBigPlaneHeadOn(int width);
-	static void generateBigPlane45Degree(int width);
+	static void generatePlaneHeadOn(int width, AircraftScale scale);
+	static void generatePlane45Degree(int width, AircraftScale scale);
+	static void generatePlane90Degree(int width, AircraftScale scale);
+
 	
 
 private:
