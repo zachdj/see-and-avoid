@@ -19,7 +19,7 @@ void PlaneGenerator::generateBigPlaneHeadOn(int width) {
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 5000.0f)));
 	
 	Path planePath = Path(waypoints, 20.0f);
-	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -1000.0f), planePath, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+	Aircraft* plane = new Aircraft(glm::vec3(0.0f, 0.0f, -2000.0f), planePath, ".\\Models\\plane\\plane.obj", AircraftScale::big);
 	plane->SetSpeed(50.0f);
 	myPlanes.push_back(plane);
 	for (int i = 0; i < waypoints.size(); i++)

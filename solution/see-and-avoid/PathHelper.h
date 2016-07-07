@@ -12,6 +12,7 @@ public:
 	Path* GetLinearPath();
 	Path* GetCircularPath();
 	Path* GetFigureEightPath();
+	Path* GetStraightLine();
 
 private:
 	GLfloat scale;

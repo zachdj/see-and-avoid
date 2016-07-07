@@ -51,3 +51,9 @@ Path * PathHelper::GetFigureEightPath() {
 	waypoints.push_back(new Waypoint(this->scale*glm::vec3(-1500.0f, 0.0f, 1500.0f)));
 	return new Path(waypoints, 40.0f);
 }
+
+Path* PathHelper::GetStraightLine() {
+	vector<Waypoint *> waypoints;
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(0.0f, 0.0f, -5000.0f)));
+	return new Path(waypoints, 40.0f);
+}
