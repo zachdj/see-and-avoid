@@ -16,7 +16,7 @@ static vector<vector<Point>> planePoints;
 void PlaneGenerator::generatePlaneHeadOn(int width, AircraftScale scale) {
 	int widthOfAirspace = width;
 	waypoints.push_back(new Waypoint(glm::vec3(0.0f, 0.0f, 5000.0f)));
-	
+
 	Path planePath = Path(waypoints, 20.0f);
 	Aircraft * plane;
 	if( scale == AircraftScale::big)
@@ -35,17 +35,22 @@ void PlaneGenerator::generatePlaneHeadOn(int width, AircraftScale scale) {
 	DrawPathsOnMatrix(widthOfAirspace);
 }
 
-void PlaneGenerator::generatePlane45Degree(int width, AircraftScale scale) {
+void PlaneGenerator::generatePlane45Degree(int width, AircraftScale scale, bool negativeAngle) {
 	int widthOfAirspace = width;
-	waypoints.push_back(new Waypoint(glm::vec3(-1414.0f, 0.0f, 414.0f)));
+	int multiplier;
+	if (negativeAngle)
+		multiplier = -1;
+	else
+		multiplier = 1;
+	waypoints.push_back(new Waypoint(glm::vec3(multiplier *-1414.0f, 0.0f, 414.0f)));
 	Path planePath = Path(waypoints, 20.0f);
 	Aircraft * plane;
 	if (scale == AircraftScale::big)
-		plane = new Aircraft(glm::vec3(707.0f, 0.0f, -1707.0f), planePath, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+		plane = new Aircraft(glm::vec3(multiplier *707.0f, 0.0f, -1707.0f), planePath, ".\\Models\\plane\\plane.obj", AircraftScale::big);
 	else if ((scale == AircraftScale::med))
-		plane = new Aircraft(glm::vec3(707.0f, 0.0f, -1707.0f), planePath, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
+		plane = new Aircraft(glm::vec3(multiplier *707.0f, 0.0f, -1707.0f), planePath, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
 	else
-		plane = new Aircraft(glm::vec3(707.0f, 0.0f, -1707.0f), planePath, ".\\Models\\vought\\vought.obj", AircraftScale::small);
+		plane = new Aircraft(glm::vec3(multiplier *707.0f, 0.0f, -1707.0f), planePath, ".\\Models\\vought\\vought.obj", AircraftScale::small);
 	plane->SetSpeed(50.0f);
 	myPlanes.push_back(plane);
 	for (int i = 0; i < waypoints.size(); i++)
@@ -56,17 +61,23 @@ void PlaneGenerator::generatePlane45Degree(int width, AircraftScale scale) {
 	DrawPathsOnMatrix(widthOfAirspace);
 }
 
-void PlaneGenerator::generatePlane90Degree(int width, AircraftScale scale) {
+void PlaneGenerator::generatePlane90Degree(int width, AircraftScale scale, bool negativeAngle) {
 	int widthOfAirspace = width;
-	waypoints.push_back(new Waypoint(glm::vec3(-5000.0f, 0.0f, -1000.0f)));
+	int multiplier;
+	if (negativeAngle)
+		multiplier = -1;
+	else
+		multiplier = 1;
+
+	waypoints.push_back(new Waypoint(glm::vec3(multiplier * -5000.0f, 0.0f, -1000.0f)));
 	Path planePath = Path(waypoints, 20.0f);
 	Aircraft * plane;
 	if (scale == AircraftScale::big)
-		plane = new Aircraft(glm::vec3(1000.0f, 0.0f, -1000.0f), planePath, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+		plane = new Aircraft(glm::vec3(multiplier * 1000.0f, 0.0f, -1000.0f), planePath, ".\\Models\\plane\\plane.obj", AircraftScale::big);
 	else if ((scale == AircraftScale::med))
-		plane = new Aircraft(glm::vec3(1000.0f, 0.0f, -1000.0f), planePath, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
+		plane = new Aircraft(glm::vec3(multiplier * 1000.0f, 0.0f, -1000.0f), planePath, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
 	else
-		plane = new Aircraft(glm::vec3(1000.0f, 0.0f, -1000.0f), planePath, ".\\Models\\vought\\vought.obj", AircraftScale::small);
+		plane = new Aircraft(glm::vec3(multiplier * 1000.0f, 0.0f, -1000.0f), planePath, ".\\Models\\vought\\vought.obj", AircraftScale::small);
 	plane->SetSpeed(50.0f);
 	myPlanes.push_back(plane);
 	for (int i = 0; i < waypoints.size(); i++)
@@ -77,7 +88,32 @@ void PlaneGenerator::generatePlane90Degree(int width, AircraftScale scale) {
 	DrawPathsOnMatrix(widthOfAirspace);
 }
 
+void PlaneGenerator::generatePlane170Degree(int width, AircraftScale scale, bool negativeAngle) {
+	int widthOfAirspace = width;
+	int multiplier;
+	if (negativeAngle)
+		multiplier = -1;
+	else
+		multiplier = 1;
 
+	waypoints.push_back(new Waypoint(glm::vec3(multiplier * -1865.0f, 0.0f, -5925.0f)));
+	Path planePath = Path(waypoints, 20.0f);
+	Aircraft * plane;
+	if (scale == AircraftScale::big)
+		plane = new Aircraft(glm::vec3(multiplier * 173.0f, 0.0f, -15.0f), planePath, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+	else if ((scale == AircraftScale::med))
+		plane = new Aircraft(glm::vec3(multiplier * 173.0f, 0.0f, -15.0f), planePath, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
+	else
+		plane = new Aircraft(glm::vec3(multiplier * 173.0f, 0.0f, -15.0f), planePath, ".\\Models\\vought\\vought.obj", AircraftScale::small);
+	plane->SetSpeed(50.0f);
+	myPlanes.push_back(plane);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
+
+	DrawPathsOnMatrix(widthOfAirspace);
+}
 
 
 

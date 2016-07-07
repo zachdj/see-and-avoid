@@ -34,8 +34,9 @@ public:
 
 	//All scenarios for testing for paper
 	static void generatePlaneHeadOn(int width, AircraftScale scale);
-	static void generatePlane45Degree(int width, AircraftScale scale);
-	static void generatePlane90Degree(int width, AircraftScale scale);
+	static void generatePlane45Degree(int width, AircraftScale scale, bool negativeAngle = false);
+	static void generatePlane90Degree(int width, AircraftScale scale, bool negativeAngle = false);
+	static void generatePlane170Degree(int width, AircraftScale scale, bool negativeAngle = false);
 
 	
 
