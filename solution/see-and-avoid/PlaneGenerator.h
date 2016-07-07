@@ -37,6 +37,7 @@ public:
 	static void generatePlane45Degree(int width, AircraftScale scale, bool negativeAngle = false);
 	static void generatePlane90Degree(int width, AircraftScale scale, bool negativeAngle = false);
 	static void generatePlane170Degree(int width, AircraftScale scale, bool negativeAngle = false);
+	static void generate2Planes(int width, AircraftScale scale1, AircraftScale scale2, int anglePlane1, int anglePlane2);
 
 	
 
