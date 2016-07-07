@@ -31,6 +31,10 @@ public:
 	static void generateRandomPlanes(int widthOfAirspace);
 	static void generateApproachingPlanes(int widthOfAirspace);
 	static void generateAirportPlanes(int width);
+
+	//All scenarios for testing for paper
+	static void generateBigPlaneHeadOn(int width);
+	static void generateBigPlane45Degree(int width);
 	
 
 private:
