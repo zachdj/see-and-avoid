@@ -147,14 +147,14 @@ int renderScene() {
 	Skybox * skybox = new Skybox(skyboxShader);
 
 	// PathHelper for preloaded paths
-	PathHelper * pathHelper = new PathHelper();
+	PathHelper * pathHelper = new PathHelper(widthOfAirspace / 4000.0f);
 
 	// create a plane that follows a path
 	Shader planeShader(".\\Shaders\\Aircraft\\aircraft.vs", ".\\Shaders\\Aircraft\\aircraft.fs");
 	
 	//Create Planes Before Drawing any new windows
 	//PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
-	PlaneGenerator::generateAirportPlanes(widthOfAirspace);
+	PlaneGenerator::generateAirspacePlanes(widthOfAirspace);
     myplanes = PlaneGenerator::getPlanes();	
 
 	// we have to create openCV windows in this thread!
@@ -170,8 +170,9 @@ int renderScene() {
 	PlaneDrawer * planeDrawer = new PlaneDrawer(defaultPlaneTexture, planeShader);
 
 	// create camera and path for camera (our plane)
-	camera = Camera(width, height, glm::vec3(0.0f, 0.0f, 1200.0f));
-	camera.SetPath(pathHelper->GetPreloadedPath(0));
+	float scale = widthOfAirspace / 4000.0; // 4000 was default width of airspace
+	camera = Camera(width, height, scale*glm::vec3(0.0f, 0.0f, 1200.0f));
+	camera.SetPath(pathHelper->GetCircularPath());
 	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));
 
