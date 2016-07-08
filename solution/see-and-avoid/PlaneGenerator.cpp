@@ -159,6 +159,69 @@ void PlaneGenerator::generate2Planes(int width, AircraftScale scale1, AircraftSc
 	DrawPathsOnMatrix(widthOfAirspace);
 }
 
+void PlaneGenerator::generate3Planes(int width, AircraftScale scale1, AircraftScale scale2, AircraftScale scale3, int anglePlane1, int anglePlane2, int anglePlane3) {
+	int widthOfAirspace = width;
+
+	waypoints.push_back(new Waypoint(glm::vec3(-5 * 1000 * sin(anglePlane1 *PI / 180), 0.0f, -1000 + 5 * 1000 * cos(anglePlane1 *PI / 180))));
+	Path planePath = Path(waypoints, 20.0f);
+	Aircraft * plane;
+	if (scale1 == AircraftScale::big)
+		plane = new Aircraft(glm::vec3(1000 * sin(anglePlane1 *PI / 180), 0.0f, -1000 - 1000 * cos(anglePlane1 *PI / 180)), planePath, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+	else if ((scale1 == AircraftScale::med))
+		plane = new Aircraft(glm::vec3(1000 * sin(anglePlane1 *PI / 180), 0.0f, -1000 - 1000 * cos(anglePlane1 *PI / 180)), planePath, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
+	else
+		plane = new Aircraft(glm::vec3(1000 * sin(anglePlane1 *PI / 180), 0.0f, -1000 - 1000 * cos(anglePlane1 *PI / 180)), planePath, ".\\Models\\vought\\vought.obj", AircraftScale::small);
+	plane->SetSpeed(50.0f);
+	plane->SetOrientation(0.0f, (GLfloat)anglePlane1, 0.0f);
+	myPlanes.push_back(plane);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
+
+	waypoints.clear();
+	waypoints.push_back(new Waypoint(glm::vec3(-5 * 1000 * sin(anglePlane2 *PI / 180), 0.0f, -1000 + 5 * 1000 * cos(anglePlane2 *PI / 180))));
+	Path planePath2 = Path(waypoints, 20.0f);
+	Aircraft * plane2;
+	glm::vec3 direction2 = glm::vec3(1000 * sin(anglePlane2 *PI / 180), 0.0f, -1000 - 1000 * cos(anglePlane2 *PI / 180));
+	if (scale2 == AircraftScale::big)
+		plane2 = new Aircraft(direction2, planePath2, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+	else if ((scale2 == AircraftScale::med))
+		plane2 = new Aircraft(direction2, planePath2, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
+	else
+		plane2 = new Aircraft(direction2, planePath2, ".\\Models\\vought\\vought.obj", AircraftScale::small);
+	plane2->SetSpeed(50.0f);
+	plane2->SetOrientation(0.0f, (GLfloat)anglePlane2, 0.0f);
+	myPlanes.push_back(plane2);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
+
+	waypoints.clear();
+	waypoints.push_back(new Waypoint(glm::vec3(-5 * 1000 * sin(anglePlane3 *PI / 180), 0.0f, -1000 + 5 * 1000 * cos(anglePlane3 *PI / 180))));
+	Path planePath3 = Path(waypoints, 20.0f);
+	Aircraft * plane3;
+	glm::vec3 direction3 = glm::vec3(1000 * sin(anglePlane3 *PI / 180), 0.0f, -1000 - 1000 * cos(anglePlane3 *PI / 180));
+	if (scale3 == AircraftScale::big)
+		plane3 = new Aircraft(direction3, planePath3, ".\\Models\\plane\\plane.obj", AircraftScale::big);
+	else if ((scale3 == AircraftScale::med))
+		plane3 = new Aircraft(direction3, planePath3, ".\\Models\\fighter\\fighter.obj", AircraftScale::med);
+	else
+		plane3 = new Aircraft(direction3, planePath3, ".\\Models\\vought\\vought.obj", AircraftScale::small);
+	plane3->SetSpeed(50.0f);
+	plane3->SetOrientation(0.0f, (GLfloat)anglePlane3, 0.0f);
+	myPlanes.push_back(plane3);
+	for (int i = 0; i < waypoints.size(); i++)
+		points.push_back(Point(waypoints.at(i)->GetPosition().x, waypoints.at(i)->GetPosition().z));
+	planePoints.push_back(points);
+	points.clear();
+
+	DrawPathsOnMatrix(widthOfAirspace);
+}
+
+
+
 void PlaneGenerator::generateAirspacePlanes(int width) {
 
 	int widthOfAirspace = width;
@@ -272,7 +335,6 @@ void PlaneGenerator::generateAirspacePlanes(int width) {
 	DrawPathsOnMatrix(widthOfAirspace);
 
 }
-
 
 void PlaneGenerator::generateAirportPlanes(int width) {
 
