@@ -69,9 +69,9 @@ int widthOfAirspace = 4000;
 
 vector< Aircraft*> myplanes; // planes to render
 Camera camera; // camera object
-//DoNothingAvoidance ai = DoNothingAvoidance();
+DoNothingAvoidance ai = DoNothingAvoidance();
 //AvoidanceDistanceAgnostic ai = AvoidanceDistanceAgnostic();
-AvoidanceWithDistance ai = AvoidanceWithDistance();
+//AvoidanceWithDistance ai = AvoidanceWithDistance();
 
 /***************************** End forward declarations ********************************************************/
 
@@ -79,7 +79,7 @@ int main() {
 
 	PrintToFile::clearFile();
 	PrintToFile::clearDebugFile();	
-	//clear the folder holding collision photos
+	//clear the folder holding collision photos - this will have to change on *nix systems
 	system("del /Q \"collisions\"");
 
 	thread renderThread(renderScene);
@@ -157,7 +157,7 @@ int renderScene() {
 	
 	//Create Planes Before Drawing any new windows
 	//PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
-	PlaneGenerator::generatePlane90Degree(widthOfAirspace, AircraftScale::med);
+	PlaneGenerator::generatePlane170Degree(widthOfAirspace, AircraftScale::small);
     myplanes = PlaneGenerator::getPlanes();	
 
 	// we have to create openCV windows in this thread!
@@ -168,7 +168,7 @@ int renderScene() {
 
 	PlanePathMatrices = PlaneGenerator::getPlanePaths();
 	namedWindow("Plane Paths", CV_WINDOW_AUTOSIZE);
-	cv::moveWindow("Plane Paths", 0, 50);
+	cv::moveWindow("Plane Paths", width/2.0, height/2.0);
 	createTrackbar("Plane Select: ", "Plane Paths", &planeSelection, PlaneGenerator::getPlanePaths().size() - 1, on_trackbar);	
 
 	Texture defaultPlaneTexture(".\\asset\\container.jpg");
@@ -176,7 +176,7 @@ int renderScene() {
 
 	// create camera and path for camera (our plane)
 	float scale = widthOfAirspace / 4000.0; // 4000 was default width of airspace
-	camera = Camera(width, height, scale*glm::vec3(0.0f, 0.0f, 350.0f));
+	camera = Camera(width, height, scale*glm::vec3(0.0f, 0.0f, 475.0f));
 	camera.SetPath(pathHelper->GetStraightLine());
 	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));
@@ -258,7 +258,6 @@ int processScene() {
 	double focalLengthSum = 0;
 	int focalLengthMeasurements = 0;
 	while (!renderingStopped) {
-
 		semaphore.lock();
 		frame = img;
 		semaphore.unlock();
