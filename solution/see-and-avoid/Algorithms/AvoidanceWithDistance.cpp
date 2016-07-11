@@ -63,8 +63,11 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 			glm::vec3 newWayPos = position;
 			if (theta > 2.5 || theta < 0.6) {
 				if (info.currentPositionX <= SCREENW/2 && info.deltaX >= 0) {
-					//if blob is on the left and moving right, turn hard left
-					newWayPos = position + 300.0f*direction + 175.0f*normal;
+					//if blob is on the left and moving right
+					if (!camera.IsTurningLeft()) {
+						//if we are going straight or turning right
+						newWayPos = position + 300.0f*direction + 175.0f*normal;
+					}
 				}
 				else if(info.currentPositionX <= SCREENW/2 && info.deltaX < 0) {
 					//if blob is on the left and moving left, turn slight right
@@ -79,17 +82,16 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 					//newWay = new Waypoint(position + 300.0f*direction + 175.0f*normal);
 				}
 				else{ //if (info.currentPositionX > SCREENW / 2 && info.deltaX < 0) {
-					//if blob is on the right and moving left, turn hard right
-					newWayPos = position + 300.0f*direction - 175.0f*normal;
+					//if blob is on the right and moving left
+					if (!camera.IsTurningRight()) {
+						// if we are going straight or turning left
+						newWayPos = position + 300.0f*direction - 175.0f*normal;
+					}
 				}
-				//if (info.deltaY >= 0) {
-				//	newWayPos = newWayPos + glm::vec3(0.0f, -100.0f, 0.0f);
-				//}
-				//else {
-				//	newWayPos = newWayPos + glm::vec3(0.0f, 100.0f, 0.0f);
-				//}
 	
-				camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(newWayPos));
+				if (newWayPos != position) {
+					camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(newWayPos));
+				}
 			}
 		}
 	}

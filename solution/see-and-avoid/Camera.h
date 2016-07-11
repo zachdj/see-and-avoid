@@ -33,6 +33,8 @@ class Camera
 		void SetPath(Path * path);
 		Path * GetPath();
 		bool IsAutonomousNavigationActive();
+		bool IsTurningLeft();
+		bool IsTurningRight();
 		glm::mat4 GetCameraViewMatrix();
 		glm::mat4 GetProjectionMatrix();
 		glm::mat4 GetOrthoMatrix();

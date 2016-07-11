@@ -157,7 +157,7 @@ int renderScene() {
 	
 	//Create Planes Before Drawing any new windows
 	//PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
-	PlaneGenerator::generatePlane170Degree(widthOfAirspace, AircraftScale::small);
+	PlaneGenerator::generate1Plane(widthOfAirspace, AircraftScale::small, 160);
     myplanes = PlaneGenerator::getPlanes();	
 
 	// we have to create openCV windows in this thread!
@@ -176,7 +176,7 @@ int renderScene() {
 
 	// create camera and path for camera (our plane)
 	float scale = widthOfAirspace / 4000.0; // 4000 was default width of airspace
-	camera = Camera(width, height, scale*glm::vec3(0.0f, 0.0f, 475.0f));
+	camera = Camera(width, height, scale*glm::vec3(0.0f, 0.0f, 50.0f));
 	camera.SetPath(pathHelper->GetStraightLine());
 	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));

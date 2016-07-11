@@ -83,6 +83,14 @@ bool Camera::IsAutonomousNavigationActive()
 	return this->autonomousModeActive;
 }
 
+bool Camera::IsTurningLeft() {
+	return this->roll > 0;
+}
+
+bool Camera::IsTurningRight() {
+	return this->roll < 0;
+}
+
 glm::mat4 Camera::GetCameraViewMatrix()
 {
 	glm::mat4 view; //rotate camera appropriately
