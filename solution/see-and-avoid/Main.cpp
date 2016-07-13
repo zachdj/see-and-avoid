@@ -65,13 +65,13 @@ void on_trackbar(int, void*);
 vector< Mat> planePaths;
 vector<Mat> PlanePathMatrices;
 int planeSelection = 0;
-int widthOfAirspace = 4000;
+int widthOfAirspace = 2000;
 
 vector< Aircraft*> myplanes; // planes to render
 Camera camera; // camera object
-DoNothingAvoidance ai = DoNothingAvoidance();
+//DoNothingAvoidance ai = DoNothingAvoidance();
 //AvoidanceDistanceAgnostic ai = AvoidanceDistanceAgnostic();
-//AvoidanceWithDistance ai = AvoidanceWithDistance();
+AvoidanceWithDistance ai = AvoidanceWithDistance();
 
 /***************************** End forward declarations ********************************************************/
 
@@ -157,7 +157,7 @@ int renderScene() {
 	
 	//Create Planes Before Drawing any new windows
 	//PlaneGenerator planeGenerator(RANDOM, widthOfAirspace);
-	PlaneGenerator::generate1Plane(widthOfAirspace, AircraftScale::small, 160);
+	PlaneGenerator::generateAirportPlanes(widthOfAirspace);
     myplanes = PlaneGenerator::getPlanes();	
 
 	// we have to create openCV windows in this thread!
@@ -177,7 +177,7 @@ int renderScene() {
 	// create camera and path for camera (our plane)
 	float scale = widthOfAirspace / 4000.0; // 4000 was default width of airspace
 	camera = Camera(width, height, scale*glm::vec3(0.0f, 0.0f, 50.0f));
-	camera.SetPath(pathHelper->GetStraightLine());
+	camera.SetPath(pathHelper->GetAirportPath());
 	camera.ActivateAutonomousMode();
 	//camera.GetPath()->SetAvoidanceWaypoint(new Waypoint(glm::vec3(-100.0f, 0.0f, -1100.0f)));
 

@@ -14,6 +14,8 @@ within the test environment. We will claim this to be our own aircraft.
 
 #include <iostream>
 #include <algorithm>
+#include <time.h>
+#include <ctime>
 using namespace std;
 
 #include "Path.h"

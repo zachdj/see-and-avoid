@@ -61,7 +61,7 @@ void AvoidanceWithDistance::reactToBlob(BlobInfo info, Camera & camera) {
 
 			double theta = acos(glm::dot(direction, glm::vec3(0.0f, 0.0f, 1.0f)));
 			glm::vec3 newWayPos = position;
-			if (theta > 2.5 || theta < 0.6) {
+			if (theta > 2.4 || theta < 0.8) {
 				if (info.currentPositionX <= SCREENW/2 && info.deltaX >= 0) {
 					//if blob is on the left and moving right
 					if (!camera.IsTurningLeft()) {

@@ -188,6 +188,10 @@ void Camera::DoAutonomousMovement(GLfloat timeDelta) {
 		//check if we've ticked off an active waypoint
 		if (glm::length(vectorToObject) < completionRadius) {
 			if (active->Equals(this->GetPath()->GetNextPathWaypoint())) {
+				time_t now = time(0);
+				tm *ltm = localtime(&now);
+				stringstream stream; stream << "Time: " << ltm->tm_hour << ":" << ltm->tm_min << ":" << 1 + ltm->tm_sec;
+				PrintToFile::print(stream.str());
 				stringstream num; num << waypointsCompleted;
 				PrintToFile::print("Completed waypoint... " + num.str());
 				waypointsCompleted++;
