@@ -17,7 +17,7 @@ determined to be a collision threat, an avoidance maneuver will be attempted.
 This work was done in accordance to "see and avoid" regulations set forth
 by Federal Aviation Administration (FAA). The system is intended for use 
 as a secondary avoidance system. Other systems including use of TCAS or ADS-B
-provide additional information needed for properely efficient avoidance.  
+provide additional information needed for efficient avoidance.  
 
 The project has been supported by the NSF REU site at Auburn University 2016.
 
@@ -30,7 +30,7 @@ Build the project in x86 Release mode. OpenCV does not allow run in Debug
 mode due to a missing .dll file. 
 
 The project successfully links required files to the project in the project
-folders. There is no need to change envirnoment variables to link libraries to
+folders. There is no need to change environment variables to link libraries to
 the project. 
 
 ### Program Specifics ###
@@ -38,7 +38,7 @@ the project.
 - All units are based on the measurement of 1 foot
 - All speeds are in ft/s
 - Two threads are built: one for OpenGL Rendering, one for OpenCV Processing
-- The RANDOM variable at the top of main determines if planes are randomly generated
+
 
 
 ### Contribution guidelines ###

@@ -14,6 +14,8 @@ within the test environment. We will claim this to be our own aircraft.
 
 #include <iostream>
 #include <algorithm>
+#include <time.h>
+#include <ctime>
 using namespace std;
 
 #include "Path.h"
@@ -33,6 +35,8 @@ class Camera
 		void SetPath(Path * path);
 		Path * GetPath();
 		bool IsAutonomousNavigationActive();
+		bool IsTurningLeft();
+		bool IsTurningRight();
 		glm::mat4 GetCameraViewMatrix();
 		glm::mat4 GetProjectionMatrix();
 		glm::mat4 GetOrthoMatrix();

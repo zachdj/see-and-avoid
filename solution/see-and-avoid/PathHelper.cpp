@@ -57,3 +57,18 @@ Path* PathHelper::GetStraightLine() {
 	waypoints.push_back(new Waypoint(this->scale*glm::vec3(0.0f, 0.0f, -5000.0f)));
 	return new Path(waypoints, 40.0f);
 }
+
+//path through airport space
+Path * PathHelper::GetAirportPath() {
+	vector<Waypoint *> waypoints;
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(-1900.0f, 0.0f, -1900.0f)));
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(1900.0f, 0.0f, 1900.0f)));
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(-1900.0f, 0.0f, -1900.0f)));
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(-1900.0f, 0.0f, 1900.0f)));
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(1900.0f, 0.0f, -1900.0f)));
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(-1900.0f, 0.0f, 1900.0f)));
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(-1900.0f, 0.0f, 0.0f)));
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(1900.0f, 0.0f, 0.0f)));
+	waypoints.push_back(new Waypoint(this->scale*glm::vec3(-1900.0f, 0.0f, 0.0f)));
+	return new Path(waypoints, 40.0f);
+}

@@ -13,6 +13,7 @@ public:
 	Path* GetCircularPath();
 	Path* GetFigureEightPath();
 	Path* GetStraightLine();
+	Path* GetAirportPath();
 
 private:
 	GLfloat scale;
