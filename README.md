@@ -38,7 +38,7 @@ the project.
 - All units are based on the measurement of 1 foot
 - All speeds are in ft/s
 - Two threads are built: one for OpenGL Rendering, one for OpenCV Processing
-- The RANDOM variable at the top of main determines if planes are randomly generated
+
 
 
 ### Contribution guidelines ###
