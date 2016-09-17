@@ -2,7 +2,9 @@
 
 Project created by Andy Morgan and Zach Jones
 Auburn REU on SMART UAVs 2016
+
 Research Coordinator: Dr. Richard Chapman
+
 REU Director: Dr. Saad Biaz
 
 ### What is this repository for? ###
@@ -37,7 +39,7 @@ the project.
 
 - All units are based on the measurement of 1 foot
 - All speeds are in ft/s
-- Two threads are built: one for OpenGL Rendering, one for OpenCV Processing
+- Two threads run in parallel: one for OpenGL Rendering, one for OpenCV Processing
 
 
 
