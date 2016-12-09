@@ -26,14 +26,23 @@ The project has been supported by the NSF REU site at Auburn University 2016.
 ### How do I get set up? ###
 
 To get started, download and install the latest version of MS Visual Studio. 
-This project was created in MSVC 2015 Update 2. The solution contains 
-required OpenCV and OpenGL library files. To run, open the .sln file.
-Build the project in x86 Release mode. OpenCV does not allow run in Debug
-mode due to a missing .dll file. 
+This project was created in MSVC 2015 Update 2 and has been successfully
+run on Update 1 and Update 3. The solution contains required OpenCV and OpenGL 
+library files. To run, open the .sln file. Build the project in x86 Release mode.
+OpenCV does not allow run in Debug mode due to a missing .dll file (that CMake
+cannot build). 
 
 The project successfully links required files to the project in the project
-folders. There is no need to change environment variables to link libraries to
-the project. 
+folders. There is one Environment value you will need to change in Visual Studio.
+Source control does not track this variable since it is unique to each user. 
+
+To change the required variable, do:
+- Make sure you have "see-and'avoid" selected in the Solution Explorer (ensures proper change of properties)
+- Project -> Properties
+- Debugging -> Environment -> Edit
+- In the top text field insert:
+	 PATH=%PATH%;$(ProjectDir)dlls;
+NOTE: The Evaluated value field will update. Click OK and save. Compile using x86 Release.
 
 ### Program Specifics ###
 
