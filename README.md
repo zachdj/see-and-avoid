@@ -37,11 +37,13 @@ folders. There is one Environment value you will need to change in Visual Studio
 Source control does not track this variable since it is unique to each user. 
 
 To change the required variable, do:
+
 - Make sure you have "see-and'avoid" selected in the Solution Explorer (ensures proper change of properties)
 - Project -> Properties
 - Debugging -> Environment -> Edit
 - In the top text field insert:
 	 PATH=%PATH%;$(ProjectDir)dlls;
+
 NOTE: The Evaluated value field will update. Click OK and save. Compile using x86 Release.
 
 ### Program Specifics ###
