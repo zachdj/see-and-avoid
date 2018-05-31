@@ -1,4 +1,4 @@
-# README #
+# See and Avoid #
 
 Project created by Andy Morgan and Zach Jones
 Auburn REU on SMART UAVs 2016
